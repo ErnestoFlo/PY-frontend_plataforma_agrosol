@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .services import api_client
+from .services import api_client, proveedores
+from .forms import *
 
 ########## VISTAS DE EJEMPLO ##########
 def listar(request):
@@ -45,3 +46,35 @@ def editar(request, id):
 def eliminar(request, id):
     api_client.delete(id)
     return redirect("listar")
+
+########## VISTAS DE PROVEEDORES ##########
+def list_proveedores(request):
+    cliente = proveedores.get_all_proveedores()
+    return render(request, "proveedores/index_proveedores.html", {'lista': cliente["data"]})
+
+def create_proveedor(request):
+    if request.method == "POST":
+        form = form_proveedores(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            proveedores.create(form.cleaned_data)
+            return redirect("proveedores")
+    else:
+        form = form_proveedores()
+    return render(request, "proveedores/create_proveedor.html", {"form": form})
+
+def edit_proveedor(request, id):
+    form = None
+    if request.method == "POST":
+        form = form_proveedores(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            proveedores.update(id, form.cleaned_data)
+            return redirect("proveedores")
+    else:
+        cliente = proveedores.get_by_id(id)
+        form = form_proveedores(initial=cliente["data"])
+
+    return render(request, "proveedores/edit_proveedor.html", {"form": form})
+
+def delete_proveedor(request, id):
+    proveedores.delete(id)
+    return redirect("proveedores")
