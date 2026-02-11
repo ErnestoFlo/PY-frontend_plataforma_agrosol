@@ -1,0 +1,47 @@
+{% extends '../layouts/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <section class="vh-100 container-fluid">
+    <p class="h1">Editar Proveedor</p>
+
+    <form method="POST" class="row g-3">
+      {% csrf_token %}
+      <div class="col-md-6">
+        <label for="inputEmail4" class="form-label">Nombre de Proveedor</label>
+        {% render_field form.proveedor type="text" class="form-control" %}
+      </div>
+      <div class="col-md-6">
+        <label for="inputPassword4" class="form-label">Dirección</label>
+        {% render_field form.direccion type="text" class="form-control" %}
+      </div>
+      <div class="col-12">
+        <label for="inputAddress" class="form-label">Contacto</label>
+        {% render_field form.contacto type="text" class="form-control" %}
+      </div>
+      <div class="col-12">
+        <label for="inputAddress2" class="form-label">Cargo</label>
+        {% render_field form.cargo type="text" class="form-control" %}
+      </div>
+      <div class="col-md-3">
+        <label for="inputCity" class="form-label">Teléfono</label>
+        {% render_field form.telefono type="text" class="form-control" %}
+      </div>
+      <div class="col-md-3">
+        <label for="inputCity" class="form-label">Celular</label>
+        {% render_field form.celular type="text" class="form-control" %}
+      </div>
+      <div class="col-md-3">
+        <label for="inputZip" class="form-label">Email</label>
+        {% render_field form.email type="text" class="form-control" %}
+      </div>
+      <div class="col-md-2">
+        <label for="inputZip" class="form-label">Términos de Pago</label>
+        {% render_field form.terminos_de_pago type="text" class="form-control" %}
+      </div>
+      <div class="col-6">
+        <button type="submit" class="btn btn-primary">Enviar Edicion</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
