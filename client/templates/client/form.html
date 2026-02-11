@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario</title>
+</head>
+<body>
+    <h1>{{ cliente.proveedor|default:"Nuevo Proveedor" }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="proveedor" placeholder="Proveedor"
+               value="{{ cliente.proveedor|default:'' }}" required>
+
+        <input type="text" name="direccion" placeholder="direccion"
+               value="{{ cliente.direccion|default:'' }}" required>
+
+        <input type="text" name="contacto" placeholder="contacto"
+               value="{{ cliente.contacto|default:'' }}" required>
+               
+        <input type="text" name="cargo" placeholder="cargo"
+               value="{{ cliente.cargo|default:'' }}" required>
+               
+        <input type="text" name="telefono" placeholder="telefono"
+               value="{{ cliente.telefono|default:'' }}" required>
+               
+        <input type="text" name="celular" placeholder="celular"
+               value="{{ cliente.celular|default:'' }}" required>
+               
+        <input type="email" name="email" placeholder="email"
+               value="{{ cliente.email|default:'' }}" required>
+               
+        <input type="text" name="terminos_de_pago" placeholder="terminos_de_pago"
+               value="{{ cliente.terminos_de_pago|default:'' }}" required>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <a href="{% url 'listar' %}">Volver</a>
+</body>
+</html>

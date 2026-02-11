@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clientes</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Clientes</h1>
+    <a href="{% url 'crear' %}" class="btn">Nuevo Cliente</a>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Proveedor</th>
+            <th>Dirección</th>
+            <th>Contacto</th>
+            <th>Cargo</th>
+            <th>Teléfono</th>
+            <th>Celular</th>
+            <th>Email</th>
+            <th>Terminos de pago</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for c in cliente %}
+        <tr>
+            <td>{{ c.proveedoresID }}</td>
+            <td>{{ c.proveedor }}</td>
+            <td>{{ c.direccion }}</td>
+            <td>{{ c.contacto }}</td>
+            <td>{{ c.cargo }}</td>
+            <td>{{ c.telefono }}</td>
+            <td>{{ c.celular }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.terminos_de_pago }}</td>
+            <td>
+                <a href="{% url 'editar' c.proveedoresID %}">Editar</a>
+                <a href="{% url 'eliminar' c.proveedoresID %}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
