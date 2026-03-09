@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .services import api_client, proveedores
 from .forms import *
+from django.contrib.auth.decorators import login_required 
 
 ########## VISTAS DE EJEMPLO ##########
 def listar(request):
@@ -78,3 +79,8 @@ def edit_proveedor(request, id):
 def delete_proveedor(request, id):
     proveedores.delete(id)
     return redirect("proveedores")
+
+### Vista de prueba para login ###
+@login_required
+def principio (request):
+    return render(request, "login/principio.html")

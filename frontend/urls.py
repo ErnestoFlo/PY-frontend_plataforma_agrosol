@@ -20,5 +20,6 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('FPA/', include("client.urls"))
+    path('agrosol/', include("client.urls")),
+    path('auth/', include('django.contrib.auth.urls')), # ruta de autenticación para login
 ]
