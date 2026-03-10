@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     ### URLS DE EJEMPLO ###
@@ -14,5 +17,7 @@ urlpatterns = [
     path("proveedores/eliminar/<int:id>", views.delete_proveedor, name="proveedores_eliminar"),
 
     ### Pruebas de login ###
-    path("principio", views.principio, name="principio")
-]
+    path("principio/", views.principio, name="principio"),
+    path("perfil/", views.perfil, name="perfil")
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

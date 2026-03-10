@@ -79,17 +79,42 @@
       pointer-events: none;
     }
 
+    /* ── AVATAR ── */
+    .avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
     .avatar-ring {
-      width: 90px; height: 90px;
+      width: 100px; height: 100px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--verde), #16a34a);
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.2rem; font-weight: 800;
+      font-size: 2.4rem; font-weight: 800;
       color: #0a0f0a;
       box-shadow: 0 0 0 3px var(--fondo), 0 0 0 5px var(--verde-dim);
-      flex-shrink: 0;
+      overflow: hidden;
+      cursor: pointer;
+      transition: opacity .2s;
     }
-
+    .avatar-ring:hover { opacity: .85; }
+    .avatar-ring img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px; right: 2px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--verde);
+      color: #0a0f0a;
+      border: 2px solid var(--fondo);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem;
+      cursor: pointer;
+      transition: transform .2s;
+    }
+    .avatar-edit-btn:hover { transform: scale(1.15); }
     .profile-name {
       font-size: 2rem;
       font-weight: 800;
@@ -247,6 +272,96 @@
     .code-var     { color: #fde68a; }
     .code-str     { color: #86efac; }
 
+    /* ── MODAL DE EDICIÓN ── */
+    .modal-custom .modal-content {
+      background: var(--card);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      color: var(--texto);
+    }
+    .modal-custom .modal-header {
+      border-bottom: 1px solid var(--borde);
+      padding: 1.25rem 1.5rem;
+    }
+    .modal-custom .modal-footer {
+      border-top: 1px solid var(--borde);
+    }
+    .form-label-custom {
+      font-family: 'DM Mono', monospace;
+      font-size: .7rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .4rem;
+    }
+    .form-control-custom {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      color: var(--texto);
+      font-size: .9rem;
+      padding: .55rem .85rem;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .form-control-custom:focus {
+      outline: none;
+      border-color: var(--verde);
+      background: rgba(74,222,128,.05);
+      color: var(--texto);
+    }
+    .btn-save {
+      background: var(--verde);
+      color: #0a0f0a;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: .85rem;
+      padding: .55rem 1.4rem;
+      transition: opacity .2s;
+    }
+    .btn-save:hover { opacity: .85; }
+    .btn-cancel {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      font-size: .85rem;
+      padding: .55rem 1.2rem;
+      transition: all .2s;
+    }
+    .btn-cancel:hover { color: var(--texto); border-color: var(--muted); }
+
+    /* ── CAMPOS EXTRA DEL PERFIL ── */
+    .profile-extra-field {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem 0;
+      border-bottom: 1px solid var(--borde);
+    }
+    .profile-extra-field:last-child { border-bottom: none; }
+    .profile-extra-icon {
+      color: var(--verde);
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .profile-extra-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      min-width: 80px;
+    }
+    .profile-extra-value {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--texto);
+    }
+
     /* ── ESTADO ONLINE ── */
     .status-dot {
       width: 10px; height: 10px;
@@ -323,17 +438,38 @@
     <div class="profile-hero fade-up">
       <div class="d-flex align-items-center gap-4 flex-wrap">
 
-        <!-- Avatar con iniciales -->
-        <div class="avatar-ring">
-          {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+        <!-- Avatar: imagen real o iniciales -->
+        <div class="avatar-wrapper">
+
+          <div class="avatar-ring" onclick="document.getElementById('modal-editar') && new bootstrap.Modal(document.getElementById('modal-editar')).show()">
+            {% if request.user.profile.avatar %}
+
+              <img src="{{ request.user.profile.avatar.url }}" alt="Avatar de {{ request.user.username }}">
+            {% else %}
+              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+            {% endif %}
+          </div>
+          <div class="avatar-edit-btn" data-bs-toggle="modal" data-bs-target="#modal-editar">
+            <i class="bi bi-pencil-fill"></i>
+          </div>
         </div>
 
-        <div>
+        <div class="flex-grow-1">
           <!-- Nombre completo o username si no tiene nombre -->
           <h1 class="profile-name">
             {{ request.user.get_full_name|default:request.user.username }}
           </h1>
-          <p class="profile-username mb-2">@{{ request.user.username }}</p>
+          <p class="profile-username mb-1">@{{ request.user.username }}</p>
+
+          <!-- Cargo del perfil extendido -->
+          {% if request.user.profile.cargo %}
+            <p style="color:var(--muted); font-size:.85rem; margin-bottom:.6rem;">
+              <i class="bi bi-briefcase me-1"></i>{{ request.user.profile.cargo }}
+              {% if request.user.profile.area %}
+                · <span style="color:var(--acento);">{{ request.user.profile.area }}</span>
+              {% endif %}
+            </p>
+          {% endif %}
 
           <!-- Badges de rol -->
           <div class="d-flex gap-2 flex-wrap">
@@ -362,6 +498,14 @@
             {% endif %}
           </div>
         </div>
+
+        <!-- Botón editar perfil -->
+        <div class="ms-auto">
+          <button class="btn-save" data-bs-toggle="modal" data-bs-target="#modal-editar">
+            <i class="bi bi-pencil-square me-1"></i>Editar Perfil
+          </button>
+        </div>
+
       </div>
     </div>
 
@@ -424,10 +568,57 @@
 
     </div>
 
-    <!-- ── FECHAS ── -->
-    <p class="section-title fade-up delay-2">Actividad</p>
+    <!-- ── CAMPOS EXTRA DEL PERFIL ── -->
+    <p class="section-title fade-up delay-2">Información del Perfil</p>
 
     <div class="row g-3 mb-4 fade-up delay-2">
+      <div class="col-md-6">
+        <div class="info-card">
+          <div class="profile-extra-field">
+            <i class="bi bi-briefcase profile-extra-icon"></i>
+            <span class="profile-extra-label">Cargo</span>
+            <span class="profile-extra-value">{{ request.user.profile.cargo|default:"—" }}</span>
+          </div>
+          <div class="profile-extra-field">
+            <i class="bi bi-building profile-extra-icon"></i>
+            <span class="profile-extra-label">Área</span>
+            <span class="profile-extra-value">{{ request.user.profile.area|default:"—" }}</span>
+          </div>
+          <div class="profile-extra-field">
+            <i class="bi bi-telephone profile-extra-icon"></i>
+            <span class="profile-extra-label">Teléfono</span>
+            <span class="profile-extra-value">{{ request.user.profile.telefono|default:"—" }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-card d-flex flex-column align-items-center justify-content-center text-center" style="gap:1rem;">
+          {% if request.user.profile.avatar.name %}
+            <img src="{{ request.user.profile.avatar.url }}"
+                 alt="Avatar"
+                 style="width:80px;height:80px;border-radius:50%;object-fit:cover;
+                        box-shadow:0 0 0 3px var(--fondo),0 0 0 5px var(--verde-dim);">
+            <p class="card-label" style="margin:0;">Foto de perfil actual</p>
+          {% else %}
+            <div style="width:80px;height:80px;border-radius:50%;
+                        background:linear-gradient(135deg,var(--verde),#16a34a);
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:2rem;font-weight:800;color:#0a0f0a;">
+              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+            </div>
+            <p class="card-label" style="margin:0;">Sin foto de perfil</p>
+          {% endif %}
+          <button class="btn-cancel" style="font-size:.75rem;" data-bs-toggle="modal" data-bs-target="#modal-editar">
+            <i class="bi bi-camera me-1"></i>Cambiar foto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FECHAS ── -->
+    <p class="section-title fade-up delay-3">Actividad</p>
+
+    <div class="row g-3 mb-4 fade-up delay-3">
       <div class="col-md-6">
         <div class="date-card">
           <i class="bi bi-calendar-plus date-icon"></i>
@@ -623,12 +814,25 @@
 
     <div class="code-block fade-up delay-5">
 {% verbatim %}
-<span class="code-comment">{# ── DATOS BÁSICOS ── #}</span>
+<span class="code-comment">{# ── DATOS BÁSICOS (User) ── #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.username</span>       <span class="code-tag">}}</span>  <span class="code-comment">{# ernesto123 #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.first_name</span>      <span class="code-tag">}}</span>  <span class="code-comment">{# Ernesto #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.last_name</span>       <span class="code-tag">}}</span>  <span class="code-comment">{# Flores #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.email</span>           <span class="code-tag">}}</span>  <span class="code-comment">{# e@agrosol.com #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.get_full_name</span>   <span class="code-tag">}}</span>  <span class="code-comment">{# Ernesto Flores #}</span>
+
+<span class="code-comment">{# ── PERFIL EXTENDIDO (UserProfile) ── #}</span>
+<span class="code-tag">{{</span> <span class="code-var">request.user.profile.cargo</span>    <span class="code-tag">}}</span>  <span class="code-comment">{# Analista #}</span>
+<span class="code-tag">{{</span> <span class="code-var">request.user.profile.area</span>     <span class="code-tag">}}</span>  <span class="code-comment">{# Ventas #}</span>
+<span class="code-tag">{{</span> <span class="code-var">request.user.profile.telefono</span> <span class="code-tag">}}</span>  <span class="code-comment">{# +504 9999-9999 #}</span>
+<span class="code-tag">{{</span> <span class="code-var">request.user.profile.avatar.url</span> <span class="code-tag">}}</span>  <span class="code-comment">{# /media/avatars/foto.jpg #}</span>
+
+<span class="code-comment">{# ── AVATAR con fallback a iniciales ── #}</span>
+{% if <span class="code-var">request.user.profile.avatar.name</span> %}
+  &lt;img src="<span class="code-tag">{{</span> <span class="code-var">request.user.profile.avatar.url</span> <span class="code-tag">}}</span>"&gt;
+{% else %}
+  <span class="code-tag">{{</span> <span class="code-var">request.user.first_name|first|upper</span> <span class="code-tag">}}</span><span class="code-tag">{{</span> <span class="code-var">request.user.last_name|first|upper</span> <span class="code-tag">}}</span>
+{% endif %}
 
 <span class="code-comment">{# ── BOOLEANOS ── #}</span>
 <span class="code-tag">{{</span> <span class="code-var">request.user.is_authenticated</span> <span class="code-tag">}}</span>
@@ -662,6 +866,130 @@
     {% endif %}
 
   </main>
+
+
+  <!-- ══════════════════════════════════════════
+       MODAL — EDITAR PERFIL
+       Vista requerida: POST a {% url 'perfil' %}
+       con enctype="multipart/form-data"
+  ══════════════════════════════════════════ -->
+  {% if request.user.is_authenticated %}
+  <div class="modal fade modal-custom" id="modal-editar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:700; font-size:1.1rem;">
+            <i class="bi bi-person-gear me-2" style="color:var(--verde);"></i>
+            Editar Perfil
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form method="POST" action="{% url 'perfil' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="modal-body p-4">
+
+            <!-- Avatar actual + input de nueva imagen -->
+            <div class="d-flex align-items-center gap-4 mb-4 pb-4" style="border-bottom:1px solid var(--borde);">
+              <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;
+                          background:linear-gradient(135deg,var(--verde),#16a34a);
+                          display:flex;align-items:center;justify-content:center;
+                          font-size:1.8rem;font-weight:800;color:#0a0f0a;flex-shrink:0;
+                          box-shadow:0 0 0 3px var(--fondo),0 0 0 4px var(--verde-dim);">
+                {% if request.user.profile.avatar %}
+                  <img src="{{ request.user.profile.avatar.url }}"
+                       style="width:100%;height:100%;object-fit:cover; display:block;" alt="Avatar">
+                {% else %}
+                  {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                {% endif %}
+              </div>
+              <div class="flex-grow-1">
+                <p class="form-label-custom mb-1">Foto de perfil</p>
+                <input type="file" name="avatar" accept="image/*"
+                       class="form-control-custom" style="padding:.4rem .7rem; cursor:pointer;">
+                <p style="color:var(--muted);font-size:.72rem;margin-top:.4rem;">
+                  JPG, PNG o GIF · Máximo 2MB
+                </p>
+              </div>
+            </div>
+
+            <div class="row g-3">
+
+              <!-- Nombre -->
+              <div class="col-md-6">
+                <p class="form-label-custom">Nombre</p>
+                <input type="text" name="first_name"
+                       value="{{ request.user.first_name }}"
+                       class="form-control-custom" placeholder="Tu nombre">
+              </div>
+
+              <!-- Apellido -->
+              <div class="col-md-6">
+                <p class="form-label-custom">Apellido</p>
+                <input type="text" name="last_name"
+                       value="{{ request.user.last_name }}"
+                       class="form-control-custom" placeholder="Tu apellido">
+              </div>
+
+              <!-- Email -->
+              <div class="col-12">
+                <p class="form-label-custom">Email</p>
+                <input type="email" name="email"
+                       value="{{ request.user.email }}"
+                       class="form-control-custom" placeholder="correo@agrosol.com">
+              </div>
+
+              <!-- Separador campos del perfil -->
+              <div class="col-12">
+                <p class="form-label-custom" style="margin-bottom:0; padding-top:.5rem;
+                   border-top:1px solid var(--borde); padding-top:1rem;">
+                  Datos adicionales
+                </p>
+              </div>
+
+              <!-- Cargo -->
+              <div class="col-md-6">
+                <p class="form-label-custom">Cargo</p>
+                <input type="text" name="cargo"
+                       value="{{ request.user.profile.cargo }}"
+                       class="form-control-custom" placeholder="Ej: Analista">
+              </div>
+
+              <!-- Área -->
+              <div class="col-md-6">
+                <p class="form-label-custom">Área</p>
+                <input type="text" name="area"
+                       value="{{ request.user.profile.area }}"
+                       class="form-control-custom" placeholder="Ej: Ventas">
+              </div>
+
+              <!-- Teléfono -->
+              <div class="col-md-6">
+                <p class="form-label-custom">Teléfono</p>
+                <input type="text" name="telefono"
+                       value="{{ request.user.profile.telefono }}"
+                       class="form-control-custom" placeholder="+504 9999-9999">
+              </div>
+
+            </div>
+          </div>
+
+          <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-save">
+              <i class="bi bi-check2 me-1"></i>Guardar Cambios
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   <footer>
     Agrosol · Sistema de Gestión · {{ request.user.username }}

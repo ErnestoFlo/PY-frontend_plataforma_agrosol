@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,3 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/agrosol/principio' # A dónde va el usuario DESPUÉS de hacer login exitoso
 LOGIN_URL = '/auth/login/' # A dónde redirige si intenta acceder a una página protegida sin login
 LOGOUT_REDIRECT_URL = '/auth/login' # A dónde va después de hacer logout
+
+############ Habilitar alojamiento de servidor de imágenes ###########
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '')
