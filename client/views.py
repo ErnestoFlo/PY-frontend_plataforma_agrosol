@@ -2,6 +2,11 @@ from django.shortcuts import render, redirect
 from .services import api_client, proveedores
 from .forms import *
 from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, redirect, get_object_or_404
+
 
 ########## VISTAS DE EJEMPLO ##########ç
 @login_required
@@ -91,8 +96,9 @@ def delete_proveedor(request, id):
 ### Vista de prueba para login ###
 @login_required
 def principio (request):
-    return render(request, "login/principio.html")
+    return render(request, "usuarios/principio.html")
 
+########## USUARIOS ##########
 @login_required
 def perfil(request):
     if request.method == "POST":
@@ -113,4 +119,97 @@ def perfil(request):
 
         return redirect('perfil')
 
-    return render(request, "login/principio.html")
+    return render(request, "usuarios/principio.html")
+
+# ── Decorador reutilizable para superusuarios ──
+def superuser_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not request.user.is_superuser:
+            raise PermissionDenied  # → 403
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+# ── LISTADO DE USUARIOS ──
+@superuser_required
+def lista_usuarios(request):
+    usuarios = User.objects.all().order_by('-date_joined')
+    return render(request, 'usuarios/lista.html', {
+        'usuarios': usuarios,
+        'total': usuarios.count(),
+        'activos': usuarios.filter(is_active=True).count(),
+        'staff': usuarios.filter(is_staff=True).count(),
+        'superusers': usuarios.filter(is_superuser=True).count(),
+    })
+
+
+# ── EDITAR USUARIO ──
+@superuser_required
+def editar_usuario(request, id):
+    usuario = get_object_or_404(User, id=id)
+
+    # Evitar que se edite a sí mismo desde aquí
+    if usuario == request.user:
+        return redirect('lista_usuarios')
+
+    if request.method == "POST":
+        usuario.first_name = request.POST.get('first_name', '')
+        usuario.last_name  = request.POST.get('last_name', '')
+        usuario.email = request.POST.get('email', '')
+        usuario.is_staff = 'is_staff'      in request.POST
+        usuario.is_superuser = 'is_superuser'  in request.POST
+        usuario.save()
+
+        # Datos del perfil extendido
+        usuario.profile.cargo = request.POST.get('cargo', '')
+        usuario.profile.area = request.POST.get('area', '')
+        usuario.profile.telefono = request.POST.get('telefono', '')
+        usuario.profile.save()
+
+        return redirect('lista_usuarios')
+
+    return render(request, 'usuarios/editar.html', {
+        'usuario': usuario
+    })
+
+
+# ── DESACTIVAR USUARIO (soft delete) ──
+@superuser_required
+def desactivar_usuario(request, id):
+    usuario = get_object_or_404(User, id=id)
+
+    # Protecciones importantes
+    if usuario == request.user:
+        return redirect('lista_usuarios')  # No puede desactivarse a sí mismo
+    if usuario.is_superuser:
+        return redirect('lista_usuarios')  # No puede desactivar a otro superusuario
+
+    if request.method == "POST":
+        usuario.is_active = False  # Soft delete — no borra, solo desactiva
+        usuario.save()
+        return redirect('lista_usuarios')
+
+    return render(request, 'usuarios/confirmar_desactivar.html', {
+        'usuario': usuario
+    })
+
+########## PÁGINA DE ERRORES ###########
+
+def error_400(request, exception=None):
+    return render(request, 'errors/400.html', status=400)
+
+def error_403(request, exception=None):
+    return render(request, 'errors/403.html', status=403)
+
+def error_404(request, exception=None):
+    return render(request, 'errors/404.html', status=404)
+
+def error_500(request):
+    return render(request, 'errors/500.html', status=500)
+
+from django.core.exceptions import SuspiciousOperation
+
+def test_400(request):
+    raise SuspiciousOperation("Prueba de error 400")

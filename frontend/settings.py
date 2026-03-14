@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-alya!*(=cktnyu17c6d*i(1l@m7b^9_^*hzr2=5cl$gd9k_s(@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -142,3 +142,8 @@ LOGOUT_REDIRECT_URL = '/auth/login' # A dónde va después de hacer logout
 ############ Habilitar alojamiento de servidor de imágenes ###########
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '')
+
+############ Seguridad de sesión ############
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True # La sesión muere cuando se cierra el navegador
+SESSION_COOKIE_AGE = 28800 # Tiempo máximo de sesión aunque haya actividad: 8 horas (en segundos)
+SESSION_SAVE_EVERY_REQUEST = True # Cada request renueva el tiempo de expiración

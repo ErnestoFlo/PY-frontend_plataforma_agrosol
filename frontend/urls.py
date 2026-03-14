@@ -24,10 +24,18 @@ from django.urls import path, include, re_path
 from django.views.static import serve         
 from django.contrib import admin
 
+handler400 = 'client.views.error_400'
+handler403 = 'client.views.error_403'
+handler404 = 'client.views.error_404'
+handler500 = 'client.views.error_500'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('agrosol/', include("client.urls")),
     path('auth/', include('django.contrib.auth.urls')), # ruta de autenticación para login
 
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

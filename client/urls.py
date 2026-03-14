@@ -16,8 +16,14 @@ urlpatterns = [
     path("proveedores/editar/<int:id>", views.edit_proveedor, name="proveedores_editar"),
     path("proveedores/eliminar/<int:id>", views.delete_proveedor, name="proveedores_eliminar"),
 
-    ### Pruebas de login ###
+    ### URLS DE LOGIN ###
     path("principio/", views.principio, name="principio"),
-    path("perfil/", views.perfil, name="perfil")
+
+    ### URLS DE USUARIOS ###
+    path("usuarios/", views.lista_usuarios, name="lista_usuarios"),
+    path("usuarios/editar/<int:id>/", views.editar_usuario, name="editar_usuario"),
+    path("usuarios/desactivar/<int:id>/", views.desactivar_usuario, name="desactivar_usuario"),
+    path("perfil/", views.perfil, name="perfil"),
+    path("test-400/", views.test_400, name="test_400"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
