@@ -26,4 +26,20 @@ urlpatterns = [
     path("perfil/", views.perfil, name="perfil"),
     path("test-400/", views.test_400, name="test_400"),
 
+    ### URLS DE PERMISOS ###
+    path("permisos/", views.panel_permisos, name="panel_permisos"),
+    path("permisos/grupos/crear/", views.grupo_crear, name="grupo_crear"),
+    path("permisos/grupos/<int:id>/eliminar/", views.grupo_eliminar, name="grupo_eliminar"),
+    path("permisos/grupos/<int:id>/", views.grupo_editar_permisos, name="grupo_editar_permisos"),
+    path("permisos/grupos/<int:id>/guardar/", views.grupo_guardar_permisos, name="grupo_guardar_permisos"),
+    path("permisos/grupos/<int:id>/usuarios/", views.grupo_asignar_usuario, name="grupo_asignar_usuario"),
+    path("prueba-tecnica/", views.prueba_tecnica, name="prueba_tecnica"),
+    # Módulos
+    # path("permisos/modulos/crear/", views.modulo_crear, name="modulo_crear"),
+    # path("permisos/modulos/<int:id>/eliminar/", views.modulo_eliminar, name="modulo_eliminar"),
+    # path("permisos/modulos/<int:modulo_id>/elementos/crear/", views.elemento_crear, name="elemento_crear"),
+    # path("permisos/elementos/<int:id>/eliminar/", views.elemento_eliminar, name="elemento_eliminar"),
+    # # Grupos — acceso a módulo (nivel 1)
+    # path("permisos/grupos/<int:id>/acceso/", views.grupo_guardar_acceso_modulo, name="grupo_guardar_acceso"),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

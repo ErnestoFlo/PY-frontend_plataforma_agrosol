@@ -607,11 +607,25 @@
         </a>
         {% endif %}
 
+        <!-- Solo superusuarios (gestion de permisos) -->
+        {% if request.user.is_superuser %}
+        <a href="{% url 'panel_permisos' %}" class="btn-nav" title="Permisos">
+          <i class="bi bi-shield-lock"></i>
+        </a>
+        {% endif %}
+
         <!-- Perfil — visible para todos -->
+        <a href="{% url 'prueba_tecnica' %}"
+          class="btn-nav" title="Prueba técnica">
+          <i class="bi bi-tools"></i>
+        </a>
+
         <a href="{% url 'perfil' %}"
           class="btn-nav {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}" title="Mi Perfil">
           <i class="bi bi-person"></i>
         </a>
+
+        
 
       </nav>
 

@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
-from .services import api_client, proveedores
 from .forms import *
+from .services import api_client, proveedores
 from django.contrib.auth.decorators import login_required 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Modulo, Componente, PermisoGrupo, get_permisos
+import json
 
 
 ########## VISTAS DE EJEMPLO ##########ç
@@ -213,3 +215,208 @@ from django.core.exceptions import SuspiciousOperation
 
 def test_400(request):
     raise SuspiciousOperation("Prueba de error 400")
+
+########## PERMISOS GRANULARES ###########
+
+# ── Decorador reutilizable para superusuarios ───────────────
+def superuser_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+# ════════════════════════════════════════════════════════════════
+#  PANEL PRINCIPAL — Lista de grupos con sus módulos
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+def panel_permisos(request):
+    grupos  = Group.objects.prefetch_related('permisos_granulares').all().order_by('name')
+    modulos = Modulo.objects.filter(activo=True).prefetch_related('componentes')
+    usuarios_sin_grupo = User.objects.filter(groups=None, is_active=True).exclude(is_superuser=True)
+
+    return render(request, 'permisos/panel.html', {
+        'grupos':              grupos,
+        'modulos':             modulos,
+        'usuarios_sin_grupo':  usuarios_sin_grupo,
+        'total_grupos':        grupos.count(),
+        'total_modulos':       modulos.count(),
+        'total_componentes':   Componente.objects.filter(activo=True).count(),
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+#  CREAR GRUPO
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+@require_POST
+def grupo_crear(request):
+    nombre = request.POST.get('nombre', '').strip()
+    if not nombre:
+        return JsonResponse({'success': False, 'error': 'El nombre es requerido.'}, status=400)
+    if Group.objects.filter(name=nombre).exists():
+        return JsonResponse({'success': False, 'error': f'El grupo "{nombre}" ya existe.'}, status=400)
+
+    grupo = Group.objects.create(name=nombre)
+    return JsonResponse({
+        'success': True,
+        'grupo': {'id': grupo.id, 'name': grupo.name}
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+#  ELIMINAR GRUPO
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+@require_POST
+def grupo_eliminar(request, id):
+    grupo = get_object_or_404(Group, id=id)
+    nombre = grupo.name
+    grupo.delete()
+    return JsonResponse({'success': True, 'nombre': nombre})
+
+
+# ════════════════════════════════════════════════════════════════
+#  EDITOR DE PERMISOS DE UN GRUPO
+#  Muestra todos los módulos y componentes con toggles
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+def grupo_editar_permisos(request, id):
+    grupo   = get_object_or_404(Group, id=id)
+    modulos = Modulo.objects.filter(activo=True).prefetch_related('componentes')
+
+    # Construir estructura de permisos actuales del grupo
+    permisos_actuales = {}
+    for perm in PermisoGrupo.objects.filter(group=grupo).select_related('componente'):
+        permisos_actuales[perm.componente.id] = {
+            'ver':  perm.puede_ver,
+            'usar': perm.puede_usar,
+        }
+
+    # Usuarios asignados a este grupo
+    usuarios_del_grupo = grupo.user_set.filter(is_active=True).select_related('profile')
+    # Usuarios disponibles para asignar
+    usuarios_disponibles = User.objects.filter(
+        is_active=True, is_superuser=False
+    ).exclude(groups=grupo).select_related('profile')
+
+    return render(request, 'permisos/editar_grupo.html', {
+        'grupo':                grupo,
+        'modulos':              modulos,
+        'permisos_actuales':    permisos_actuales,
+        'usuarios_del_grupo':   usuarios_del_grupo,
+        'usuarios_disponibles': usuarios_disponibles,
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+#  GUARDAR PERMISOS DE UN GRUPO (AJAX)
+#  Recibe JSON: { componente_id: { ver: bool, usar: bool }, ... }
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+@require_POST
+def grupo_guardar_permisos(request, id):
+    grupo = get_object_or_404(Group, id=id)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'JSON inválido.'}, status=400)
+
+    # Procesar cada componente enviado
+    actualizados = 0
+    for comp_id_str, perms in data.items():
+        try:
+            comp_id = int(comp_id_str)
+            comp    = Componente.objects.get(id=comp_id)
+        except (ValueError, Componente.DoesNotExist):
+            continue
+
+        PermisoGrupo.objects.update_or_create(
+            group=grupo,
+            componente=comp,
+            defaults={
+                'puede_ver':  perms.get('ver',  False),
+                'puede_usar': perms.get('usar', False),
+            }
+        )
+        actualizados += 1
+
+    return JsonResponse({
+        'success':     True,
+        'actualizados': actualizados,
+        'grupo':       grupo.name,
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+#  ASIGNAR USUARIO A GRUPO (AJAX)
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+@require_POST
+def grupo_asignar_usuario(request, id):
+    grupo    = get_object_or_404(Group, id=id)
+    user_id  = request.POST.get('user_id')
+    accion   = request.POST.get('accion', 'agregar')  # 'agregar' o 'quitar'
+
+    try:
+        usuario = User.objects.get(id=user_id, is_active=True)
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'}, status=404)
+
+    if accion == 'agregar':
+        usuario.groups.add(grupo)
+        msg = f'{usuario.username} agregado al grupo {grupo.name}'
+    else:
+        usuario.groups.remove(grupo)
+        msg = f'{usuario.username} removido del grupo {grupo.name}'
+
+    return JsonResponse({
+        'success': True,
+        'mensaje': msg,
+        'usuario': {
+            'id':       usuario.id,
+            'username': usuario.username,
+            'nombre':   usuario.get_full_name() or usuario.username,
+        }
+    })
+
+
+# ════════════════════════════════════════════════════════════════
+#  OBTENER PERMISOS DE UN GRUPO (para preview)
+# ════════════════════════════════════════════════════════════════
+@superuser_required
+def grupo_preview_permisos(request, id):
+    grupo   = get_object_or_404(Group, id=id)
+    modulos = Modulo.objects.filter(activo=True).prefetch_related('componentes')
+
+    resumen = []
+    for modulo in modulos:
+        componentes_info = []
+        for comp in modulo.componentes.filter(activo=True):
+            try:
+                perm = PermisoGrupo.objects.get(group=grupo, componente=comp)
+                ver  = perm.puede_ver
+                usar = perm.puede_usar
+            except PermisoGrupo.DoesNotExist:
+                ver = usar = False
+            componentes_info.append({
+                'nombre': comp.nombre,
+                'clave':  comp.clave,
+                'tipo':   comp.tipo,
+                'ver':    ver,
+                'usar':   usar,
+            })
+        resumen.append({
+            'modulo':       modulo.nombre,
+            'componentes':  componentes_info,
+        })
+
+    return JsonResponse({'success': True, 'grupo': grupo.name, 'resumen': resumen})
+
+@login_required
+def prueba_tecnica(request):
+    return render(request, 'permisos/prueba_tecnica.html')
