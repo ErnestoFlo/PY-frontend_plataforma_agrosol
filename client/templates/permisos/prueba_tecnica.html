@@ -216,6 +216,34 @@
     @keyframes rowhl { 0%,100%{background:transparent} 40%{background:rgba(74,222,128,.07)} }
 
     footer { border-top:1px solid var(--borde); padding:1.25rem 0; text-align:center; font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); margin-top:3rem; }
+
+    /* ── PERMISOS — estados visuales ── */
+    .perm-disabled {
+      opacity: .35 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      filter: grayscale(.6);
+    }
+    .perm-disabled-input {
+      opacity: .4 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+    }
+    .perm-card-disabled {
+      opacity: .3 !important;
+      pointer-events: none !important;
+      filter: grayscale(.5);
+      position: relative;
+    }
+    .perm-card-disabled::after {
+      content: 'Sin acceso';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: .75rem;
+      color: var(--muted); letter-spacing: .08em;
+      background: rgba(10,15,10,.5); border-radius: inherit;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -256,7 +284,8 @@
       <span class="cat-label cat-accion"><i class="bi bi-lightning-fill"></i>Acciones</span>
     </p>
 
-    <div class="panel-card accion-card fade-up d1">
+    {% if not permisos or permisos.seccion_acciones.ver %}
+    <div class="panel-card accion-card fade-up d1" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones"{% if permisos and not permisos.seccion_acciones.usar %} style="pointer-events:none;opacity:.5;"{% endif %}>
       <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accion-color);margin-bottom:1.25rem;">
         Botones de CRUD + acciones auxiliares — disparan peticiones al servidor
       </p>
@@ -265,28 +294,39 @@
       <div class="mb-4">
         <p class="field-label" style="margin-bottom:.75rem;">CRUD Principal</p>
         <div class="d-flex gap-2 flex-wrap">
-          <button class="btn-crear" onclick="accionToast('Crear', 'success')">
+          {% if not permisos or permisos.btn_crear.ver %}
+          <button class="btn-crear{% if permisos and not permisos.btn_crear.usar %} perm-disabled{% endif %}" data-permiso="btn_crear" data-tipo="accion" data-label="Botón Crear" {% if not permisos or permisos.btn_crear.usar %}onclick="accionToast('Crear', 'success')"{% endif %}>
             <i class="bi bi-plus-lg"></i>Crear
           </button>
-          <button class="btn-editar-a" onclick="accionToast('Editar', 'info')">
+          {% endif %}
+          {% if not permisos or permisos.btn_editar.ver %}
+          <button class="btn-editar-a{% if permisos and not permisos.btn_editar.usar %} perm-disabled{% endif %}" data-permiso="btn_editar" data-tipo="accion" data-label="Botón Editar" {% if not permisos or permisos.btn_editar.usar %}onclick="accionToast('Editar', 'info')"{% endif %}>
             <i class="bi bi-pencil"></i>Editar
           </button>
-          <button class="btn-eliminar-a" onclick="accionToast('Eliminar', 'error')">
+          {% endif %}
+          {% if not permisos or permisos.btn_eliminar.ver %}
+          <button class="btn-eliminar-a{% if permisos and not permisos.btn_eliminar.usar %} perm-disabled{% endif %}" data-permiso="btn_eliminar" data-tipo="accion" data-label="Botón Eliminar" {% if not permisos or permisos.btn_eliminar.usar %}onclick="accionToast('Eliminar', 'error')"{% endif %}>
             <i class="bi bi-trash3"></i>Eliminar
           </button>
-          <button class="btn-ver-a" onclick="accionToast('Ver detalle', 'warning')">
+          {% endif %}
+          {% if not permisos or permisos.btn_ver.ver %}
+          <button class="btn-ver-a{% if permisos and not permisos.btn_ver.usar %} perm-disabled{% endif %}" data-permiso="btn_ver" data-tipo="accion" data-label="Botón Ver" {% if not permisos or permisos.btn_ver.usar %}onclick="accionToast('Ver detalle', 'warning')"{% endif %}>
             <i class="bi bi-eye"></i>Ver
           </button>
-          <button class="btn-cancelar-a" onclick="accionToast('Cancelado', 'info')">
+          {% endif %}
+          {% if not permisos or permisos.btn_cancelar.ver %}
+          <button class="btn-cancelar-a{% if permisos and not permisos.btn_cancelar.usar %} perm-disabled{% endif %}" data-permiso="btn_cancelar" data-tipo="accion" data-label="Botón Cancelar" {% if not permisos or permisos.btn_cancelar.usar %}onclick="accionToast('Cancelado', 'info')"{% endif %}>
             <i class="bi bi-x-lg"></i>Cancelar
           </button>
+          {% endif %}
         </div>
       </div>
 
       <!-- Icon buttons inline -->
       <div>
         <p class="field-label" style="margin-bottom:.75rem;">Icon Buttons (acciones inline en tabla)</p>
-        <div class="d-flex gap-2 align-items-center flex-wrap">
+        {% if not permisos or permisos.btn_iconos.ver %}
+        <div class="d-flex gap-2 align-items-center flex-wrap{% if permisos and not permisos.btn_iconos.usar %} perm-card-disabled{% endif %}" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline">
           <button class="icon-btn edit" title="Editar" onclick="accionToast('Editar registro', 'info')">
             <i class="bi bi-pencil"></i>
           </button>
@@ -312,8 +352,10 @@
             ← Hover para ver estados
           </span>
         </div>
+        {% endif %}
       </div>
     </div>
+    {% endif %}
 
     <!-- ══════════════════════════════════════════
          SECCIÓN 2 — COMPONENTES
@@ -328,7 +370,8 @@
       <div class="col-lg-6">
 
         <!-- Textbox -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_textbox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_textbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_textbox" data-tipo="componente" data-label="Textbox">
           <p class="field-label">Textbox <span class="tipo-chip">texto</span></p>
           <input type="text" class="field-input" id="c-textbox"
                  placeholder="Escribe aquí..." oninput="actualizarTabla()">
@@ -336,9 +379,11 @@
             Input de texto libre · máx. 255 caracteres
           </p>
         </div>
+                {% endif %}
 
         <!-- Password -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_password.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_password.usar %} perm-card-disabled{% endif %}" data-permiso="c_password" data-tipo="componente" data-label="Password Textbox">
           <p class="field-label">Password Textbox <span class="tipo-chip">password</span></p>
           <div class="input-group-custom">
             <input type="password" class="field-input" id="c-password" placeholder="••••••••">
@@ -347,9 +392,11 @@
             </button>
           </div>
         </div>
+                {% endif %}
 
         <!-- Combobox -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_combobox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_combobox.usar %} perm-card-disabled{% endif %}" data-permiso="c_combobox" data-tipo="componente" data-label="Combobox / Select">
           <p class="field-label">Combobox / Select <span class="tipo-chip">select</span></p>
           <select class="field-input" id="c-combobox" onchange="actualizarTabla()">
             <option value="">Seleccionar categoría...</option>
@@ -360,15 +407,19 @@
             <option value="Software">Software</option>
           </select>
         </div>
+                {% endif %}
 
         <!-- Datepicker -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_datepicker.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_datepicker.usar %} perm-card-disabled{% endif %}" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker">
           <p class="field-label">Datepicker <span class="tipo-chip">fecha</span></p>
           <input type="date" class="field-input" id="c-datepicker" onchange="actualizarTabla()">
         </div>
+                {% endif %}
 
         <!-- Rangebox / Slider -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_range.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_range.usar %} perm-card-disabled{% endif %}" data-permiso="c_range" data-tipo="componente" data-label="Rangebox / Slider">
           <p class="field-label">Rangebox / Slider <span class="tipo-chip">rango</span></p>
           <div class="d-flex align-items-center gap-3">
             <input type="range" class="range-custom flex-grow-1" id="c-range"
@@ -380,6 +431,7 @@
             Rango 0–100 · valor actual: <span id="range-val-2" style="color:var(--verde);">45</span>
           </p>
         </div>
+                {% endif %}
 
       </div>
 
@@ -387,7 +439,8 @@
       <div class="col-lg-6">
 
         <!-- Searcher -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_searcher.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_searcher.usar %} perm-card-disabled{% endif %}" data-permiso="c_searcher" data-tipo="componente" data-label="Searcher">
           <p class="field-label">Searcher <span class="tipo-chip">búsqueda</span></p>
           <div class="search-wrapper">
             <i class="bi bi-search search-icon"></i>
@@ -400,9 +453,11 @@
             Búsqueda con sugerencias dinámicas
           </p>
         </div>
+                {% endif %}
 
         <!-- Checkboxes -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_checkbox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_checkbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_checkbox" data-tipo="componente" data-label="Checkboxes">
           <p class="field-label">Checkboxes <span class="tipo-chip">múltiple</span></p>
           <label class="check-custom">
             <input type="checkbox" id="c-check1" checked onchange="actualizarTabla()">
@@ -420,9 +475,11 @@
             <span class="check-text">Opción C — Pendiente</span>
           </label>
         </div>
+                {% endif %}
 
         <!-- Radiobuttons -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_radio.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_radio.usar %} perm-card-disabled{% endif %}" data-permiso="c_radio" data-tipo="componente" data-label="Radiobutton">
           <p class="field-label">Radiobutton <span class="tipo-chip">único</span></p>
           <label class="radio-custom">
             <input type="radio" name="c-radio" value="Alto" checked onchange="actualizarTabla()">
@@ -440,9 +497,11 @@
             <span class="check-text">Prioridad Baja</span>
           </label>
         </div>
+                {% endif %}
 
         <!-- Toggle / Switch -->
-        <div class="panel-card componente-card fade-up d2">
+        {% if not permisos or permisos.c_toggle.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_toggle.usar %} perm-card-disabled{% endif %}" data-permiso="c_toggle" data-tipo="componente" data-label="Toggle / Switch">
           <p class="field-label">Toggle / Switch <span class="tipo-chip">booleano</span></p>
           <div class="toggle-row">
             <div>
@@ -465,11 +524,13 @@
             </label>
           </div>
         </div>
+                {% endif %}
 
         <!-- Color picker + File upload en row -->
         <div class="row g-3">
           <div class="col-6">
-            <div class="panel-card componente-card fade-up d2">
+            {% if not permisos or permisos.c_color.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_color.usar %} perm-card-disabled{% endif %}" data-permiso="c_color" data-tipo="componente" data-label="Color Picker">
               <p class="field-label">Color Picker <span class="tipo-chip">color</span></p>
               <div class="color-input-wrap">
                 <input type="color" class="color-picker" id="c-color" value="#4ade80"
@@ -479,9 +540,11 @@
                        oninput="sincronizarColor(this.value)">
               </div>
             </div>
+                    {% endif %}
           </div>
           <div class="col-6">
-            <div class="panel-card componente-card fade-up d2">
+            {% if not permisos or permisos.c_file.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_file.usar %} perm-card-disabled{% endif %}" data-permiso="c_file" data-tipo="componente" data-label="File / Image Upload">
               <p class="field-label">File / Image <span class="tipo-chip">archivo</span></p>
               <div class="upload-zone" id="upload-zone"
                    ondragover="event.preventDefault();this.classList.add('dragover')"
@@ -497,6 +560,7 @@
               <input type="file" id="c-file" accept="image/*" style="display:none"
                      onchange="previewFile(this)">
             </div>
+                    {% endif %}
           </div>
         </div>
 
@@ -511,7 +575,8 @@
     </p>
 
     <!-- Barra de herramientas de la tabla -->
-    <div class="d-flex align-items-center justify-content-between mb-3 gap-3 flex-wrap fade-up d3">
+    {% if not permisos or permisos.barra_tabla.ver %}
+    <div class="d-flex align-items-center justify-content-between mb-3 gap-3 flex-wrap fade-up d3{% if permisos and not permisos.barra_tabla.usar %} perm-disabled{% endif %}" data-permiso="barra_tabla" data-tipo="accion" data-label="Barra de Herramientas Tabla">
       <div class="search-wrapper" style="max-width:280px;flex:1;">
         <i class="bi bi-search search-icon"></i>
         <input type="text" class="field-input search-input" id="tabla-search"
@@ -521,24 +586,28 @@
         <button class="btn-cancelar-a" onclick="resetearTabla()" style="font-size:.78rem;padding:.4rem .9rem;">
           <i class="bi bi-arrow-clockwise"></i>Reset
         </button>
-        <button class="btn-crear" onclick="agregarRegistro()" style="font-size:.78rem;padding:.4rem .9rem;">
+        {% if not permisos or permisos.btn_agregar_fila.ver %}
+        <button class="btn-crear{% if permisos and not permisos.btn_agregar_fila.usar %} perm-disabled{% endif %}" data-permiso="btn_agregar_fila" data-tipo="accion" data-label="Botón Agregar Fila" {% if not permisos or permisos.btn_agregar_fila.usar %}onclick="agregarRegistro()"{% endif %} style="font-size:.78rem;padding:.4rem .9rem;">
           <i class="bi bi-plus-lg"></i>Agregar fila
         </button>
+        {% endif %}
       </div>
     </div>
+    {% endif %}
 
-    <div class="table-card fade-up d3">
+    {% if not permisos or permisos.tabla_datos.ver %}
+    <div class="table-card fade-up d3" data-permiso="tabla_datos" data-tipo="dato" data-label="Tabla de Datos">
       <table class="table table-custom" id="tabla-datos">
         <thead>
           <tr>
             <th>#</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Fecha</th>
-            <th>Valor</th>
+            {% if not permisos or permisos.col_nombre.ver %}<th data-permiso="col_nombre" data-tipo="dato" data-label="Columna Nombre">Nombre</th>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<th data-permiso="col_categoria" data-tipo="dato" data-label="Columna Categoría">Categoría</th>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<th data-permiso="col_fecha" data-tipo="dato" data-label="Columna Fecha">Fecha</th>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<th data-permiso="col_valor" data-tipo="dato" data-label="Columna Valor">Valor</th>{% endif %}
             <th>Color</th>
-            <th>Prioridad</th>
-            <th>Estado</th>
+            {% if not permisos or permisos.col_prioridad.ver %}<th data-permiso="col_prioridad" data-tipo="dato" data-label="Columna Prioridad">Prioridad</th>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<th data-permiso="col_estado" data-tipo="dato" data-label="Columna Estado">Estado</th>{% endif %}
             <th>Notif.</th>
             <th></th>
           </tr>
@@ -547,61 +616,61 @@
           <!-- Datos ficticios iniciales -->
           <tr class="fila-dato">
             <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#001</td>
-            <td style="font-weight:600;">Proyecto Alpha</td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Software</span></td>
-            <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">12/01/2026</td>
-            <td style="font-family:'DM Mono',monospace;font-size:.78rem;">78</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Proyecto Alpha</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Software</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">12/01/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">78</td>{% endif %}
             <td><span class="color-dot" style="background:#4ade80;"></span></td>
-            <td><span class="status-badge s-revision">Alto</span></td>
-            <td><span class="status-badge s-activo">Activo</span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
             <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
             <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #001','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
           </tr>
           <tr class="fila-dato">
             <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#002</td>
-            <td style="font-weight:600;">Stock Herramientas</td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Herramientas</span></td>
-            <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">05/02/2026</td>
-            <td style="font-family:'DM Mono',monospace;font-size:.78rem;">32</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Stock Herramientas</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Herramientas</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">05/02/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">32</td>{% endif %}
             <td><span class="color-dot" style="background:#f87171;"></span></td>
-            <td><span class="status-badge s-pendiente">Medio</span></td>
-            <td><span class="status-badge s-pendiente">Pendiente</span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-pendiente">Medio</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-pendiente">Pendiente</span></td>{% endif %}
             <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
             <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #002','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
           </tr>
           <tr class="fila-dato">
             <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#003</td>
-            <td style="font-weight:600;">Lote Alimentos Q1</td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Alimentos</span></td>
-            <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">20/03/2026</td>
-            <td style="font-family:'DM Mono',monospace;font-size:.78rem;">91</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Lote Alimentos Q1</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Alimentos</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">20/03/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">91</td>{% endif %}
             <td><span class="color-dot" style="background:#fbbf24;"></span></td>
-            <td><span class="status-badge s-activo">Alto</span></td>
-            <td><span class="status-badge s-activo">Activo</span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-activo">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
             <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
             <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #003','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
           </tr>
           <tr class="fila-dato">
             <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#004</td>
-            <td style="font-weight:600;">Colección Ropa Verano</td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Ropa</span></td>
-            <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">01/04/2026</td>
-            <td style="font-family:'DM Mono',monospace;font-size:.78rem;">55</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Colección Ropa Verano</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Ropa</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">01/04/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">55</td>{% endif %}
             <td><span class="color-dot" style="background:#a78bfa;"></span></td>
-            <td><span class="status-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);">Bajo</span></td>
-            <td><span class="status-badge s-inactivo">Inactivo</span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);">Bajo</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-inactivo">Inactivo</span></td>{% endif %}
             <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
             <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #004','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
           </tr>
           <tr class="fila-dato">
             <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#005</td>
-            <td style="font-weight:600;">Dispositivos Electrónicos</td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Electrónica</span></td>
-            <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">14/03/2026</td>
-            <td style="font-family:'DM Mono',monospace;font-size:.78rem;">67</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Dispositivos Electrónicos</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Electrónica</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">14/03/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">67</td>{% endif %}
             <td><span class="color-dot" style="background:#60a5fa;"></span></td>
-            <td><span class="status-badge s-revision">Alto</span></td>
-            <td><span class="status-badge s-revision">Revisión</span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-revision">Revisión</span></td>{% endif %}
             <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
             <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #005','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
           </tr>
@@ -616,6 +685,7 @@
         </span>
       </div>
     </div>
+    {% endif %}
 
   </main>
 

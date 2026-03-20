@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Modulo, Componente, PermisoGrupo, get_permisos
+from .models import Modulo, Componente, PermisoGrupo, get_permisos, AccesoModulo, tiene_acceso_modulo, escanear_template, PermisoElemento, Elemento
 import json
 
 
@@ -138,14 +138,107 @@ def superuser_required(view_func):
 @superuser_required
 def lista_usuarios(request):
     usuarios = User.objects.all().order_by('-date_joined')
+    grupos   = Group.objects.all().order_by('name')  # ← necesario para el select del modal
     return render(request, 'usuarios/lista.html', {
-        'usuarios': usuarios,
-        'total': usuarios.count(),
-        'activos': usuarios.filter(is_active=True).count(),
-        'staff': usuarios.filter(is_staff=True).count(),
+        'usuarios':   usuarios,
+        'grupos':     grupos,             # ← pasar grupos al template
+        'total':      usuarios.count(),
+        'activos':    usuarios.filter(is_active=True).count(),
+        'staff':      usuarios.filter(is_staff=True).count(),
         'superusers': usuarios.filter(is_superuser=True).count(),
     })
 
+@superuser_required
+@require_POST
+def crear_usuario(request):
+    """
+    Crea un nuevo usuario desde el modal de la lista de usuarios.
+    Recibe multipart/form-data (para poder incluir avatar).
+    Retorna JSON.
+    """
+    username     = request.POST.get('username', '').strip()
+    first_name   = request.POST.get('first_name', '').strip()
+    last_name    = request.POST.get('last_name', '').strip()
+    email        = request.POST.get('email', '').strip()
+    password1    = request.POST.get('password1', '')
+    password2    = request.POST.get('password2', '')
+    cargo        = request.POST.get('cargo', '').strip()
+    area         = request.POST.get('area', '').strip()
+    telefono     = request.POST.get('telefono', '').strip()
+    is_staff     = request.POST.get('is_staff',     '0') == '1'
+    is_superuser = request.POST.get('is_superuser', '0') == '1'
+    grupo_id     = request.POST.get('grupo', '').strip()
+ 
+    # ── Validaciones ──
+    if not username:
+        return JsonResponse({'success': False, 'error': 'El username es obligatorio.'}, status=400)
+ 
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({'success': False, 'error': f'El username "{username}" ya está en uso.'}, status=400)
+ 
+    if not password1:
+        return JsonResponse({'success': False, 'error': 'La contraseña es obligatoria.'}, status=400)
+ 
+    if len(password1) < 8:
+        return JsonResponse({'success': False, 'error': 'La contraseña debe tener mínimo 8 caracteres.'}, status=400)
+ 
+    if password1 != password2:
+        return JsonResponse({'success': False, 'error': 'Las contraseñas no coinciden.'}, status=400)
+ 
+    if email and User.objects.filter(email=email).exists():
+        return JsonResponse({'success': False, 'error': f'El email "{email}" ya está en uso.'}, status=400)
+ 
+    # ── Crear el User ──
+    usuario = User.objects.create_user(
+        username=username,
+        password=password1,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+    )
+    usuario.is_staff     = is_staff
+    usuario.is_superuser = is_superuser
+    usuario.save()
+ 
+    # ── Actualizar perfil extendido ──
+    perfil = usuario.profile  # se crea automáticamente con la signal
+    perfil.cargo    = cargo
+    perfil.area     = area
+    perfil.telefono = telefono
+    if 'avatar' in request.FILES:
+        perfil.avatar = request.FILES['avatar']
+    perfil.save()
+ 
+    # ── Asignar grupo ──
+    if grupo_id:
+        try:
+            grupo = Group.objects.get(id=int(grupo_id))
+            usuario.groups.add(grupo)
+        except (Group.DoesNotExist, ValueError):
+            pass  # Si el grupo no existe, simplemente no se asigna
+ 
+    # ── Preparar respuesta ──
+    avatar_url = None
+    if perfil.avatar and perfil.avatar.name:
+        avatar_url = perfil.avatar.url
+ 
+    return JsonResponse({
+        'success': True,
+        'usuario': {
+            'id':          usuario.id,
+            'username':    usuario.username,
+            'first_name':  usuario.first_name,
+            'last_name':   usuario.last_name,
+            'full_name':   usuario.get_full_name() or usuario.username,
+            'email':       usuario.email,
+            'cargo':       perfil.cargo,
+            'area':        perfil.area,
+            'is_staff':    usuario.is_staff,
+            'is_superuser':usuario.is_superuser,
+            'avatar_url':  avatar_url,
+            'date_joined': usuario.date_joined.strftime('%d/%m/%Y'),
+        }
+    })
 
 # ── EDITAR USUARIO ──
 @superuser_required
@@ -229,24 +322,140 @@ def superuser_required(view_func):
     return wrapper
 
 
-# ════════════════════════════════════════════════════════════════
-#  PANEL PRINCIPAL — Lista de grupos con sus módulos
-# ════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════
+#  VISTAS A AGREGAR/REEMPLAZAR en client/views.py
+# ══════════════════════════════════════════════════════════════
+
+# 1. Reemplaza panel_permisos
 @superuser_required
 def panel_permisos(request):
-    grupos  = Group.objects.prefetch_related('permisos_granulares').all().order_by('name')
-    modulos = Modulo.objects.filter(activo=True).prefetch_related('componentes')
-    usuarios_sin_grupo = User.objects.filter(groups=None, is_active=True).exclude(is_superuser=True)
+    from django.contrib.auth.models import Group
+    grupos  = Group.objects.all().order_by('name').prefetch_related(
+        'user_set', 'accesos_modulos__modulo'
+    )
+    modulos = Modulo.objects.filter(activo=True).prefetch_related('accesos__group')
+    usuarios_activos = User.objects.filter(
+        is_active=True, is_superuser=False
+    ).order_by('first_name','username').select_related('profile').prefetch_related('groups')
+
+    usuarios_con_grupo = usuarios_activos.filter(groups__isnull=False).distinct()
+    usuarios_sin_grupo = usuarios_activos.filter(groups=None)
 
     return render(request, 'permisos/panel.html', {
-        'grupos':              grupos,
-        'modulos':             modulos,
-        'usuarios_sin_grupo':  usuarios_sin_grupo,
-        'total_grupos':        grupos.count(),
-        'total_modulos':       modulos.count(),
-        'total_componentes':   Componente.objects.filter(activo=True).count(),
+        'grupos':           grupos,
+        'modulos':          modulos,
+        'todos_usuarios':   usuarios_activos,
+        'lista_sin_grupo':  usuarios_sin_grupo,
+        'total_grupos':     grupos.count(),
+        'total_modulos':    modulos.count(),
+        'total_usuarios':   usuarios_activos.count(),
+        'usuarios_sin_grupo':  usuarios_sin_grupo.count(),
+        'usuarios_asignados':  usuarios_con_grupo.count(),
     })
 
+
+# 2. Agregar modulo_crear
+@superuser_required
+@require_POST
+def modulo_crear(request):
+    from django.utils.text import slugify
+    nombre   = request.POST.get('nombre','').strip()
+    icono    = request.POST.get('icono','bi-grid').strip()
+    url_name = request.POST.get('url_name','').strip()
+    desc     = request.POST.get('descripcion','').strip()
+
+    if not nombre:
+        return JsonResponse({'success':False,'error':'El nombre es requerido.'},status=400)
+
+    slug = slugify(nombre)
+    if Modulo.objects.filter(slug=slug).exists():
+        return JsonResponse({'success':False,'error':'Ya existe un módulo con ese nombre.'},status=400)
+
+    m = Modulo.objects.create(
+        nombre=nombre, slug=slug, icono=icono,
+        url_name=url_name, descripcion=desc,
+        orden=Modulo.objects.count()+1
+    )
+    return JsonResponse({'success':True,'modulo':{
+        'id':m.id,'nombre':m.nombre,'slug':m.slug,
+        'icono':m.icono,'url_name':m.url_name,'descripcion':m.descripcion,
+    }})
+
+
+# 3. Agregar modulo_eliminar
+@superuser_required
+@require_POST
+def modulo_eliminar(request, id):
+    modulo = get_object_or_404(Modulo, id=id)
+    nombre = modulo.nombre
+    modulo.delete()
+    return JsonResponse({'success':True,'nombre':nombre})
+
+
+# 4. Agregar grupo_gestionar_modulo (asignar/revocar acceso)
+@superuser_required
+@require_POST
+def grupo_gestionar_modulo(request, id):
+    from django.contrib.auth.models import Group
+    grupo    = get_object_or_404(Group, id=id)
+    modulo_id = request.POST.get('modulo_id','').strip()
+    accion    = request.POST.get('accion','asignar')
+
+    modulo = get_object_or_404(Modulo, id=modulo_id)
+
+    if accion == 'asignar':
+        AccesoModulo.objects.update_or_create(
+            group=grupo, modulo=modulo,
+            defaults={'tiene_acceso': True}
+        )
+        msg = f'Acceso a "{modulo.nombre}" concedido a {grupo.name}'
+    else:
+        AccesoModulo.objects.filter(group=grupo, modulo=modulo).delete()
+        msg = f'Acceso a "{modulo.nombre}" revocado de {grupo.name}'
+
+    return JsonResponse({
+        'success':     True,
+        'mensaje':     msg,
+        'modulo_icono': modulo.icono,
+    })
+
+@superuser_required
+@require_POST
+def modulo_editar(request, id):
+    from django.utils.text import slugify
+    modulo = get_object_or_404(Modulo, id=id)
+ 
+    nombre   = request.POST.get('nombre',      '').strip()
+    icono    = request.POST.get('icono',        modulo.icono).strip()
+    url_name = request.POST.get('url_name',     '').strip()
+    desc     = request.POST.get('descripcion',  '').strip()
+ 
+    if not nombre:
+        return JsonResponse({'success': False, 'error': 'El nombre es requerido.'}, status=400)
+ 
+    # Verificar que el nuevo nombre no colisione con otro módulo
+    nuevo_slug = slugify(nombre)
+    if Modulo.objects.filter(slug=nuevo_slug).exclude(id=id).exists():
+        return JsonResponse({'success': False, 'error': 'Ya existe un módulo con ese nombre.'}, status=400)
+ 
+    modulo.nombre      = nombre
+    modulo.slug        = nuevo_slug
+    modulo.icono       = icono or 'bi-grid'
+    modulo.url_name    = url_name
+    modulo.descripcion = desc
+    modulo.save()
+ 
+    return JsonResponse({
+        'success': True,
+        'modulo': {
+            'id':          modulo.id,
+            'nombre':      modulo.nombre,
+            'slug':        modulo.slug,
+            'icono':       modulo.icono,
+            'url_name':    modulo.url_name,
+            'descripcion': modulo.descripcion,
+        }
+    })
 
 # ════════════════════════════════════════════════════════════════
 #  CREAR GRUPO
@@ -358,31 +567,38 @@ def grupo_guardar_permisos(request, id):
 @superuser_required
 @require_POST
 def grupo_asignar_usuario(request, id):
-    grupo    = get_object_or_404(Group, id=id)
-    user_id  = request.POST.get('user_id')
-    accion   = request.POST.get('accion', 'agregar')  # 'agregar' o 'quitar'
-
+    grupo   = get_object_or_404(Group, id=id)
+    user_id = request.POST.get('user_id')
+    accion  = request.POST.get('accion', 'agregar')
+ 
     try:
         usuario = User.objects.get(id=user_id, is_active=True)
     except User.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Usuario no encontrado.'}, status=404)
-
+ 
     if accion == 'agregar':
+        # ── Regla: un usuario solo puede pertenecer a UN grupo ──
+        grupo_anterior = usuario.groups.first()
+        usuario.groups.clear()   # quita cualquier grupo previo
         usuario.groups.add(grupo)
-        msg = f'{usuario.username} agregado al grupo {grupo.name}'
+        msg = f'{usuario.username} asignado a {grupo.name}'
+        return JsonResponse({
+            'success': True,
+            'mensaje': msg,
+            'grupo_anterior': grupo_anterior.name if grupo_anterior and grupo_anterior.id != grupo.id else None,
+            'usuario': {
+                'id':       usuario.id,
+                'username': usuario.username,
+                'nombre':   usuario.get_full_name() or usuario.username,
+            }
+        })
     else:
         usuario.groups.remove(grupo)
-        msg = f'{usuario.username} removido del grupo {grupo.name}'
-
-    return JsonResponse({
-        'success': True,
-        'mensaje': msg,
-        'usuario': {
-            'id':       usuario.id,
-            'username': usuario.username,
-            'nombre':   usuario.get_full_name() or usuario.username,
-        }
-    })
+        msg = f'{usuario.username} removido de {grupo.name}'
+        return JsonResponse({'success': True, 'mensaje': msg, 'usuario': {
+            'id': usuario.id, 'username': usuario.username,
+            'nombre': usuario.get_full_name() or usuario.username,
+        }})
 
 
 # ════════════════════════════════════════════════════════════════
@@ -417,6 +633,113 @@ def grupo_preview_permisos(request, id):
 
     return JsonResponse({'success': True, 'grupo': grupo.name, 'resumen': resumen})
 
+########## Prueba tecnica ##########
 @login_required
 def prueba_tecnica(request):
-    return render(request, 'permisos/prueba_tecnica.html')
+    if not tiene_acceso_modulo(request.user, 'prueba_tecnica'):
+        raise PermissionDenied
+    
+    permisos = get_permisos(request.user, 'prueba_tecnica')
+    return render(request, 'permisos/prueba_tecnica.html', {'permisos': permisos})
+
+##### Control de elementos ######
+
+@superuser_required
+@require_POST
+def modulo_escanear(request, id):
+    # Escanea el template del módulo y registra automáticamente
+    # todos los elementos con data-permiso que encuentre.
+
+    modulo = get_object_or_404(Modulo, id=id)
+    resultado = escanear_template(modulo)
+ 
+    if 'error' in resultado:
+        return JsonResponse({'success': False, 'error': resultado['error']}, status=400)
+ 
+    return JsonResponse({
+        'success':    True,
+        'modulo':     modulo.nombre,
+        'creados':    resultado['creados'],
+        'existentes': resultado['existentes'],
+        'total':      resultado['total'],
+        'elementos':  [
+            {
+                'id':    e.id,
+                'clave': e.clave,
+                'tipo':  e.tipo,
+                'label': e.label,
+            }
+            for e in modulo.elementos.filter(activo=True).order_by('tipo', 'orden')
+        ],
+    })
+ 
+ 
+@superuser_required
+def modulo_elementos(request, id):
+    # Retorna los elementos de un módulo (para el panel de permisos).
+    # GET: devuelve elementos con los permisos del grupo indicado.
+
+    modulo   = get_object_or_404(Modulo, id=id)
+    grupo_id = request.GET.get('grupo_id')
+ 
+    elementos = modulo.elementos.filter(activo=True).order_by('tipo', 'orden')
+ 
+    data = []
+    for elem in elementos:
+        perm_data = {'ver': True, 'usar': True}  # default
+ 
+        if grupo_id:
+            try:
+                grupo = Group.objects.get(id=grupo_id)
+                perm  = PermisoElemento.objects.filter(
+                    group=grupo, elemento=elem
+                ).first()
+                if perm:
+                    perm_data = {'ver': perm.puede_ver, 'usar': perm.puede_usar}
+            except Group.DoesNotExist:
+                pass
+ 
+        data.append({
+            'id':    elem.id,
+            'clave': elem.clave,
+            'tipo':  elem.tipo,
+            'label': elem.label,
+            'ver':   perm_data['ver'],
+            'usar':  perm_data['usar'],
+        })
+ 
+    return JsonResponse({
+        'success':  True,
+        'modulo':   {'id': modulo.id, 'nombre': modulo.nombre},
+        'elementos': data,
+    })
+ 
+ 
+@superuser_required
+@require_POST
+def grupo_guardar_permisos_elemento(request, grupo_id, elemento_id):
+    # Guarda el permiso ver/usar de un elemento específico para un grupo.
+    # Llamado por el toggle en el panel — una petición por toggle.
+
+    grupo    = get_object_or_404(Group,    id=grupo_id)
+    elemento = get_object_or_404(Elemento, id=elemento_id)
+ 
+    puede_ver  = request.POST.get('puede_ver',  'false').lower() == 'true'
+    puede_usar = request.POST.get('puede_usar', 'false').lower() == 'true'
+ 
+    # Si puede_usar=True, puede_ver debe ser True también (lógica)
+    if puede_usar:
+        puede_ver = True
+ 
+    perm, _ = PermisoElemento.objects.update_or_create(
+        group=grupo, elemento=elemento,
+        defaults={'puede_ver': puede_ver, 'puede_usar': puede_usar}
+    )
+ 
+    return JsonResponse({
+        'success':   True,
+        'puede_ver': perm.puede_ver,
+        'puede_usar': perm.puede_usar,
+        'elemento':  elemento.label,
+        'grupo':     grupo.name,
+    })
