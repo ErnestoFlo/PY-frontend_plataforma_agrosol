@@ -1,0 +1,59 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef modal_trigger %}
+  <button type="{{ func_type|default:'button' }}"
+    class="btn {{ type }} {{ x_params }}"
+    data-action="openModal"
+    data-target="{{ modal_id }}"
+    hx-get="{{ url }}"
+    hx-target="#{{ modal_id }}-content"
+    hx-swap="innerHTML"
+    hx-trigger="click once">
+    {{ text }}
+  </button>
+{% endpartialdef %}
+
+{% partialdef modal %}
+  <div id="{{ modal_id }}"
+    class="modal-overlay hidden"
+    data-action="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="{{ modal_id }}-title">
+    <div class="modal-container card {{ size|default:'modal-md' }}">
+
+      <div class="modal-header">
+        <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
+          {{ title }}
+        </h2>
+        {% include "components/buttons.html#input_icon_button" with func_type='button' type='btn-icon-ghost-neutral' x_params='p-1 shrink-0' size='5' icon_name='icon-xmark-fill' action='closeModal' target=modal_id %}
+      </div>
+
+      <div id="{{ modal_id }}-content" class="modal-body">
+        <!-- HTMX inyecta aquí -->
+      </div>
+
+      {% if show_footer %}
+      <div class="modal-footer">
+        <button type="button"
+          class="btn btn-ghost text-sm"
+          data-action="closeModal"
+          data-target="{{ modal_id }}">
+          Cancelar
+        </button>
+        {% if confirm_url %}
+          <button type="button"
+            class="btn btn-primary text-sm"
+            hx-post="{{ confirm_url }}"
+            hx-target="#{{ modal_id }}-content"
+            hx-swap="innerHTML">
+            {{ confirm_text|default:'Confirmar' }}
+          </button>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+{% endpartialdef %}

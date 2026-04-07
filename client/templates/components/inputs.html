@@ -1,0 +1,147 @@
+{% load static %}
+{% load partials %}
+  
+{% partialdef input %}
+  <fieldset class="input-container {{ x_params }}">
+    <input type="{{ type }}" id="{{ name }}" class="input peer" placeholder=" ">
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
+  </fieldset>
+{% endpartialdef %}
+
+{% partialdef input_icon %}
+  <fieldset class="input-container {{ x_params }}">
+    <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} peer" placeholder=" ">
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
+    {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='input-button p-0 shrink-0' size='5' icon_name=icon %}
+  </fieldset>
+{% endpartialdef %}
+
+{% partialdef input_password %}
+  <fieldset class="input-container {{ x_params }}">
+    <input type="password" id="{{ name }}" class="input peer" placeholder=" ">
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
+      {{ label }}
+    </label>
+    {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='p-0 shrink-0' size='5' icon_name=icon action='togglePassword' target=name %}
+  </fieldset>
+{% endpartialdef %}
+
+{% partialdef input_combobox %}
+  <fieldset class="input-container {{ x_params }}" data-action="combobox"
+        hx-get="{{ url }}"
+        hx-trigger="click once"
+        hx-target="#{{ name }}-options"
+        hx-swap="innerHTML">    
+    <!-- Input visible que muestra la selección -->
+    <input 
+      type="text" id="{{ name }}" name="{{ name }}" class="input peer cursor-pointer caret-transparent" placeholder=" " readonly
+      data-action="comboboxToggle" data-target="{{ name }}">
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
+      {{ label }}
+    </label>
+    <!-- Icono de flecha -->
+    {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='p-0 shrink-0' size='5' icon_name=icon action='comboboxToggle' target=name %}
+    <!-- Combobox dropdown -->
+    {% include "partials/options_lists.html#combobox_dropdown" with name=name %}
+  </fieldset>
+{% endpartialdef %}
+
+{% partialdef input_range %}
+  <div class="range-container {{ x_params }}">
+    
+    <fieldset class="range-track-container">
+      <legend class="input-legend">{{ label }}</legend>
+      <label for="{{ name }}" class="input-label-static">{{ label }}</label>
+
+      <div class="range-wrapper" data-action="range" data-target="{{ name }}">
+        <!-- Track visual -->
+        <div class="range-track">
+          <div class="range-fill" id="{{ name }}-fill"></div>
+          <div class="range-thumb" id="{{ name }}-thumb"></div>
+        </div>
+        <!-- Input real invisible encima -->
+        <input 
+          type="range"
+          id="{{ name }}"
+          name="{{ name }}"
+          class="range-input-hidden"
+          min="{{ min|default:0 }}"
+          max="{{ max|default:100 }}"
+          value="{{ value|default:50 }}"
+          step="{{ step|default:1 }}"
+        >
+      </div>
+
+    </fieldset>
+
+    <!-- Labels inferiores -->
+    <div class="range-labels">
+      <span class="range-label-bounds">{{ min|default:0 }}</span>
+      <output id="{{ name }}-value" class="range-label-value">{{ value|default:50 }}</output>
+      <span class="range-label-bounds">{{ max|default:100 }}</span>
+    </div>
+
+  </div>
+{% endpartialdef %}
+
+{% partialdef input_checkbox %}
+
+  <div class=" group flex justify-end items-center {{ x_params }} relative gap-2">
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>
+    <input type="checkbox" class="opacity-0 absolute top-0 left-0 w-full h-full z-10" id="remember-me">
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-1">
+      <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }} opacity-0 group-has-checked:opacity-100 text-neutral-50 z-10">
+        <use href="{% static 'sprite.svg' %}#icon-check-fill"/>
+      </svg>
+    </div>
+  </div>
+  
+{% endpartialdef %}
+
+{% partialdef input_radiobutton %}
+  
+  <div class=" group flex justify-end items-center {{ x_params }} relative gap-2">
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>
+    <input type="radio" class="opacity-0 absolute w-full h-full" id="remember-me">
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded-full border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-0.5">
+    </div>
+  </div>  
+
+{% endpartialdef %}
+
+{% partialdef input_color %}
+  
+  <input type="color" name="" id="">
+
+{% endpartialdef %}
+
+{% partialdef input_file %}
+  <div class="file-picker {{ x_params }}" data-action="filePicker" data-target="{{ name }}">
+    <input type="file" id="{{ name }}" name="{{ name }}" class="hidden"
+      {% if multiple %}multiple{% endif %}
+      {% if accept %}accept="{{ accept }}"{% endif %}>
+    <div class="file-picker-zone" data-action="filePickerZone" data-target="{{ name }}">
+      <svg class="w-8 h-8 text-fg-muted">
+        <use href="{% static 'sprite.svg' %}#icon-file-regular"/>
+      </svg>
+      <p class="text-sm text-fg-muted text-center">
+        Arrastra archivos aquí o
+        <span class="text-fg-success font-semibold">selecciona</span>
+      </p>
+      {% if accept %}
+        <p class="text-xs text-fg-muted">{{ accept }}</p>
+      {% endif %}
+    </div>
+    <ul id="{{ name }}-files" class="file-list"></ul>
+  </div>
+{% endpartialdef %}

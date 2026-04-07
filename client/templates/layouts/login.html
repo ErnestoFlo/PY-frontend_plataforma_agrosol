@@ -1,0 +1,25 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+  <main class="w-full flex items-center justify-center h-screen px-20 max-w-screen relative overflow-hidden backdrop-blur-3xl">
+    <div class="card w-15/19 h-14/19 flex">
+      <div class="h-full w-3/5 p-3 border-r border-fg-body"></div>
+      <div class="h-full w-2/5 p-3">
+          <div class="h-full w-full flex flex-col items-center justify-center gap-16">
+            <h1 class="font-display text-3xl font-bold text-fg">Iniciar Sesión</h1>
+            <form class="flex flex-col gap-8 items-center">
+              {% include "components/inputs.html#input" with label_bg_color="surface-1" x_params="w-full" type='text' name='username_id' label='Usuario' %}
+              {% include "components/inputs.html#input_password" with label_bg_color="surface-1" x_params="w-full" name='password_id' label='Contraseña' icon='icon-open-eye-regular' %}
+
+              {% include "components/buttons.html#button" with func_type="submit" x_params="w-1/2" type='btn-primary' text='Ingresar' %}
+            </form>
+          </div>
+      </div>
+    </div>
+    <!-- <div class="absolute flex bottom-1 right-1 w-6/10 h-auto translate-y-2/19 translate-x-2/19 z-10 -scale-x-100">
+      <img src="{% static 'images/welcome_page.png' %}" alt="Arbol con raices" class="w-full h-auto brightness-90"/>
+    </div> -->
+  </main>
+  <img src="{% static 'images/welcome_bg.jpg' %}" alt="" class="absolute h-3/2 w-auto brightness-75 -z-50 top-0 left-0">
+{% endblock %}

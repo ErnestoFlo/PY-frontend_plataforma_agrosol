@@ -1,0 +1,29 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+  <header class="flex justify-between items-center w-36/37 h-auto fixed my-3 mx-10 px-8 py-3 z-50 backdrop-blur-lg rounded-full shadow-lg bg-surface-1/5">
+    <img src="{% static 'images/logo letras blancas icono color@4x-8.png' %}" alt="" class="w-auto h-7">
+    {% include "../components/navbar.html#navbar" %}
+    <div class="h-full flex items-center justify-center">
+      <span class="text-fg-inverted text-xs">
+        Version 1.0
+      </span>
+    </div>
+  </header>
+  <main class="w-full flex flex-nowrap items-center h-screen px-20 max-w-screen relative overflow-hidden backdrop-blur-3xl">
+    <div class="w-full h-full flex flex-col justify-center gap-16">
+      <div class="text-neutral-300 text-8xl font-display font-semibold">
+        De La <span class="text-neutral-100"><br>Mano</span>
+        Del<span class="text-neutral-100"><br> Agricultor</span>
+      </div>
+      {% include '../components/buttons.html#button' with type='btn-primary' x_params='w-30' text='Ingresar' %}
+    </div>
+    <div class="absolute flex bottom-1 right-1 w-6/10 h-auto translate-y-2/19 translate-x-2/19 z-10 -scale-x-100">
+      <img src="{% static 'images/welcome_page.png' %}" alt="Arbol con raices" class="w-full h-auto brightness-90"/>
+    </div>
+    <!-- <div class="highlight w-1/2 aspect-square bg-primary-200/40 blur-3xl bottom-1/2 left-2/3 -z-10"></div>
+    <div class="highlight w-1/2 aspect-square bg-accent-200/35 blur-3xl bottom-1/2 right-2/3 -z-10"></div> -->
+  </main>
+  <img src="{% static 'images/welcome_bg.jpg' %}" alt="" class="absolute h-3/2 w-auto brightness-75 -z-50 top-0 left-0">
+{% endblock %}

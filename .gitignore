@@ -1,0 +1,33 @@
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+# Entornos virtuales
+env/
+venv/
+ENV/
+venv/
+# Archivos de configuración locales y sensibles
+*.env
+local_settings.py
+# Archivos de bases de datos locales
+db.sqlite3
+# Archivos generados por Django
+*.log
+*.pot
+*.pyc
+# Cachés y archivos temporales
+*.cache
+*.pid
+# Archivos de migraciones (opcional, solo en desarrollo)
+**/migrations/**
+# Archivos del sistema operativo
+DS_Store
+# Archivos multimedia y estáticos generados
+media/
+staticfiles/
+# Configuración específica del editor
+vscode/
+idea/
+
+tailwindcss.exe

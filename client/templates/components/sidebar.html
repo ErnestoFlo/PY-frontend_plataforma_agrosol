@@ -1,0 +1,47 @@
+{% load static %}
+{% load partials %}
+  
+{% partialdef sidebar %}
+
+  <div class="card w-auto h-full flex flex-col justify-center items-between gap-8 p-0 py-3">
+    <div class="w-auto flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
+      {% include "components/buttons.html#icon_button" with func_type="button" type='btn-icon-ghost-neutral' size='6' icon_name='icon-bars-fill' action='collapseSidebar' target=name %}
+    </div>
+    <div class="w-auto flex-1 flex flex-nowrap flex-col items-start justify-start gap-1 overflow-hidden px-2">
+      <a href="{% url 'test_form_page' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-regular' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Pruebas formulario
+        </div>
+      </a>
+      <a href="{% url 'tests_page' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-fill' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Componentes
+        </div>
+      </a>
+      <a href="{% url 'dashboard' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-regular' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Dashboard
+        </div>
+      </a>
+      <a href="{% url 'proveedores' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-fill' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Proveedores
+        </div>
+      </a>
+      <a href="{% url 'dashboard' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Otra vista
+        </div>
+      </a>
+    </div>
+    <div class="w-full flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
+    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' action='toggleTheme' %}
+    </div>
+  </div>
+
+{% endpartialdef %}

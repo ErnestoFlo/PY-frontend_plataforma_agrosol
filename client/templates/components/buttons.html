@@ -1,0 +1,39 @@
+{% load static %}
+{% load partials %}
+  
+{% partialdef button %}
+  <button type="{{ func_type }}" class="btn {{ type }} {{ x_params }}"
+  {% if action %}data-action="{{ action }}"{% endif %}
+  {% if target %}data-target="{{ target }}"{% endif %}>{{ text }}</button>
+{% endpartialdef %}
+
+{% partialdef icon_button %}
+  <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
+  {% if action %}data-action="{{ action }}"{% endif %}
+  {% if target %}data-target="{{ target }}"{% endif %}>
+    <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }}">
+      <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
+    </svg>
+  </button>
+{% endpartialdef %}
+
+{% partialdef input_icon_button %}
+  <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
+  {% if action %}data-action="{{ action }}"{% endif %}
+  {% if target %}data-target="{{ target }}"{% endif %}>
+    <svg class="w-5 h-5 {{ x_icon_params }}">
+      <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
+    </svg>
+  </button>
+{% endpartialdef %}
+
+{% partialdef toggle_button %}
+  <button type="button"
+    class="toggle-btn {{ x_params }}"
+    data-action="toggle"
+    data-checked="{{ checked|default:'false' }}"
+    {% if target %}data-target="{{ target }}"{% endif %}
+    {% if name %}id="{{ name }}"{% endif %}>
+    <span class="toggle-thumb"></span>
+  </button>
+{% endpartialdef %}
