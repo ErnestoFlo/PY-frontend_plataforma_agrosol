@@ -1,4 +1,4 @@
-{% extends '../layouts/dashboard.html' %}
+{% extends '../layouts/pc_nav.html' %}
 {% load static %}
 
 {% block view %}
@@ -57,7 +57,7 @@
     {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' action='toggleTheme' %}
     {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-danger' size='6' icon_name='icon-home-regular' %}
 
-    {% include "components/inputs.html#input" with type='text' name='name' label='Input Label' %}
+    <!-- {% include "components/inputs.html#input" with type='text' name='name' label='Input Label' %} -->
     {% include "components/inputs.html#input_icon" with type='number' name='another_name' label='Input Label' icon='icon-sort-fill' %}
     {% include "components/inputs.html#input_icon" with type='text' name='fecha_hora' label='Fecha y Hora' icon='icon-date-fill' %}
     {% include "components/inputs.html#input_password" with name='another3_name' label='Input Label' icon='icon-open-eye-regular' %}

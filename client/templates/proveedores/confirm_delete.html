@@ -1,0 +1,12 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef delete_proveedor %}
+
+<section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+  <p class="text-fg-body mt-2 col-span-12">¿Está seguro de eliminar este elemento?</p>
+  <div class="flex justify-end gap-2 mt-2 col-span-12">
+    {% include "components/buttons.html#button" with func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target='modal-delete' %}
+    {% include 'components/buttons.html#button' with func_type='submit' type='btn-danger' text='Eliminar' hx_get=delete_url hx_target=table_body_id hx_swap="innerHTML" hx_trigger="click" %}      
+  </div>
+</section>

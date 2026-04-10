@@ -1,4 +1,38 @@
 {% load static %}
 {% load partials %}
-  
-{% partialdef button %}
+
+{% partialdef topbar %}
+<header class="card topbar h-full">
+  <!-- Logo -->
+  <a href="/" class="topbar-logo" aria-label="Ir al inicio">
+    <img src="{% static 'images/logo letras blancas icono color@4x-8.png' %}" alt="Agrosol" id="main-logo" class="h-7 w-auto">
+  </a>
+
+  <!-- Búsqueda -->
+  {% include 'components/inputs.html#input_search' with x_params='max-w-80 h-8' type='search' id='general_search' icon='icon-magnifyng-glass-fill' %}
+
+  <!-- Acciones -->
+  <nav class="topbar-actions" aria-label="Acciones de usuario">
+
+    <!-- Notificaciones -->
+    {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size='5' icon_name='icon-bell-regular' action='toggleNotifications' %}
+
+    <!-- Avatar con dropdown -->
+    <div class="relative rounded-full p-1" data-action="popoverContainer" style="z-index: 999;">
+      <button type="button relative"
+        class="topbar-avatar-btn"
+        data-action="togglePopover"
+        data-target="user-menu"
+        aria-haspopup="true"
+        aria-expanded="false">
+        {% include "components/avatars.html#avatar" with size='8' initials='A' user_img='cat_avatar.jpg' %}
+        <svg class="w-3 h-3 text-fg-muted" aria-hidden="true">
+          <use href="{% static 'sprite.svg' %}#icon-chevron-down-fill"/>
+        </svg>
+      </button>
+      {% include "components/popovers.html#user_menu" with popover_id='user-menu' username='SuperGato3000' role='Administrador' initials='A'  user_img='cat_avatar.jpg' %}
+    </div>
+  </nav>
+
+</header>
+{% endpartialdef %}

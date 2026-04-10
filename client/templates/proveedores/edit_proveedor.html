@@ -1,47 +1,41 @@
-{% extends '../layouts/dashboard.html' %}
+{% load static %}
+{% load partials %}
 {% load widget_tweaks %}
 
-{% block view %}
-  <section class="vh-100 container-fluid">
-    <p class="h1">Editar Proveedor</p>
+{% partialdef edit_form %}
+  <form method="POST" class="grid grid-cols-12 gap-x-6 gap-y-4"
+    hx-post="/agrosol/proveedores/editar/{{ proveedor_id }}"
+    hx-target="#tabla-prov-body"
+    hx-swap="innerHTML"
+    hx-on::after-request="if(event.detail.successful) { closeModal('modal-edit') }"
+    >
+    {% csrf_token %}
+      {# — Sección: Datos generales — #}
+      <div role="group" aria-labelledby="seccion-personal" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-personal" class="col-span-12 text-sm font-medium text-neutral-500"> Datos generales</p>
+        {% include "components/inputs.html#input" with field=form.proveedor x_params="col-span-12" name='proveedor' label='Nombre de Proveedor' type='text' %}
+        {% include "components/inputs.html#input" with field=form.direccion x_params="col-span-12" name='direccion' label='Dirección' type='text' %}
+        {% include "components/inputs.html#input" with field=form.contacto x_params="col-span-12" name='contacto' label='Contacto' type='text' %}
+        {% include "components/inputs.html#input" with field=form.cargo x_params="col-span-12" name='cargo' label='Cargo' type='text' %}
+      </div>
 
-    <form method="POST" class="row g-3">
-      {% csrf_token %}
-      <div class="col-md-6">
-        <label for="inputEmail4" class="form-label">Nombre de Proveedor</label>
-        {% render_field form.proveedor type="text" class="form-control" %}
+      {# — Sección: Contacto — #}
+      <div role="group" aria-labelledby="seccion-personal" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-personal" class="col-span-12 text-sm font-medium text-neutral-500"> Contacto </p>
+        {% include "components/inputs.html#input" with field=form.telefono x_params="col-span-12" name='telefono' label='Teléfono' type='text' %}
+        {% include "components/inputs.html#input" with field=form.celular x_params="col-span-12" name='celular' label='Celular' type='text' %}
+        {% include "components/inputs.html#input" with field=form.email x_params="col-span-12" name='email' label='Email' type='text' %}
       </div>
-      <div class="col-md-6">
-        <label for="inputPassword4" class="form-label">Dirección</label>
-        {% render_field form.direccion type="text" class="form-control" %}
+
+      {# — Sección: Otros — #}
+      <div role="group" aria-labelledby="seccion-personal" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-personal" class="col-span-12 text-sm font-medium text-neutral-500"> Otros</p>
+        {% include "components/inputs.html#input" with field=form.terminos_de_pago x_params="col-span-12" name='terminos-de-pago' label='Términos de Pago' type='text' %}
       </div>
-      <div class="col-12">
-        <label for="inputAddress" class="form-label">Contacto</label>
-        {% render_field form.contacto type="text" class="form-control" %}
+      
+      <div class="flex justify-end gap-2 mt-2 col-span-12">
+        {% include "components/buttons.html#button" with func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target='modal-edit' %}
+        {% include 'components/buttons.html#button' with func_type='submit' type='btn-primary' text='Editar' %}      
       </div>
-      <div class="col-12">
-        <label for="inputAddress2" class="form-label">Cargo</label>
-        {% render_field form.cargo type="text" class="form-control" %}
-      </div>
-      <div class="col-md-3">
-        <label for="inputCity" class="form-label">Teléfono</label>
-        {% render_field form.telefono type="text" class="form-control" %}
-      </div>
-      <div class="col-md-3">
-        <label for="inputCity" class="form-label">Celular</label>
-        {% render_field form.celular type="text" class="form-control" %}
-      </div>
-      <div class="col-md-3">
-        <label for="inputZip" class="form-label">Email</label>
-        {% render_field form.email type="text" class="form-control" %}
-      </div>
-      <div class="col-md-2">
-        <label for="inputZip" class="form-label">Términos de Pago</label>
-        {% render_field form.terminos_de_pago type="text" class="form-control" %}
-      </div>
-      <div class="col-6">
-        <button type="submit" class="btn btn-primary">Enviar Edicion</button>
-      </div>
-    </form>
-  </section>
-{% endblock %}
+  </form>
+{% endpartialdef %}

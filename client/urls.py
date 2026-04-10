@@ -11,7 +11,8 @@ urlpatterns = [
     path("proveedores/", views.list_proveedores, name="proveedores"),
     path("proveedores/crear", views.create_proveedor, name="proveedores_crear"),
     path("proveedores/editar/<int:id>", views.edit_proveedor, name="proveedores_editar"),
-    path("proveedores/eliminar/<int:id>", views.delete_proveedor, name="proveedores_eliminar"),
+    path("proveedores/confirm-delete/<int:id>/", views.confirm_delete, name="confirm_delete"),
+    path("proveedores/eliminar/<int:id>/", views.delete_proveedor, name="proveedores_eliminar"),
     ### URLS DE DISEÑO
     path("design/test_components/", views.tests_views, name="tests_page"),
     path("design/test_form/", views.tests_form, name="test_form_page"),

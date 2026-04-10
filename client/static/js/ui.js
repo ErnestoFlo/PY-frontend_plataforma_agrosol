@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showMonths: 1,
   });
   const theme = document.documentElement.getAttribute('data-theme')
-  updateThemeIcon(theme)
+  updateThemeAssets(theme)
 
   // *********** ASIGNACION DE EVENTOS ***********
   // ***** BOTONES *****
@@ -65,7 +65,22 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     input.addEventListener('change', () => renderFileList(inputId, input.files))
   })
-
+  // ***** POPOVERS *****
+  document.querySelectorAll('[data-action="togglePopover"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      togglePopover(e.currentTarget.dataset.target)
+    })
+  })
+  document.querySelectorAll('[data-action="closePopover"]').forEach(btn => {
+    btn.addEventListener('click', (e) => closePopover(e.currentTarget.dataset.target))
+  })
+  // Cerrar al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-action="popoverContainer"]')) {
+      document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
+    }
+  })
 
 
   // ***************   FUNCIONES   ***************
@@ -80,18 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('theme', next)
 
     // Actualiza el ícono del botón
-    updateThemeIcon(next)
+    updateThemeAssets(next)
   }
-  function updateThemeIcon(theme) {
+  function updateThemeAssets(theme) {
     const btn = document.querySelector('[data-action="toggleTheme"]')
+    const main_logo = document.querySelector('#main-logo')
     if (!btn) return
     const icon = btn.querySelector('use')
-    const sprite = btn.dataset.sprite
+    const sprite = btn.dataset.sprite;
+    console.log(icon)
     icon.setAttribute(
       'href',
       theme === 'dark'
         ? `${sprite}#icon-sun-regular`
         : `${sprite}#icon-moon-regular`
+    )
+    main_logo.setAttribute(
+      'src',
+      theme === 'dark'
+        ? '/static/images/logo letras blancas icono color@4x-8.png'
+        : '/static/images/Logo princiapal@4x-8.png'
     )
   }
 
@@ -183,12 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.classList.remove('hidden')
     document.body.style.overflow = 'hidden'
   }
-  function closeModal(modalId) {
-    const modal = document.getElementById(modalId)
-    if (!modal) return
-    modal.classList.add('hidden')
-    document.body.style.overflow = ''
-  }
+
 
   // File picker
   function renderFileList(inputId, files) {
@@ -209,4 +227,30 @@ document.addEventListener('DOMContentLoaded', () => {
       list.appendChild(li)
     })
   }
+
+  // Mostrar - Cerrar Popovers
+  function togglePopover(popoverId) {
+    const popover = document.getElementById(popoverId)
+    if (!popover) return
+    const isOpen = popover.dataset.open === 'true'
+    // Cierra todos los demás primero
+    document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
+    popover.setAttribute('data-open', isOpen ? 'false' : 'true')
+  }
+
+  function closePopover(popoverId) {
+    const popover = document.getElementById(popoverId)
+    if (!popover) return
+    popover.setAttribute('data-open', 'false')
+  }
+
+  window.closePopover = closePopover
 })
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId)
+    console.log("Se ejecutó");
+    if (!modal) return
+    modal.classList.add('hidden')
+    document.body.style.overflow = ''
+  }
+  window.closeModal = closeModal

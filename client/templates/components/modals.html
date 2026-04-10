@@ -1,19 +1,6 @@
 {% load static %}
 {% load partials %}
 
-{% partialdef modal_trigger %}
-  <button type="{{ func_type|default:'button' }}"
-    class="btn {{ type }} {{ x_params }}"
-    data-action="openModal"
-    data-target="{{ modal_id }}"
-    hx-get="{{ url }}"
-    hx-target="#{{ modal_id }}-content"
-    hx-swap="innerHTML"
-    hx-trigger="click once">
-    {{ text }}
-  </button>
-{% endpartialdef %}
-
 {% partialdef modal %}
   <div id="{{ modal_id }}"
     class="modal-overlay hidden"
@@ -22,7 +9,6 @@
     aria-modal="true"
     aria-labelledby="{{ modal_id }}-title">
     <div class="modal-container card {{ size|default:'modal-md' }}">
-
       <div class="modal-header">
         <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
           {{ title }}

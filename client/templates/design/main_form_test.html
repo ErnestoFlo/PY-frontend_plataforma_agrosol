@@ -1,4 +1,4 @@
-{% extends '../layouts/dashboard.html' %}
+{% extends '../layouts/pc_nav.html' %}
 {% load static %}
 
 {% block view %}
@@ -47,6 +47,8 @@
           <p id="seccion-direccion" class="col-span-12 text-sm font-medium text-neutral-500">Seleccione fotografía</p>
           {% include "components/inputs.html#input_file" with name='fotografia' accept='image/*'  x_params='col-span-12' %}
         </div>
+
+        {% include 'components/buttons.html#button' with func_type='submit' type='btn-primary' text='Editar' %}
         <div id="form-response" class="col-span-12"></div>
       </form>
     </div>

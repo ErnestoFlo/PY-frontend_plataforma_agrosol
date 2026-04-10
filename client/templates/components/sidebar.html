@@ -5,42 +5,90 @@
 
   <div class="card w-auto h-full flex flex-col justify-center items-between gap-8 p-0 py-3">
     <div class="w-auto flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
-      {% include "components/buttons.html#icon_button" with func_type="button" type='btn-icon-ghost-neutral' size='6' icon_name='icon-bars-fill' action='collapseSidebar' target=name %}
+      {% include "components/buttons.html#icon_button" with func_type="button" type='btn-icon-ghost-neutral' size='5' icon_name='icon-bars-fill' action='collapseSidebar' target=name %}
     </div>
-    <div class="w-auto flex-1 flex flex-nowrap flex-col items-start justify-start gap-1 overflow-hidden px-2">
+    <div class="w-auto flex-1 flex flex-nowrap flex-col items-start justify-center gap-2 overflow-hidden px-2">
+      {% if pagename == 'Main Form Test' %}
+      <a href="{% url 'test_form_page' %}" class="sidebar-item bg-primary-theme/15">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg" type='btn-icon-ghost-neutral' size='5' icon_name='icon-image-regular' %}
+        <div class="text-fg align-start font-medium font-sans whitespace-nowrap">
+          Pruebas formulario
+        </div>
+      </a>
+      {% else %}
       <a href="{% url 'test_form_page' %}" class="sidebar-item">
-        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-regular' %}
+        {% include "components/buttons.html#icon_button" with x_params="text-fg-body" type='btn-icon-ghost-neutral' size='5' icon_name='icon-image-regular' %}
         <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
           Pruebas formulario
         </div>
       </a>
+      {% endif %}
+      {% if pagename == 'Test & Views' %}
+      <a href="{% url 'tests_page' %}" class="sidebar-item bg-primary-theme/15">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg" type='btn-icon-ghost-neutral' size='5' icon_name='icon-date-regular' %}
+        <div class="text-fg align-start font-medium font-sans whitespace-nowrap">
+          Componentes
+        </div>
+      </a>
+      {% else %}
       <a href="{% url 'tests_page' %}" class="sidebar-item">
-        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-fill' %}
+        {% include "components/buttons.html#icon_button" with x_params="text-fg-body" type='btn-icon-ghost-neutral' size='5' icon_name='icon-date-regular' %}
         <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
           Componentes
         </div>
       </a>
+      {% endif %}
+
+      {% if pagename == 'Dashboard' %}
+      <a href="{% url 'dashboard' %}" class="sidebar-item bg-primary-theme/15">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg" type='btn-icon-ghost-neutral' size='5' icon_name='icon-file-regular' %}
+        <div class="text-fg align-start font-medium font-sans whitespace-nowrap">
+          Dashboard
+        </div>
+      </a>
+      {% else %}
       <a href="{% url 'dashboard' %}" class="sidebar-item">
-        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-regular' %}
+        {% include "components/buttons.html#icon_button" with x_params="text-fg-body" type='btn-icon-ghost-neutral' size='5' icon_name='icon-file-regular' %}
         <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
           Dashboard
         </div>
       </a>
+      {% endif %}
+
+      {% if pagename == 'Proveedores' %}
+      <a href="{% url 'proveedores' %}" class="sidebar-item bg-primary-theme/15">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg" type='btn-icon-ghost-neutral' size='5' icon_name='icon-pencil-regular' %}
+        <div class="text-fg align-start font-medium font-sans whitespace-nowrap">
+          Proveedores
+        </div>
+      </a>
+      {% else %}
       <a href="{% url 'proveedores' %}" class="sidebar-item">
-        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-fill' %}
+        {% include "components/buttons.html#icon_button" with x_params="text-fg-body" type='btn-icon-ghost-neutral' size='5' icon_name='icon-pencil-regular' %}
         <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
           Proveedores
         </div>
       </a>
-      <a href="{% url 'dashboard' %}" class="sidebar-item">
-        {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' %}
-        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
-          Otra vista
+      {% endif %}
+
+      {% if pagename == 'Dashboard' %}
+      <a href="{% url 'dashboard' %}" class="sidebar-item bg-primary-theme/15">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg" type='btn-icon-ghost-neutral' size='5' icon_name='icon-file-regular' %}
+        <div class="text-fg align-start font-medium font-sans whitespace-nowrap">
+          Dashboard
         </div>
       </a>
+      {% else %}
+      <a href="{% url 'dashboard' %}" class="sidebar-item">
+        {% include "components/buttons.html#icon_button" with x_params="text-fg-body" type='btn-icon-ghost-neutral' size='5' icon_name='icon-file-regular' %}
+        <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap">
+          Dashboard
+        </div>
+      </a>
+      {% endif %}
     </div>
     <div class="w-full flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' action='toggleTheme' %}
+    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='5' icon_name='icon-clipboard-fill' %}
     </div>
   </div>
 

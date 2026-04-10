@@ -35,6 +35,7 @@
   --color-primary-700: hsl(148 78% 18%);
   --color-primary-800: hsl(148 60% 13%);
   --color-primary-900: hsl(148 40% 9%);
+  --color-primary-theme: var(--color-success-400);
 
   /* Accent Tones */
   --color-accent-50:  hsl(40 12% 96%);
@@ -47,6 +48,7 @@
   --color-accent-700: hsl(40 78% 18%);
   --color-accent-800: hsl(40 60% 13%);
   --color-accent-900: hsl(40 40% 9%);
+  --color-accent-theme: var(--color-accent-400);
 
 /* Neutros */
   --color-neutral-50:  hsl(40 5% 90%);
@@ -209,17 +211,19 @@
     --shadow-up-xl:  0 20px 25px -5px hsla(40 5% 10% / 1), 0 8px 10px -6px hsla(40 5% 10% / 0.06);
 
     /* Fondos */
-  --color-surface-4:         var(--color-neutral-300);
-  --color-surface-3:         var(--color-neutral-100);
-  --color-bg:                var(--color-neutral-200);
-  --color-surface-1:         var(--color-neutral-100);
-  --color-surface-2:         var(--color-neutral-50);
+    --color-surface-4:         var(--color-neutral-300);
+    --color-surface-3:         var(--color-neutral-100);
+    --color-bg:                var(--color-neutral-200);
+    --color-surface-1:         var(--color-neutral-100);
+    --color-surface-2:         var(--color-neutral-50);
+    --color-accent-theme:      var(--color-accent-600);
+    --color-primary-theme:     var(--color-primary-600);
 
-  /* Textos */   
-  --color-fg:                var(--color-neutral-900); /* texto principal */
-  --color-fg-body:           var(--color-neutral-600); /* texto secundario */
-  --color-fg-muted:          var(--color-neutral-400); /* texto deshabilitado, placeholders */
-  --color-fg-inverted:       var(--color-neutral-50);  /* texto sobre fondos oscuros */
+    /* Textos */   
+    --color-fg:                var(--color-neutral-900); /* texto principal */
+    --color-fg-body:           var(--color-neutral-600); /* texto secundario */
+    --color-fg-muted:          var(--color-neutral-400); /* texto deshabilitado, placeholders */
+    --color-fg-inverted:       var(--color-neutral-50);  /* texto sobre fondos oscuros */
 
     /* Alertas */
     --color-surface-success: var(--color-success-100);
@@ -234,9 +238,9 @@
   [data-theme="dark"]{
     /* Sombras */
       --shadow-c-sm:  0 1px 2px 0 hsla(40 5% 95% / 0.2);
-			--shadow-c-md:  0 4px 6px -1px hsla(40 5% 95% / 0.5), 0 2px 4px -2px hsla(40 5% 95% / 0.2);
-			--shadow-c-lg:  0 10px 15px -3px hsla(40 5% 95% / 0.5), 0 4px 6px -4px hsla(40 5% 95% / 0.2);
-			--shadow-c-xl:  0 20px 25px -5px hsla(40 5% 95% / 0.5), 0 8px 10px -6px hsla(40 5% 95% / 0.2);
+			--shadow-c-md:  0 4px 10px -1px hsla(40 5% 95% / 0.1), 0 2px 8px -2px hsla(40 5% 95% / 0.05);
+			--shadow-c-lg:  0 10px 15px -3px hsla(40 5% 95% / 0.1), 0 4px 6px -4px hsla(40 5% 95% / 0.05);
+			--shadow-c-xl:  0 20px 25px -5px hsla(40 5% 95% / 0.1), 0 8px 10px -6px hsla(40 5% 95% / 0.05);
       --shadow-up-sm:  0 1px 2px 0 hsla(40 5% 95% / 1);
       --shadow-up-md:  0 2px 3px 0 hsla(40 5% 95% / 0.8);
       --shadow-up-lg:  0 10px 15px -3px hsla(40 5% 95% / 1), 0 4px 6px -4px hsla(40 5% 95% / 0.07);
@@ -247,6 +251,8 @@
       --color-bg:             var(--color-neutral-950);
       --color-surface-3:      var(--color-neutral-700);
       --color-surface-4:      var(--color-neutral-600);
+      --color-accent-theme:   var(--color-accent-400);
+      --color-primary-theme:  var(--color-primary-400);
 
       /* Textos — se invierten */
       --color-fg:             var(--color-neutral-50);  /* texto principal */
@@ -269,9 +275,9 @@
     :root:not([data-theme="light"]) {
       /* Sombras */
       --shadow-c-sm:  0 1px 2px 0 hsla(40 5% 95% / 0.2);
-			--shadow-c-md:  0 4px 6px -1px hsla(40 5% 95% / 0.5), 0 2px 4px -2px hsla(40 5% 95% / 0.2);
-			--shadow-c-lg:  0 10px 15px -3px hsla(40 5% 95% / 0.5), 0 4px 6px -4px hsla(40 5% 95% / 0.2);
-			--shadow-c-xl:  0 20px 25px -5px hsla(40 5% 95% / 0.5), 0 8px 10px -6px hsla(40 5% 95% / 0.2);
+			--shadow-c-md:  0 1px 10px -1px hsla(40 5% 95% / 0.1), 0 1px 8px -2px hsla(40 5% 95% / 0.05);
+			--shadow-c-lg:  0 10px 15px -3px hsla(40 5% 95% / 0.1), 0 4px 6px -4px hsla(40 5% 95% / 0.05);
+			--shadow-c-xl:  0 20px 25px -5px hsla(40 5% 95% / 0.1), 0 8px 10px -6px hsla(40 5% 95% / 0.05);
       --shadow-up-sm:  0 1px 2px 0 hsla(40 5% 95% / 1);
       --shadow-up-md:  0 2px 3px 0 hsla(40 5% 95% / 0.8);
       --shadow-up-lg:  0 10px 15px -3px hsla(40 5% 95% / 1), 0 4px 6px -4px hsla(40 5% 95% / 0.07);
@@ -282,6 +288,8 @@
       --color-bg:             var(--color-neutral-950);
       --color-surface-3:      var(--color-neutral-700);
       --color-surface-4:      var(--color-neutral-600);
+      --color-accent-theme:   var(--color-accent-400);
+      --color-primary-theme:  var(--color-primary-400);
 
       /* Textos — se invierten */
       --color-fg:             var(--color-neutral-50);  /* texto principal */
@@ -303,6 +311,10 @@
 }
 
 @layer components {
+  /* *{
+    @apply
+    transition-colors duration-200
+  } */
   /*
   ########## SCROLLBARS ##########
   */
@@ -391,7 +403,7 @@
     transition: border-color 200ms ease;
   }
   .input-container:focus-within {
-    @apply border-primary-500 focus-visible:shadow-input-success;
+    @apply border-primary-theme focus-visible:shadow-input-success;
   }
   .input{
     @apply
@@ -408,10 +420,10 @@
     /* invisible pero ocupa espacio en el borde */
   }
   .input-container:focus-within .btn-icon-ghost-neutral {
-    @apply text-primary-500;
+    @apply text-primary-theme;
   }
   .input-container:focus-within .input-label {
-    @apply text-primary-500;
+    @apply text-primary-theme;
   }
   .label-neutral{
     @apply
@@ -568,10 +580,10 @@
     @apply flex flex-col items-center justify-center gap-2 px-6 py-8
     border-2 border-dashed border-neutral-500 rounded-lg
     text-fg-muted cursor-pointer transition-colors
-    hover:border-primary-500 hover:bg-primary-500/5;
+    hover:border-primary-theme hover:bg-primary-500/5;
   }
   .file-picker-zone.drag-over {
-    @apply border-primary-500 bg-primary-500/10;
+    @apply border-primary-theme bg-primary-500/10;
   }
   .file-list {
     @apply flex flex-col gap-1;
@@ -590,20 +602,21 @@
   ########## CONTAINERS ##########
   */
   .card{
+    box-shadow: var(--shadow-c-md);
     @apply
-    relative px-6 py-5 bg-surface-1/60 backdrop-blur-xl shadow-md rounded-lg
+    relative px-6 py-5 bg-surface-1/55 backdrop-blur-xl rounded-xl;
   }
   .card-accent {
-    @apply border-l-2 border-l-primary-500;
+    @apply border-l-2 border-l-primary-theme;
   }
   .card-highlighted {
-    @apply border border-primary-500;
+    @apply border border-primary-theme;
   }
 
   /* SIDE BAR */
   .sidebar-item{
     @apply
-    w-full flex overflow-hidden flex-nowrap items-center gap-3 rounded-full py-1 px-1
+    w-full flex overflow-hidden flex-nowrap items-center gap-1 rounded-full py-1 px-1
     hover:bg-surface-3
     active:bg-surface-4
     focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2
@@ -616,7 +629,7 @@
     @apply relative w-11 h-6 rounded-full bg-neutral-400 transition-colors duration-200 cursor-pointer shrink-0;
   }
   .toggle-btn[data-checked="true"] {
-    @apply bg-primary-500;
+    @apply bg-primary-theme;
   }
   .toggle-thumb {
     @apply absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-neutral-100 shadow-sm transition-transform duration-200 pointer-events-none;
@@ -668,12 +681,12 @@
   ########## MODAL ##########
   */
   .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 backdrop-blur-sm;
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/50 ;
     transition: opacity 200ms ease;
   }
   .modal-overlay.hidden { @apply opacity-0 pointer-events-none; }
   .modal-container {
-    @apply w-full mx-4 flex flex-col gap-4;
+    @apply w-full max-h-9/10 mx-4 flex flex-col gap-4 overflow-y-auto bg-surface-1/85;
   }
   .modal-sm  { @apply max-w-sm; }
   .modal-md  { @apply max-w-lg; }
@@ -693,7 +706,7 @@
   ########## TABLE ##########
   */
   .table-container {
-    @apply overflow-hidden p-0;
+    @apply overflow-hidden p-0 w-full max-h-full;
   }
   .data-table {
     @apply w-full text-sm text-fg-body;
@@ -705,13 +718,13 @@
     @apply px-4 py-3 text-sm text-fg-body border-b border-neutral-700/50 max-w-40 truncate;
   }
   .table-tr {
-    @apply transition-colors hover:bg-surface-2/50;
+    @apply transition-colors hover:bg-surface-2/50 rounded-xl;
   }
   .table-td-num {
-    @apply px-4 py-3 text-xs text-fg-muted border-b border-neutral-700/50 w-8;
+    @apply px-4 py-3 text-xs text-fg-muted border-b border-neutral-700/50 w-8 rounded-l-xl;
   }
   .table-pagination {
-    @apply flex items-center justify-center gap-1 px-4 py-3;
+    @apply flex items-center justify-center gap-1 px-4 pt-4 pb-4;
   }
   .page-btn {
     @apply w-8 h-8 flex items-center justify-center rounded-full text-sm text-fg-muted transition-colors
@@ -783,4 +796,59 @@
     @apply font-mono text-primary-400 text-xs;
   }
 
+  /*
+  ########## TOPBAR ##########
+  */
+  .topbar {
+    @apply 
+    col-span-2 h-full px-6
+    flex items-center justify-between gap-4
+    ;
+  }
+  .topbar-logo {
+    @apply flex items-center shrink-0;
+  }
+  .topbar-search {
+    @apply relative flex items-center flex-1 max-w-xl mx-auto;
+  }
+  .topbar-actions {
+    @apply flex items-center gap-1 shrink-0;
+  }
+  .topbar-avatar-btn {
+    @apply flex items-center gap-1.5 rounded-full p-1
+    transition-colors hover:bg-surface-2
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg;
+  }
+
+  /*
+  ########## POPOVER ##########
+  */
+  .popover {
+    @apply absolute top-full right-0 mt-2 z-10
+    min-w-48 w-auto
+    opacity-0 pointer-events-none scale-95 origin-top-right
+    transition-all duration-200;
+  }
+  .popover[data-open="true"] {
+    @apply opacity-100 pointer-events-auto scale-100;
+  }
+  .popover-header {
+    @apply flex flex-col items-center gap-1 px-4 py-3;
+  }
+  .popover-username {
+    @apply font-display font-semibold text-sm text-fg;
+  }
+  .popover-role {
+    @apply text-xs text-fg-muted;
+  }
+  .popover-item {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-fg-body rounded-lg
+    transition-colors hover:bg-surface-2 hover:text-fg cursor-pointer w-full;
+  }
+  .popover-item-danger {
+    @apply text-danger-500 hover:bg-danger-900 hover:text-danger-400;
+  }
+  .popover-divider {
+    @apply border-t border-neutral-700/50 my-1;
+  }
 }

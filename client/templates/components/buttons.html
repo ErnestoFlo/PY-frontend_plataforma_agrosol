@@ -4,13 +4,23 @@
 {% partialdef button %}
   <button type="{{ func_type }}" class="btn {{ type }} {{ x_params }}"
   {% if action %}data-action="{{ action }}"{% endif %}
-  {% if target %}data-target="{{ target }}"{% endif %}>{{ text }}</button>
+  {% if target %}data-target="{{ target }}"{% endif %}
+  {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
+  {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
+  {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
+  {% if hx_trigger %}hx-trigger="{{ trigger }}"{% endif %}
+  >{{ text }}</button>
 {% endpartialdef %}
 
 {% partialdef icon_button %}
   <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
   {% if action %}data-action="{{ action }}"{% endif %}
-  {% if target %}data-target="{{ target }}"{% endif %}>
+  {% if target %}data-target="{{ target }}"{% endif %}
+  {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
+  {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
+  {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
+  {% if hx_trigger %}hx-trigger="{{ trigger }}"{% endif %}
+  >
     <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }}">
       <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
     </svg>
@@ -20,7 +30,12 @@
 {% partialdef input_icon_button %}
   <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
   {% if action %}data-action="{{ action }}"{% endif %}
-  {% if target %}data-target="{{ target }}"{% endif %}>
+  {% if target %}data-target="{{ target }}"{% endif %}
+  {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
+  {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
+  {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
+  {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  >
     <svg class="w-5 h-5 {{ x_icon_params }}">
       <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
     </svg>
@@ -29,11 +44,16 @@
 
 {% partialdef toggle_button %}
   <button type="button"
-    class="toggle-btn {{ x_params }}"
-    data-action="toggle"
-    data-checked="{{ checked|default:'false' }}"
-    {% if target %}data-target="{{ target }}"{% endif %}
-    {% if name %}id="{{ name }}"{% endif %}>
+  class="toggle-btn {{ x_params }}"
+  data-action="toggle"
+  data-checked="{{ checked|default:'false' }}"
+  {% if target %}data-target="{{ target }}"{% endif %}
+  {% if name %}id="{{ name }}"{% endif %}
+  {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
+  {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
+  {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
+  {% if hx_trigger %}hx-trigger="{{ trigger }}"{% endif %}
+  >
     <span class="toggle-thumb"></span>
   </button>
 {% endpartialdef %}

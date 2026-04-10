@@ -1,49 +1,13 @@
-{% extends '../layouts/dashboard.html' %}
+{% extends '../layouts/pc_nav.html' %}
 
 {% block view %}
-  <section class="container-fluid d-flex flex-row">
-    <section class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Proveedor</th>
-            <th scope="col">Dirección</th>
-            <th scope="col">Contacto</th>
-            <th scope="col">Cargo</th>
-            <th scope="col">Teléfono</th>
-            <th scope="col">Celular</th>
-            <th scope="col">Email</th>
-            <th scope="col">Términos de Pago</th>
-            <th scope="col">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for proveedor in lista %}
-          <tr>
-            <th scope="row" class="fs-6">{{proveedor.proveedoresID}}</th>
-            <td class="fs-6">{{ proveedor.proveedor }}</td>
-            <td class="fs-6">{{ proveedor.direccion }}</td>
-            <td class="fs-6">{{ proveedor.contacto }}</td>
-            <td class="fs-6">{{ proveedor.cargo }}</td>
-            <td class="fs-6">{{ proveedor.telefono }}</td>
-            <td class="fs-6">{{ proveedor.celular }}</td>
-            <td class="fs-6">{{ proveedor.email }}</td>
-            <td class="fs-6">{{ proveedor.terminos_de_pago }}</td>
-            <td>
-              <button class="btn btn-danger">
-                <a href="{% url 'proveedores_eliminar' proveedor.proveedoresID %}" class="text-decoration-none">Eliminar</a>
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-success">
-                <a href="{% url 'proveedores_editar' proveedor.proveedoresID %}" class="text-decoration-none">Editar</a>
-                <i class="bi bi-trash3-fill"></i>
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <section class="w-full h-full flex flex-col gap-2">
+    <section class="card tools w-full flex flex-row justify-end p-2">
+      {% include "components/buttons.html#button" with func_type='button' type='btn-primary' text='+ Nuevo' x_params='p-1' action='openModal' target='modal-create' hx_get=create_url hx_target="#modal-create-content" hx_swap="innerHTML" hx_trigger="click" %}
     </section>
+    {% include "partials/tables.html#table" with table_id='tabla-prov' columns=columns rows=rows with_actions=True current_page=current_page total_pages=total_pages page_range=page_range x_params='w-full flex-1 overflow-x-auto' %}
+    {% include "components/modals.html#modal" with modal_id='modal-create' title='Crear Proveedor' size='modal-lg' show_footer=False %}
+    {% include "components/modals.html#modal" with modal_id='modal-edit' title='Editar Proveedor' size='modal-lg' show_footer=False %}
+    {% include "components/modals.html#modal" with modal_id='modal-delete' title='Eliminar Proveedor' size='modal-md' show_footer=False %}
   </section>
 {% endblock %}

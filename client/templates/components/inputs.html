@@ -1,11 +1,19 @@
 {% load static %}
 {% load partials %}
+{% load widget_tweaks %}
   
 {% partialdef input %}
   <fieldset class="input-container {{ x_params }}">
-    <input type="{{ type }}" id="{{ name }}" class="input peer" placeholder=" ">
+    {% render_field field type=type id=name class="input peer" placeholder=" " %}
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
+  </fieldset>
+{% endpartialdef %}
+
+{% partialdef input_search %}
+  <fieldset class="input-container {{ x_params }}">
+    <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} peer" placeholder="Búsqueda">
+    {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='input-button p-0 shrink-0' size='5' icon_name=icon %}
   </fieldset>
 {% endpartialdef %}
 

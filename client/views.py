@@ -43,6 +43,7 @@ def tests_views(request):
         'current_page': page,
         'total_pages': total_pages,
         'page_range': range(1, total_pages + 1),
+        'pagename': 'Test & Views',
     })
 
 def get_options(request):
@@ -108,17 +109,81 @@ def eliminar(request, id):
 ########## VISTAS DE PROVEEDORES ##########
 def list_proveedores(request):
     cliente = proveedores.get_all_proveedores()
-    return render(request, "proveedores/index_proveedores.html", {'lista': cliente["data"]})
+    rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
+    page = int(request.GET.get('page', 1))
+    per_page = 100
+
+    id_field = 'proveedoresID'
+    cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
+
+    rows = [
+        {
+            'id': item.get(id_field) or item.get('id'),
+            'cells': [item.get(field, '') for field in cell_fields],
+            'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
+            'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
+        }
+        for item in rows_raw
+    ]
+
+    total = len(rows)
+    total_pages = (total + per_page - 1) // per_page
+    start = (page - 1) * per_page
+    paginated = rows[start:start + per_page]
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'partials/tables.html#table_rows', {
+            'rows': paginated,
+            'with_actions': True,
+            'current_page': page,
+        })
+
+    return render(request, "proveedores/index_proveedores.html", {
+            'create_url': '/agrosol/proveedores/crear',
+            'pagename': 'Proveedores',
+            'rows': paginated,
+            'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+            'current_page': page,
+            'total_pages': total_pages,
+            'page_range': range(1, total_pages + 1),
+            'table_body_id': '#tabla-prov-body',
+        })
 
 def create_proveedor(request):
+    form = None
     if request.method == "POST":
         form = form_proveedores(request.POST or None, request.FILES or None)
         if form.is_valid():
             proveedores.create(form.cleaned_data)
-            return redirect("proveedores")
+            cliente = proveedores.get_all_proveedores()
+            rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
+            page = int(request.GET.get('page', 1))
+            per_page = 100
+
+            id_field = 'proveedoresID'
+            cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
+
+            rows = [
+                {
+                    'id': item.get(id_field) or item.get('id'),
+                    'cells': [item.get(field, '') for field in cell_fields],
+                    'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
+                    'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
+                }
+                for item in rows_raw
+            ]
+
+            start = (page - 1) * per_page
+            paginated = rows[start:start + per_page]
+
+            return render(request, "partials/tables.html#table_rows", {
+                    'rows': paginated,
+                    'with_actions': True,
+                    'current_page': page,
+                })
     else:
         form = form_proveedores()
-    return render(request, "proveedores/create_proveedor.html", {"form": form})
+    return render(request, "proveedores/create_proveedor.html#create_form", {"form": form})
 
 def edit_proveedor(request, id):
     form = None
@@ -126,12 +191,76 @@ def edit_proveedor(request, id):
         form = form_proveedores(request.POST or None, request.FILES or None)
         if form.is_valid():
             proveedores.update(id, form.cleaned_data)
-            return redirect("proveedores")
+            cliente = proveedores.get_all_proveedores()
+            rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
+            page = int(request.GET.get('page', 1))
+            per_page = 100
+
+            id_field = 'proveedoresID'
+            cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
+
+            rows = [
+                {
+                    'id': item.get(id_field) or item.get('id'),
+                    'cells': [item.get(field, '') for field in cell_fields],
+                    'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
+                    'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
+                }
+                for item in rows_raw
+            ]
+
+            total = len(rows)
+            total_pages = (total + per_page - 1) // per_page
+            start = (page - 1) * per_page
+            paginated = rows[start:start + per_page]
+
+            return render(request, "partials/tables.html#table_rows", {
+                    'rows': paginated,
+                    'with_actions': True,
+                    'current_page': page,
+                })    
     else:
         cliente = proveedores.get_by_id(id)
         form = form_proveedores(initial=cliente["data"])
+    return render(request, "proveedores/edit_proveedor.html#edit_form", {"proveedor_id": id, "form": form})
 
-    return render(request, "proveedores/edit_proveedor.html", {"form": form})
+def delete_proveedor(request, id):
+    proveedores.delete(id)
+    cliente = proveedores.get_all_proveedores()
+    rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
+    page = int(request.GET.get('page', 1))
+    per_page = 100
+
+    id_field = 'proveedoresID'
+    cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
+
+    rows = [
+        {
+            'id': item.get(id_field) or item.get('id'),
+            'cells': [item.get(field, '') for field in cell_fields],
+            'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
+            'delete_url': f"/agrosol/proveedores/confirm-delete/{item.get(id_field) or item.get('id')}"
+        }
+        for item in rows_raw
+    ]
+
+    total = len(rows)
+    total_pages = (total + per_page - 1) // per_page
+    start = (page - 1) * per_page
+    paginated = rows[start:start + per_page]
+
+    return render(request, "partials/tables.html#table_rows", {
+            'rows': paginated,
+            'with_actions': True,
+            'current_page': page,
+        })
+
+def confirm_delete(request, id):
+    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
+        'row_id': id,
+        'delete_url': f"/agrosol/proveedores/eliminar/{id}",
+        'table_body_id': '#tabla-prov-body'
+    })
 
 def delete_proveedor(request, id):
     proveedores.delete(id)

@@ -1,0 +1,43 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef user_menu %}
+  <div id="{{ popover_id|default:'user-menu' }}"
+    class="popover card p-2 bg-surface-1"
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+    <!-- Header con avatar, nombre y rol -->
+    <div class="popover-header">
+      {% include "components/avatars.html#avatar" with size='12' initials=initials user_img=user_img %}
+      <span class="popover-username">{{ username|default:'UserName' }}</span>
+      <span class="popover-role">{{ role|default:'User Roll' }}</span>
+    </div>
+
+    <!-- Opciones -->
+    <nav role="none">
+      <a href="#" class="popover-item" role="menuitem"
+        data-action="closePopover" data-target="{{ popover_id|default:'user-menu' }}">
+        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
+          <use href="{% static 'sprite.svg' %}#icon-settings-fill"/>
+        </svg>
+        Configuración
+      </a>
+
+      <button type="button" class="popover-item" role="menuitem"
+        data-action="toggleTheme">
+        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
+          <use href="{% static 'sprite.svg' %}#icon-moon-regular"/>
+        </svg>
+        Cambiar Tema
+      </button>
+
+      <button type="button" class="popover-item popover-item-danger" role="menuitem">
+        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
+          <use href="{% static 'sprite.svg' %}#icon-logout-fill"/>
+        </svg>
+        Cerrar Sesión
+      </button>
+    </nav>
+  </div>
+{% endpartialdef %}
