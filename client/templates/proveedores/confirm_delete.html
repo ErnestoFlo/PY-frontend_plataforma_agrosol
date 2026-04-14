@@ -2,11 +2,34 @@
 {% load partials %}
 
 {% partialdef delete_proveedor %}
-
+{# 
+  MODAL DE CONFIRMACIÓN DE ELIMINACIÓN
+  
+  Variables esperadas del contexto (views.py):
+  - row_id: ID del proveedor a eliminar
+  - delete_url: URL POST para eliminar (ej: "/agrosol/proveedores/eliminar/123")
+  - table_body_id: ID del contenedor de la tabla para actualizar (ej: "#tabla-prov-body")
+  
+  FLUJO:
+  1. User ve tabla con botón "Eliminar"
+  2. Click → confirm_delete() renderiza este modal
+  3. User confirma en modal
+  4. POST a delete_url (con CSRF token)
+  5. delete_proveedor() elimina + retorna tabla actualizada
+  6. HTMX reemplaza tabla + cierra modal
+#}
 <section class='grid grid-cols-12 gap-x-6 gap-y-4'>
-  <p class="text-fg-body mt-2 col-span-12">¿Está seguro de eliminar este elemento?</p>
-  <div class="flex justify-end gap-2 mt-2 col-span-12">
+  <p class="text-fg-body mt-2 col-span-12">¿Está seguro que desea eliminar este elemento?</p>
+  <form method="POST" 
+        class="flex justify-end gap-2 mt-2 col-span-12"
+        hx-post="{{ delete_url }}"
+        hx-target="{{ table_body_id }}"
+        hx-swap="innerHTML"
+        hx-on::after-request="if(event.detail.successful) { closeModal('modal-delete') }">
+    {% csrf_token %}
     {% include "components/buttons.html#button" with func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target='modal-delete' %}
-    {% include 'components/buttons.html#button' with func_type='submit' type='btn-danger' text='Eliminar' hx_get=delete_url hx_target=table_body_id hx_swap="innerHTML" hx_trigger="click" %}      
-  </div>
+    {% include 'components/buttons.html#button' with func_type='submit' type='btn-danger' text='Eliminar' %} 
+  </form>
 </section>
+
+{% endpartialdef %}

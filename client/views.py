@@ -1,28 +1,35 @@
 from django.shortcuts import render, redirect
-from .services import api_client, proveedores
-from .forms import *
+from .services import proveedores
+from .forms import ProveedoresForm
+from .utils import get_proveedores_for_table, build_menu_items
 
 ########## VISTAS POR DISEÑO ###########
-# test_logs = [
-#     {'initials': 'JG', 'user': 'Juan García', 'action': 'creó un nuevo proveedor', 'time': 'hace 2 min', 'hash': 'a3f9b2c', 'badge_variant': 'success', 'badge_text': 'Creado'},
-#     {'initials': 'MA', 'user': 'María Alvarado', 'action': 'editó el proveedor Semillas del Sur', 'time': 'hace 15 min', 'hash': 'd1e8f3a', 'badge_variant': 'warning', 'badge_text': 'Editado'},
-#     {'initials': 'RC', 'user': 'Roberto Castillo', 'action': 'eliminó el producto Fertilizante X', 'time': 'hace 1 hora', 'hash': 'b7c2d9e', 'badge_variant': 'danger', 'badge_text': 'Eliminado'},
-#     {'initials': 'JG', 'user': 'Juan García', 'action': 'importó 24 registros desde Excel', 'time': 'hace 3 horas', 'hash': 'f4a1b8c', 'badge_variant': 'info', 'badge_text': 'Importado'},
-#     {'initials': 'MA', 'user': 'María Alvarado', 'action': 'generó reporte mensual', 'time': 'ayer 5:30 PM', 'hash': 'e9d3c7f', 'badge_variant': None, 'badge_text': None},
-# ]
+
 def welcome(request):
-    return render(request, "layouts/welcome.html", {"pagename": "Bienvenida"})
+    return render(request, "layouts/welcome.html", {
+        "pagename": "Bienvenida",
+        "menu_items": build_menu_items("Bienvenida"),
+    })
 
 def login(request):
-    return render(request, "layouts/login.html", {"pagename": "Inicio de Sesión"})
+    return render(request, "layouts/login.html", {
+        "pagename": "Inicio de Sesión",
+        "menu_items": build_menu_items("Inicio de Sesión"),
+    })
 
 def view1(request):
-    return render(request, "design/view1.html", {"pagename": "Dashboard"})
+    return render(request, "design/view1.html", {
+        "pagename": "Dashboard",
+        "menu_items": build_menu_items("Dashboard"),
+    })
 
 def tests_form(request):
-    return render(request, "design/main_form_test.html", {"pagename": "Main Form Test"})
+    return render(request, "design/main_form_test.html", {
+        "pagename": "Main Form Test",
+        "menu_items": build_menu_items("Main Form Test"),
+    })
 
-def tests_views(request):
+def tests_components(request):
     page = int(request.GET.get('page', 1))
     per_page = 6
 
@@ -37,231 +44,206 @@ def tests_views(request):
     start = (page - 1) * per_page
     paginated = test_rows[start:start + per_page]
 
-    return render(request, 'design/components_tests&views.html', {
+    return render(request, 'design/components_test.html', {
         'rows': paginated,
         'columns': ['Avatar', 'Header', 'Long Text Column', 'Header'],
         'current_page': page,
         'total_pages': total_pages,
         'page_range': range(1, total_pages + 1),
         'pagename': 'Test & Views',
+        'menu_items': build_menu_items('Test & Views'),
     })
 
 def get_options(request):
+    """
+    Endpoint para obtener opciones dinámicas de un combobox.
+    Usado por HTMX para inyectar/actualizar opciones de forma dinámica.
+    """
     options = [
-        {'id': 1,
-        'nombre': 'Opcion 1'},
-        {'id': 2,
-        'nombre': 'Opcion 2'},
-        {'id': 3,
-        'nombre': 'Opcion 3'},
-        {'id': 4,
-        'nombre': 'Opcion 4'},
-        {'id': 5,
-        'nombre': 'Opcion 5'}
+        {'id': 1, 'nombre': 'Opcion 1'},
+        {'id': 2, 'nombre': 'Opcion 2'},
+        {'id': 3, 'nombre': 'Opcion 3'},
+        {'id': 4, 'nombre': 'Opcion 4'},
+        {'id': 5, 'nombre': 'Opcion 5'}
     ]
-    return render(request, 'partials/options_lists.html#combobox_options', {'options': [{'value': o['id'], 'label': o['nombre']} for o in options]})
-
-########## VISTAS DE EJEMPLO ##########
-def listar(request):
-    cliente = api_client.get_all()
-    print(cliente["data"])
-    return render(request, "client/listar.html", {"cliente" : cliente["data"]})
-
-def crear(request):
-    if request.method == "POST":
-        data = {
-            "proveedor": request.POST["proveedor"],
-            "direccion": request.POST["direccion"],
-            "contacto": request.POST["contacto"],
-            "cargo": request.POST["cargo"],
-            "telefono": request.POST["telefono"],
-            "celular": request.POST["celular"],
-            "email": request.POST["email"],
-            "terminos_de_pago": request.POST["terminos_de_pago"],
-        }
-        api_client.create(data)
-        return redirect("listar")
-    
-    return render(request, "client/form.html")
-
-def editar(request, id):
-    if request.method == "POST":
-        data = {
-            "proveedor": request.POST["proveedor"],
-            "direccion": request.POST["direccion"],
-            "contacto": request.POST["contacto"],
-            "cargo": request.POST["cargo"],
-            "telefono": request.POST["telefono"],
-            "celular": request.POST["celular"],
-            "email": request.POST["email"],
-            "terminos_de_pago": request.POST["terminos_de_pago"],
-        }
-        api_client.update(id, data)
-        return redirect("listar")
-    
-    cliente = api_client.get_by_id(id)
-    return render(request, "client/form.html", {"cliente": cliente})
-
-def eliminar(request, id):
-    api_client.delete(id)
-    return redirect("listar")
+    return render(request, 'partials/options_lists.html#combobox_options', {
+        'options': [{'value': o['id'], 'label': o['nombre']} for o in options]
+    })
 
 ########## VISTAS DE PROVEEDORES ##########
 def list_proveedores(request):
-    cliente = proveedores.get_all_proveedores()
-    rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
+    """
+    Lista todos los proveedores con paginación.
+    
+    GET requests:
+    - Retorna página HTML completa si es navegación normal
+    - Retorna solo filas de tabla si es HTMX request (paginación)
+    
+    ANTES: 45 líneas de lógica repetida
+    DESPUÉS: 15 líneas usando helpers
+    """
+    proveedores_data = proveedores.get_all_proveedores()
     page = int(request.GET.get('page', 1))
-    per_page = 100
+    
+    # Usar helper que combina: extracción datos + transformación + paginación
+    table_context = get_proveedores_for_table(proveedores_data, page)
 
-    id_field = 'proveedoresID'
-    cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
-
-    rows = [
-        {
-            'id': item.get(id_field) or item.get('id'),
-            'cells': [item.get(field, '') for field in cell_fields],
-            'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
-            'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
-        }
-        for item in rows_raw
-    ]
-
-    total = len(rows)
-    total_pages = (total + per_page - 1) // per_page
-    start = (page - 1) * per_page
-    paginated = rows[start:start + per_page]
-
+    # Si es request HTMX (paginación sin recargar página)
     if request.headers.get('HX-Request'):
         return render(request, 'partials/tables.html#table_rows', {
-            'rows': paginated,
+            **table_context,
             'with_actions': True,
-            'current_page': page,
         })
 
+    # Si es GET normal, retorna página completa
     return render(request, "proveedores/index_proveedores.html", {
-            'create_url': '/agrosol/proveedores/crear',
-            'pagename': 'Proveedores',
-            'rows': paginated,
-            'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
-            'current_page': page,
-            'total_pages': total_pages,
-            'page_range': range(1, total_pages + 1),
-            'table_body_id': '#tabla-prov-body',
-        })
-
-def create_proveedor(request):
-    form = None
-    if request.method == "POST":
-        form = form_proveedores(request.POST or None, request.FILES or None)
-        if form.is_valid():
-            proveedores.create(form.cleaned_data)
-            cliente = proveedores.get_all_proveedores()
-            rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
-            page = int(request.GET.get('page', 1))
-            per_page = 100
-
-            id_field = 'proveedoresID'
-            cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
-
-            rows = [
-                {
-                    'id': item.get(id_field) or item.get('id'),
-                    'cells': [item.get(field, '') for field in cell_fields],
-                    'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
-                    'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
-                }
-                for item in rows_raw
-            ]
-
-            start = (page - 1) * per_page
-            paginated = rows[start:start + per_page]
-
-            return render(request, "partials/tables.html#table_rows", {
-                    'rows': paginated,
-                    'with_actions': True,
-                    'current_page': page,
-                })
-    else:
-        form = form_proveedores()
-    return render(request, "proveedores/create_proveedor.html#create_form", {"form": form})
-
-def edit_proveedor(request, id):
-    form = None
-    if request.method == "POST":
-        form = form_proveedores(request.POST or None, request.FILES or None)
-        if form.is_valid():
-            proveedores.update(id, form.cleaned_data)
-            cliente = proveedores.get_all_proveedores()
-            rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
-            page = int(request.GET.get('page', 1))
-            per_page = 100
-
-            id_field = 'proveedoresID'
-            cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
-
-            rows = [
-                {
-                    'id': item.get(id_field) or item.get('id'),
-                    'cells': [item.get(field, '') for field in cell_fields],
-                    'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
-                    'delete_url': f"/agrosol/proveedores/eliminar/{item.get(id_field) or item.get('id')}"
-                }
-                for item in rows_raw
-            ]
-
-            total = len(rows)
-            total_pages = (total + per_page - 1) // per_page
-            start = (page - 1) * per_page
-            paginated = rows[start:start + per_page]
-
-            return render(request, "partials/tables.html#table_rows", {
-                    'rows': paginated,
-                    'with_actions': True,
-                    'current_page': page,
-                })    
-    else:
-        cliente = proveedores.get_by_id(id)
-        form = form_proveedores(initial=cliente["data"])
-    return render(request, "proveedores/edit_proveedor.html#edit_form", {"proveedor_id": id, "form": form})
-
-def delete_proveedor(request, id):
-    proveedores.delete(id)
-    cliente = proveedores.get_all_proveedores()
-    rows_raw = cliente.get("data", []) if isinstance(cliente, dict) else []
-    page = int(request.GET.get('page', 1))
-    per_page = 100
-
-    id_field = 'proveedoresID'
-    cell_fields = ['proveedor', 'direccion', 'contacto', 'cargo', 'telefono', 'celular', 'email', 'terminos_de_pago']
-
-    rows = [
-        {
-            'id': item.get(id_field) or item.get('id'),
-            'cells': [item.get(field, '') for field in cell_fields],
-            'edit_url': f"/agrosol/proveedores/editar/{item.get(id_field) or item.get('id')}",
-            'delete_url': f"/agrosol/proveedores/confirm-delete/{item.get(id_field) or item.get('id')}"
-        }
-        for item in rows_raw
-    ]
-
-    total = len(rows)
-    total_pages = (total + per_page - 1) // per_page
-    start = (page - 1) * per_page
-    paginated = rows[start:start + per_page]
-
-    return render(request, "partials/tables.html#table_rows", {
-            'rows': paginated,
-            'with_actions': True,
-            'current_page': page,
-        })
-
-def confirm_delete(request, id):
-    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
-        'row_id': id,
-        'delete_url': f"/agrosol/proveedores/eliminar/{id}",
-        'table_body_id': '#tabla-prov-body'
+        **table_context,
+        'create_url': '/agrosol/proveedores/crear/',
+        'pagename': 'Proveedores',
+        'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+        'table_body_id': '#tabla-prov-body',
+        'menu_items': build_menu_items('Proveedores'),  # ← Pasar menú
     })
 
+def create_or_edit_proveedor(request, id=None):
+    """
+    Crea O edita un proveedor - FUNCIÓN UNIFICADA.
+    
+    ¿POR QUÉ UNA SOLA FUNCIÓN?
+    - create_proveedor() y edit_proveedor() eran 90% idénticas
+    - El único cambio: POST → proveedores.create() vs PUT → proveedores.update(id, ...)
+    - Consolidar elimina 40+ líneas de código duplicado
+    
+    RUTAS (en urls.py):
+    - POST /agrosol/proveedores/crear           → create_or_edit_proveedor(id=None)
+    - POST /agrosol/proveedores/editar/<id>    → create_or_edit_proveedor(id=<id>)
+    
+    ¿BACKEND SE ENTERA?
+    - NO, el backend recibe exactamente lo mismo:
+      - create_proveedor() → requests.POST → backend recibe POST /api/Proveedores
+      - edit_proveedor(id) → requests.PUT → backend recibe PUT /api/Proveedores/<id>
+    - El cambio es 100% frontend, transparente para backend
+    
+    FLU LÓGICO:
+    1. GET /crear → Renderiza form vacío
+    2. POST /crear + form válido → create() + retorna tabla actualizada
+    3. GET /editar/<id> → Renderiza form pre-llenado con datos del proveedor
+    4. POST /editar/<id> + form válido → update() + retorna tabla actualizada
+    """
+    form = None
+    
+    if request.method == "POST":
+        form = ProveedoresForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            # La lógica cambia aquí: CREATE o UPDATE
+            if id:
+                proveedores.update(id, form.cleaned_data)  # PUT /api/Proveedores/<id>
+            else:
+                proveedores.create(form.cleaned_data)      # POST /api/Proveedores
+            
+            # Después de crear/editar, retornar tabla actualizada (flujo HTMX)
+            proveedores_data = proveedores.get_all_proveedores()
+            page = int(request.GET.get('page', 1))
+            table_context = get_proveedores_for_table(proveedores_data, page)
+            
+            return render(request, "partials/tables.html#table_rows", {
+                **table_context,
+                'with_actions': True,
+            })
+    else:
+        # GET request
+        if id:
+            # Modo EDITAR: pre-llenar form con datos existentes
+            proveedor_data = proveedores.get_by_id(id)
+            form = ProveedoresForm(initial=proveedor_data["data"])
+        else:
+            # Modo CREAR: form vacío
+            form = ProveedoresForm()
+    
+    # Renderizar template del formulario
+    # Nota: Un solo template (form.html) maneja ambos casos (CREATE y EDIT)
+    # Variables dinámicas determinan comportamiento:
+    if id:
+        # MODO EDITAR
+        submit_url = f'/agrosol/proveedores/editar/{id}/'
+        modal_name = 'modal-edit'
+        submit_text = 'Editar'
+    else:
+        # MODO CREAR
+        submit_url = '/agrosol/proveedores/crear/'
+        modal_name = 'modal-create'
+        submit_text = 'Crear'
+    
+    template = "proveedores/form.html#form"
+    context = {
+        "form": form,
+        "proveedor_id": id,
+        "submit_url": submit_url,
+        "modal_name": modal_name,
+        "submit_text": submit_text,
+    }
+    return render(request, template, context)
+
 def delete_proveedor(request, id):
-    proveedores.delete(id)
-    return redirect("proveedores")
+    """
+    Elimina un proveedor mediante POST (desde modal de confirmación).
+    
+    FLUJO:
+    1. confirm_delete() renderiza modal con delete_url
+    2. User hace click en "Confirmar"
+    3. FORM hace POST hx-post="{{ delete_url }}"
+    4. Esta función recibe POST, elimina item
+    5. Retorna tabla actualizada
+    6. HTMX reemplaza tabla + cierra modal
+    
+    ¿POR QUÉ POST EN LUGAR DE GET?
+    - GET debe ser solo lectura (no debe tener side effects)
+    - DELETE debe ser POST o HTTP DELETE method
+    - POST incluye CSRF token automático
+    - Más seguro y estándar REST
+    
+    SEGURIDAD:
+    - CSRF token validado por middleware de Django
+    - Solo acepta POST (no GET)
+    """
+    if request.method == "POST":
+        # Eliminar el proveedor
+        proveedores.delete(id)
+        
+        # Obtener lista actualizada y retornar tabla
+        proveedores_data = proveedores.get_all_proveedores()
+        page = int(request.GET.get('page', 1))
+        table_context = get_proveedores_for_table(proveedores_data, page)
+        
+        return render(request, "partials/tables.html#table_rows", {
+            **table_context,
+            'with_actions': True,
+        })
+    
+    # Si no es POST, retornar error
+    return render(request, "error.html", {
+        'error': "Method not allowed. Use POST to delete."
+    }, status=405)
+
+
+def confirm_delete(request, id):
+    """
+    Renderiza modal de confirmación antes de eliminar.
+    
+    FLUJO:
+    1. User hace click en "Eliminar" en tabla
+    2. HTMX GET /agrosol/proveedores/confirm-delete/<id>/
+    3. Esta función renderiza modal con variables:
+       - delete_url: POST /agrosol/proveedores/eliminar/<id>/
+       - table_body_id: #tabla-prov-body (para HTMX reemplace)
+    
+    VARIABLES ESPERADAS EN TEMPLATE:
+    - row_id: ID del proveedor (para referencia)
+    - delete_url: URL POST para eliminar
+    - table_body_id: Selector CSS del contenedor a actualizar
+    """
+    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
+        'row_id': id,
+        'delete_url': f"/agrosol/proveedores/eliminar/{id}/",  # ← POST a esta URL
+        'table_body_id': '#tabla-prov-body'  # ← HTMX reemplaza este elemento
+    })

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
   // ***** RANGES *****
   document.querySelectorAll('[data-action="rangeUpdate"]').forEach(input => {
-    const inputId = wrapper.dataset.target
+    const inputId = input.dataset.target
     const fill = document.getElementById(`${inputId}-fill`)
     const thumb = document.getElementById(`${inputId}-thumb`)
     const output = document.getElementById(`${inputId}-value`)

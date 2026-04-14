@@ -4,7 +4,6 @@
   
 {% partialdef input %}
   <fieldset class="input-container {{ x_params }}">
-    {% render_field field type=type id=name class="input peer" placeholder=" " %}
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
   </fieldset>
@@ -19,6 +18,7 @@
 
 {% partialdef input_icon %}
   <fieldset class="input-container {{ x_params }}">
+    
     <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} peer" placeholder=" ">
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
