@@ -8,7 +8,7 @@ from django.conf import settings
 from bs4 import BeautifulSoup
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
-
+import functools
 
 class UserProfile(models.Model):
     # Relación uno a uno con el User de Django
@@ -520,3 +520,264 @@ def get_permisos(user, url_name):
             }
  
     return resultado
+
+TIPO_EVENTO = [
+    ('login',           'Inicio de sesión'),
+    ('logout',          'Cierre de sesión'),
+    ('modulo',          'Acceso a módulo'),
+    ('elemento',        'Interacción con elemento'),
+    ('crear',           'Creación de dato'),
+    ('editar',          'Edición de dato'),
+    ('eliminar',        'Eliminación de dato'),
+    ('buscar',          'Búsqueda / Consulta'),
+    ('acceso_denegado', 'Acceso denegado (403)'),
+]
+
+# ── Decorador principal ───────────────────────────────────────
+ 
+def registrar_actividad(accion, modelo='', campo_label='', campo_busqueda='q'):
+    """
+    Decorador que registra automáticamente la actividad CRUD
+    y búsquedas en cualquier vista.
+ 
+    Parámetros:
+        accion          → 'crear' | 'editar' | 'eliminar' | 'buscar'
+        modelo          → nombre legible del modelo ('Proveedor', 'Usuario'...)
+        campo_label     → campo del POST/GET que identifica el registro
+                          Ej: 'proveedor' → "Creó Proveedor: Tech S.A."
+        campo_busqueda  → campo GET de búsqueda (default: 'q')
+                          Solo aplica cuando accion='buscar'
+ 
+    Uso:
+        @login_required
+        @registrar_actividad(accion='crear', modelo='Proveedor', campo_label='proveedor')
+        def create_proveedor(request):
+            ...
+ 
+        @login_required
+        @registrar_actividad(accion='buscar', modelo='Proveedor', campo_busqueda='q')
+        def list_proveedores(request):
+            ...
+    """
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            response = view_func(request, *args, **kwargs)
+ 
+            # Solo loguear si el usuario está autenticado
+            if not request.user.is_authenticated:
+                return response
+ 
+            try:
+                _procesar_log(
+                    request, response, accion, modelo,
+                    campo_label, campo_busqueda, kwargs
+                )
+            except Exception:
+                pass  # Nunca interrumpir la vista por un error de log
+ 
+            return response
+        return wrapper
+    return decorator
+ 
+class ActivityLog(models.Model):
+    usuario       = models.ForeignKey(
+                      User,
+                      on_delete=models.CASCADE,
+                      related_name='activity_logs'
+                    )
+    tipo_evento   = models.CharField(max_length=20, choices=TIPO_EVENTO)
+    modulo        = models.ForeignKey(
+                      Modulo,
+                      on_delete=models.SET_NULL,
+                      null=True, blank=True,
+                      related_name='logs'
+                    )
+    elemento_clave = models.CharField(max_length=100, blank=True)
+    descripcion    = models.CharField(max_length=255, blank=True)
+    ip             = models.GenericIPAddressField(null=True, blank=True)
+    dispositivo    = models.CharField(max_length=255, blank=True)
+    fecha          = models.DateTimeField(auto_now_add=True)
+ 
+    class Meta:
+        ordering            = ['-fecha']
+        verbose_name        = 'Log de Actividad'
+        verbose_name_plural = 'Logs de Actividad'
+        indexes             = [
+            models.Index(fields=['usuario', '-fecha']),
+            models.Index(fields=['tipo_evento', '-fecha']),
+        ]
+ 
+    def __str__(self):
+        return f"{self.usuario.username} | {self.tipo_evento} | {self.fecha:%d/%m/%Y %H:%M}"
+ 
+    @property
+    def icono(self):
+        iconos = {
+            'login':           'bi-box-arrow-in-right',
+            'logout':          'bi-box-arrow-right',
+            'modulo':          'bi-collection',
+            'elemento':        'bi-cursor-fill',
+            'crear':           'bi-plus-circle-fill',
+            'editar':          'bi-pencil-fill',
+            'eliminar':        'bi-trash3-fill',
+            'buscar':          'bi-search',
+            'acceso_denegado': 'bi-shield-x',
+        }
+        return iconos.get(self.tipo_evento, 'bi-circle')
+ 
+    @property
+    def color(self):
+        colores = {
+            'login':           'verde',
+            'logout':          'rojo',
+            'modulo':          'azul',
+            'elemento':        'naranja',
+            'crear':           'verde',
+            'editar':          'azul',
+            'eliminar':        'rojo',
+            'buscar':          'muted',
+            'acceso_denegado': 'rojo',
+        }
+        return colores.get(self.tipo_evento, 'muted')
+    
+def _procesar_log(request, response, accion, modelo, campo_label,
+                  campo_busqueda, url_kwargs):
+    """Lógica interna del decorador."""
+ 
+    # ── BUSCAR ───────────────────────────────────────────────
+    if accion == 'buscar':
+        termino = request.GET.get(campo_busqueda, '').strip()
+        if not termino:
+            return  # No loguear búsquedas vacías
+ 
+        desc = f'Buscó en {modelo}: "{termino}"' if modelo else f'Búsqueda: "{termino}"'
+        registrar_log(
+            request,
+            tipo_evento    = 'buscar',
+            descripcion    = desc,
+            elemento_clave = f'buscar_{modelo.lower()}' if modelo else 'buscar',
+        )
+        return
+ 
+    # ── CRUD — solo en POST exitosos ─────────────────────────
+    # No loguear GETs (mostrar formulario) ni respuestas fallidas
+    if request.method != 'POST':
+        return
+ 
+    # Considerar exitoso: redirect (302) o 200 sin errores de form
+    # La mayoría de vistas CRUD redirigen al éxito
+    es_exitoso = (
+        hasattr(response, 'status_code') and
+        response.status_code in (200, 302, 301)
+    )
+    if not es_exitoso:
+        return
+ 
+    # Construir descripción con el campo_label si existe
+    label_valor = ''
+    if campo_label:
+        # Buscar en POST primero, luego en los kwargs de URL
+        label_valor = (
+            request.POST.get(campo_label, '') or
+            str(url_kwargs.get(campo_label, ''))
+        ).strip()
+ 
+    # Emojis y verbos por acción
+    verbos = {
+        'crear':    'Creó',
+        'editar':   'Editó',
+        'eliminar': 'Eliminó',
+    }
+    verbo = verbos.get(accion, accion.capitalize())
+ 
+    if modelo and label_valor:
+        desc = f'{verbo} {modelo}: {label_valor}'
+    elif modelo:
+        desc = f'{verbo} {modelo}'
+    else:
+        desc = f'{verbo} registro'
+ 
+    registrar_log(
+        request,
+        tipo_evento    = accion,
+        descripcion    = desc,
+        elemento_clave = f'{accion}_{modelo.lower()}' if modelo else accion,
+    )
+    
+def registrar_log(request, tipo_evento, descripcion='', modulo=None, elemento_clave=''):
+    """
+    Registra una actividad del usuario en el log.
+ 
+    Uso desde cualquier vista:
+        from .models import registrar_log
+ 
+        registrar_log(request, 'modulo',   'Accedió a Prueba Técnica', modulo=modulo_obj)
+        registrar_log(request, 'elemento', 'Usó btn_crear', elemento_clave='btn_crear')
+    """
+    if not request.user.is_authenticated:
+        return
+ 
+    # Obtener IP real (considera proxies)
+    ip = (
+        request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+        or request.META.get('REMOTE_ADDR')
+    )
+ 
+    # Obtener info del dispositivo desde User-Agent
+    ua = request.META.get('HTTP_USER_AGENT', '')
+    dispositivo = _parsear_user_agent(ua)
+ 
+    # Obtener módulo desde url_name si no se pasó
+    if modulo is None and tipo_evento == 'modulo':
+        url_name = request.resolver_match.url_name if request.resolver_match else ''
+        try:
+            modulo = Modulo.objects.get(url_name=url_name, activo=True)
+        except Modulo.DoesNotExist:
+            modulo = None
+ 
+    ActivityLog.objects.create(
+        usuario        = request.user,
+        tipo_evento    = tipo_evento,
+        modulo         = modulo,
+        elemento_clave = elemento_clave,
+        descripcion    = descripcion,
+        ip             = ip or None,
+        dispositivo    = dispositivo,
+    )
+ 
+ 
+def _parsear_user_agent(ua):
+    #Extrae navegador y SO del User-Agent de forma simple.
+    if not ua:
+        return 'Desconocido'
+ 
+    # Navegador
+    if 'Edg/' in ua:
+        nav = 'Edge'
+    elif 'Chrome/' in ua:
+        nav = 'Chrome'
+    elif 'Firefox/' in ua:
+        nav = 'Firefox'
+    elif 'Safari/' in ua and 'Chrome' not in ua:
+        nav = 'Safari'
+    elif 'Opera' in ua or 'OPR/' in ua:
+        nav = 'Opera'
+    else:
+        nav = 'Navegador desconocido'
+ 
+    # Sistema operativo
+    if 'Windows NT' in ua:
+        so = 'Windows'
+    elif 'Mac OS X' in ua:
+        so = 'macOS'
+    elif 'Linux' in ua and 'Android' not in ua:
+        so = 'Linux'
+    elif 'Android' in ua:
+        so = 'Android'
+    elif 'iPhone' in ua or 'iPad' in ua:
+        so = 'iOS'
+    else:
+        so = 'SO desconocido'
+ 
+    return f'{nav} / {so}'

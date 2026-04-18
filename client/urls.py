@@ -40,8 +40,14 @@ urlpatterns = [
     path("permisos/modulos/<int:id>/editar/", views.modulo_editar, name="modulo_editar"),
     path("permisos/modulos/<int:id>/escanear/", views.modulo_escanear, name="modulo_escanear"),
     path("permisos/modulos/<int:id>/elementos/", views.modulo_elementos, name="modulo_elementos"), # Obtener elementos de un módulo (con permisos de un grupo)
-    path("permisos/grupos/<int:grupo_id>/elementos/<int:elemento_id>/guardar/", views.grupo_guardar_permisos_elemento, name="guardar_permiso_elemento"), # Guardar permiso ver/usar de un elemento para un grupo    
+    path("permisos/grupos/<int:grupo_id>/elementos/<int:elemento_id>/guardar/", views.grupo_guardar_permisos_elemento, name="guardar_permiso_elemento"), # Guardar permiso ver/usar de un elemento para un grupo 
+
     ### PRUEBAS TECNICAS ###
     path("prueba-tecnica/", views.prueba_tecnica, name="prueba_tecnica"),
+
+    ### LOGS ###
+    path("logs/elemento/", views.registro_elemento, name="registro_elemento"),
+    path("usuarios/<int:id>/logs/",         views.logs_usuario,        name="logs_usuario"),
+    path("usuarios/<int:id>/logs/limpiar/", views.logs_limpiar_usuario, name="logs_limpiar_usuario"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

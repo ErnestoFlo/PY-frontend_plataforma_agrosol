@@ -721,6 +721,55 @@
     }
 
     // ══════════════════════════════════════════
+    //  REGISTRO DE ACTIVIDAD — Logs automáticos
+    //  Envía un log al servidor cuando el usuario
+    //  interactúa con un elemento data-permiso
+    // ══════════════════════════════════════════
+    const CSRF_LOG    = "{{ csrf_token }}";
+    const MODULO_URL  = "prueba_tecnica";
+    const LOG_URL     = "{% url 'registro_elemento' %}";
+
+    function registrarLog(clave, label) {
+      // No loguear si el usuario es superusuario (opcional)
+      // Falla silenciosamente — nunca interrumpe la UX
+      try {
+        const fd = new FormData();
+        fd.append('csrfmiddlewaretoken', CSRF_LOG);
+        fd.append('elemento_clave',     clave);
+        fd.append('elemento_label',     label);
+        fd.append('modulo_url',         MODULO_URL);
+        fetch(LOG_URL, { method: 'POST', body: fd }).catch(() => {});
+      } catch(e) {}
+    }
+
+    // Adjuntar listeners automáticamente a TODOS los elementos con data-permiso
+    // Se ejecuta una sola vez al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-permiso]').forEach(el => {
+        const clave = el.dataset.permiso;
+        const label = el.dataset.label || clave;
+        const tipo  = el.dataset.tipo  || 'componente';
+
+        // Para acciones: escuchar click
+        if (tipo === 'accion') {
+          el.addEventListener('click', () => registrarLog(clave, label), { passive: true });
+        }
+
+        // Para componentes: escuchar cambio/interacción
+        if (tipo === 'componente') {
+          const tag = el.tagName.toLowerCase();
+          if (tag === 'input' || tag === 'select' || tag === 'textarea') {
+            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
+          } else {
+            // Wrapper div/section — escuchar cualquier interacción interna
+            el.addEventListener('click',  () => registrarLog(clave, label), { passive: true });
+            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
+          }
+        }
+      });
+    });
+
+    // ══════════════════════════════════════════
     //  PASSWORD TOGGLE
     // ══════════════════════════════════════════
     function togglePassword() {

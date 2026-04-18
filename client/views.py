@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .models import Modulo, Componente, PermisoGrupo, get_permisos, AccesoModulo, tiene_acceso_modulo, escanear_template, PermisoElemento, Elemento
+from .models import Modulo, Componente, PermisoGrupo, get_permisos, AccesoModulo, tiene_acceso_modulo, escanear_template, PermisoElemento, Elemento, registrar_actividad
 import json
 
 
@@ -60,12 +60,17 @@ def eliminar(request, id):
     return redirect("listar")
 
 ########## VISTAS DE PROVEEDORES ##########
+# ── PROVEEDORES ───────────────────────────────────────────────
+ 
 @login_required
+@registrar_actividad(accion='buscar', modelo='Proveedor', campo_busqueda='q')
 def list_proveedores(request):
     cliente = proveedores.get_all_proveedores()
     return render(request, "proveedores/index_proveedores.html", {'lista': cliente["data"]})
-
+ 
+ 
 @login_required
+@registrar_actividad(accion='crear', modelo='Proveedor', campo_label='proveedor')
 def create_proveedor(request):
     if request.method == "POST":
         form = form_proveedores(request.POST or None, request.FILES or None)
@@ -75,10 +80,11 @@ def create_proveedor(request):
     else:
         form = form_proveedores()
     return render(request, "proveedores/create_proveedor.html", {"form": form})
-
+ 
+ 
 @login_required
+@registrar_actividad(accion='editar', modelo='Proveedor', campo_label='proveedor')
 def edit_proveedor(request, id):
-    form = None
     if request.method == "POST":
         form = form_proveedores(request.POST or None, request.FILES or None)
         if form.is_valid():
@@ -87,13 +93,35 @@ def edit_proveedor(request, id):
     else:
         cliente = proveedores.get_by_id(id)
         form = form_proveedores(initial=cliente["data"])
-
     return render(request, "proveedores/edit_proveedor.html", {"form": form})
-
+ 
+ 
 @login_required
+@registrar_actividad(accion='eliminar', modelo='Proveedor')
 def delete_proveedor(request, id):
     proveedores.delete(id)
     return redirect("proveedores")
+ 
+ 
+# ── CÓMO AGREGAR LOGS A CUALQUIER VISTA NUEVA ──────────────────────
+#
+# 1. CREAR registro:
+#    @registrar_actividad(accion='crear', modelo='NombreModelo', campo_label='campo_nombre')
+#
+# 2. EDITAR registro:
+#    @registrar_actividad(accion='editar', modelo='NombreModelo', campo_label='campo_nombre')
+#
+# 3. ELIMINAR registro:
+#    @registrar_actividad(accion='eliminar', modelo='NombreModelo')
+#    (no necesita campo_label porque no hay POST con datos del registro)
+#
+# 4. BUSCAR / CONSULTAR:
+#    @registrar_actividad(accion='buscar', modelo='NombreModelo', campo_busqueda='q')
+#    (campo_busqueda es el nombre del parámetro GET, default 'q')
+#
+# El decorador SIEMPRE va DESPUÉS de @login_required
+# para garantizar que request.user está disponible.
+
 
 ### Vista de prueba para login ###
 @login_required
@@ -101,27 +129,27 @@ def principio (request):
     return render(request, "usuarios/principio.html")
 
 ########## USUARIOS ##########
-@login_required
-def perfil(request):
-    if request.method == "POST":
-        # Datos del User
-        request.user.first_name = request.POST.get('first_name', '')
-        request.user.last_name = request.POST.get('last_name', '')
-        request.user.email = request.POST.get('email', '')
-        request.user.save()
+# @login_required
+# def perfil(request):
+#     if request.method == "POST":
+#         # Datos del User
+#         request.user.first_name = request.POST.get('first_name', '')
+#         request.user.last_name = request.POST.get('last_name', '')
+#         request.user.email = request.POST.get('email', '')
+#         request.user.save()
 
-        # Datos del perfil extendido
-        perfil = request.user.profile
-        perfil.cargo = request.POST.get('cargo', '')
-        perfil.area = request.POST.get('area', '')
-        perfil.telefono = request.POST.get('telefono', '')
-        if 'avatar' in request.FILES:
-            perfil.avatar = request.FILES['avatar']
-        perfil.save()
+#         # Datos del perfil extendido
+#         perfil = request.user.profile
+#         perfil.cargo = request.POST.get('cargo', '')
+#         perfil.area = request.POST.get('area', '')
+#         perfil.telefono = request.POST.get('telefono', '')
+#         if 'avatar' in request.FILES:
+#             perfil.avatar = request.FILES['avatar']
+#         perfil.save()
 
-        return redirect('perfil')
+#         return redirect('perfil')
 
-    return render(request, "usuarios/principio.html")
+#     return render(request, "usuarios/principio.html")
 
 # ── Decorador reutilizable para superusuarios ──
 def superuser_required(view_func):
@@ -743,3 +771,126 @@ def grupo_guardar_permisos_elemento(request, grupo_id, elemento_id):
         'elemento':  elemento.label,
         'grupo':     grupo.name,
     })
+
+########## VISTAS PARA LOGS ##########
+
+# ══════════════════════════════════════════════════════════════
+#  REGISTRO DE INTERACCIÓN CON ELEMENTOS (desde el frontend)
+# ══════════════════════════════════════════════════════════════
+@login_required
+@require_POST
+def registro_elemento(request):
+    """
+    Endpoint que recibe logs de interacción con elementos
+    enviados desde el frontend via fetch.
+    No interrumpe la acción del usuario — falla silenciosamente.
+    """
+    from .models import registrar_log, ActivityLog
+ 
+    elemento_clave = request.POST.get('elemento_clave', '').strip()
+    elemento_label = request.POST.get('elemento_label', '').strip()
+    modulo_url     = request.POST.get('modulo_url', '').strip()
+ 
+    if not elemento_clave:
+        return JsonResponse({'success': False}, status=400)
+ 
+    modulo = None
+    if modulo_url:
+        try:
+            modulo = Modulo.objects.get(url_name=modulo_url, activo=True)
+        except Modulo.DoesNotExist:
+            pass
+ 
+    registrar_log(
+        request,
+        tipo_evento    = 'elemento',
+        descripcion    = f'Usó: {elemento_label or elemento_clave}',
+        modulo         = modulo,
+        elemento_clave = elemento_clave,
+    )
+    return JsonResponse({'success': True})
+
+# ── Vista: logs del usuario en su perfil (ya autenticado) ────
+@login_required
+def perfil(request):
+    if request.method == "POST":
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name  = request.POST.get('last_name', '')
+        request.user.email      = request.POST.get('email', '')
+        request.user.save()
+        p = request.user.profile
+        p.cargo    = request.POST.get('cargo', '')
+        p.area     = request.POST.get('area', '')
+        p.telefono = request.POST.get('telefono', '')
+        if 'avatar' in request.FILES:
+            p.avatar = request.FILES['avatar']
+        p.save()
+        return redirect('perfil')
+ 
+    from .models import ActivityLog
+    logs = ActivityLog.objects.filter(
+        usuario=request.user
+    ).select_related('modulo').order_by('-fecha')[:50]
+ 
+    return render(request, "usuarios/perfil.html", {'logs': logs})
+ 
+ 
+# ── Vista: logs de un usuario para el superadmin ─────────────
+@superuser_required
+def logs_usuario(request, id):
+    from .models import ActivityLog
+    usuario_visto = get_object_or_404(User, id=id)
+ 
+    logs = ActivityLog.objects.filter(
+        usuario=usuario_visto
+    ).select_related('modulo').order_by('-fecha')
+ 
+    return render(request, 'usuarios/logs_usuario.html', {
+        'usuario_visto':   usuario_visto,
+        'logs':            logs,
+        'total_logs':      logs.count(),
+        'total_login':     logs.filter(tipo_evento='login').count(),
+        'total_modulos':   logs.filter(tipo_evento='modulo').count(),
+        'total_elementos': logs.filter(tipo_evento='elemento').count(),
+    })
+ 
+ 
+# ── Vista: limpiar logs de un usuario (superadmin) ───────────
+@superuser_required
+@require_POST
+def logs_limpiar_usuario(request, id):
+    from .models import ActivityLog
+    usuario_visto = get_object_or_404(User, id=id)
+    eliminados = ActivityLog.objects.filter(usuario=usuario_visto).count()
+    ActivityLog.objects.filter(usuario=usuario_visto).delete()
+    return redirect('logs_usuario', id=id)
+
+
+def error_403(request, exception=None):
+    """
+    Página 403 personalizada.
+    Registra el intento de acceso denegado si el usuario está autenticado.
+    """
+    if request.user.is_authenticated:
+        from .models import registrar_log
+        url_name = ''
+        modulo   = None
+ 
+        if request.resolver_match:
+            url_name = request.resolver_match.url_name or ''
+ 
+        # Intentar vincular con un módulo registrado
+        try:
+            modulo = Modulo.objects.get(url_name=url_name, activo=True)
+        except (Modulo.DoesNotExist, Exception):
+            modulo = None
+ 
+        registrar_log(
+            request,
+            tipo_evento    = 'acceso_denegado',
+            descripcion    = f'Acceso denegado a: {url_name or request.path}',
+            modulo         = modulo,
+            elemento_clave = 'acceso_403',
+        )
+ 
+    return render(request, 'errors/403.html', status=403)

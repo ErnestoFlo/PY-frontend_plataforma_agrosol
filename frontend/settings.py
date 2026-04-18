@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-alya!*(=cktnyu17c6d*i(1l@m7b^9_^*hzr2=5cl$gd9k_s(@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'client.middleware.ActivityLogMiddleware',  # ← agregar esta línea
 ]
 
 ROOT_URLCONF = 'frontend.urls'
@@ -135,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 ############ Variables de configuración para login ###########
-LOGIN_REDIRECT_URL = '/agrosol/principio' # A dónde va el usuario DESPUÉS de hacer login exitoso
+LOGIN_REDIRECT_URL = '/agrosol/perfil' # A dónde va el usuario DESPUÉS de hacer login exitoso
 LOGIN_URL = '/auth/login/' # A dónde redirige si intenta acceder a una página protegida sin login
 LOGOUT_REDIRECT_URL = '/auth/login' # A dónde va después de hacer logout
 
