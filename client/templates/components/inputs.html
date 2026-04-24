@@ -4,6 +4,15 @@
   
 {% partialdef input %}
   <fieldset class="input-container {{ x_params }}">
+    {% if x_input_params %}
+      {% with "input input-"|add:type|add:" "|add:x_input_params|add:" peer" as input_classes %}
+        {% render_field field type=type id=name class=input_classes placeholder=' ' %}
+      {% endwith %}
+    {% else %}
+      {% with "input input-"|add:type|add:" peer" as input_classes %}
+        {% render_field field type=type id=name class=input_classes placeholder=' ' %}
+      {% endwith %}
+    {% endif %}
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
   </fieldset>
@@ -11,15 +20,16 @@
 
 {% partialdef input_search %}
   <fieldset class="input-container {{ x_params }}">
-    <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} peer" placeholder="Búsqueda">
+    {% render_field field type='text' id=name class='input input-text peer' placeholder='Búsqueda' %}
     {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='input-button p-0 shrink-0' size='5' icon_name=icon %}
   </fieldset>
 {% endpartialdef %}
 
 {% partialdef input_icon %}
   <fieldset class="input-container {{ x_params }}">
-    
-    <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} peer" placeholder=" ">
+    {% with "input input-"|add:type|add:" "|add:x_input_params|add:" peer" as input_classes %}
+      {% render_field field type=type id=name class=input_classes placeholder=' ' %}
+    {% endwith %}
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
     {% include "components/buttons.html#input_icon_button" with func_type="button" type='btn-icon-ghost-neutral' x_params='input-button p-0 shrink-0' size='5' icon_name=icon %}
@@ -28,7 +38,13 @@
 
 {% partialdef input_password %}
   <fieldset class="input-container {{ x_params }}">
-    <input type="password" id="{{ name }}" class="input peer" placeholder=" ">
+    {% if x_input_params %}
+      {% with "input "|add:x_input_params|add:" peer" as input_classes %}
+        {% render_field field type='password' id=name class=input_classes placeholder=' ' %}
+      {% endwith %}
+    {% else %}
+      {% render_field field type='password' id=name class='input peer' placeholder=' ' %}
+    {% endif %}
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
       {{ label }}
@@ -44,9 +60,8 @@
         hx-target="#{{ name }}-options"
         hx-swap="innerHTML">    
     <!-- Input visible que muestra la selección -->
-    <input 
-      type="text" id="{{ name }}" name="{{ name }}" class="input peer cursor-pointer caret-transparent" placeholder=" " readonly
-      data-action="comboboxToggle" data-target="{{ name }}">
+    {% render_field field id=name name=name class='input peer cursor-pointer caret-transparent' placeholder=' ' readonly='true' data-action='comboboxToggle' data-target=name %}
+
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
       {{ label }}

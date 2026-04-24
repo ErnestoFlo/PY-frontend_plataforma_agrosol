@@ -19,6 +19,16 @@ PROVEEDOR_CELL_FIELDS = [
 PROVEEDOR_PER_PAGE = 100
 PROVEEDOR_BASE_URL = '/agrosol/proveedores'
 
+PROVEEDOR_COLUMNS_CONFIG = [
+    {'label': 'proveedor', 'visibility': 'always', 'priority': 1},
+    {'label': 'direccion', 'visibility': 'lg', 'priority': 3},
+    {'label': 'contacto', 'visibility': 'always', 'priority': 2},
+    {'label': 'cargo', 'visibility': 'xl', 'priority': 4},
+    {'label': 'teléfono', 'visibility': 'always', 'priority': 5},
+    {'label': 'celular', 'visibility': 'xl', 'priority': 6},
+    {'label': 'email', 'visibility': 'lg', 'priority': 7},
+    {'label': 'terminos_de_pago', 'visibility': 'xl', 'priority': 8},
+]
 
 # ============================================================================
 # HELPERS
@@ -44,7 +54,8 @@ def build_table_rows(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             'id': item_id,
             'cells': [item.get(field, '') for field in PROVEEDOR_CELL_FIELDS],
             'edit_url': f"{PROVEEDOR_BASE_URL}/editar/{item_id}",
-            'delete_url': f"{PROVEEDOR_BASE_URL}/confirmar/{item_id}"
+            'delete_url': f"{PROVEEDOR_BASE_URL}/confirmar/{item_id}",
+            'actions_id': f"actions-{item_id}"
         }
         rows.append(row)
     return rows
@@ -72,6 +83,7 @@ def get_paginated_table_data(items: List[Dict[str, Any]], page: int) -> Dict[str
     paginated, total_pages, current_page, page_range = paginate(items, page)
     
     return {
+        'columns': PROVEEDOR_COLUMNS_CONFIG,
         'rows': paginated,
         'total_pages': total_pages,
         'current_page': current_page,
@@ -94,23 +106,84 @@ def get_proveedores_for_table(api_response: Dict[str, Any], page: int) -> Dict[s
 # ============================================================================
 
 # Definición centralizada de items del menú
-MENU_ITEMS_CONFIG = [
-    {'url': 'test_form_page', 'icon': 'icon-image-regular', 'label': 'Pruebas formulario', 'page_name': 'Main Form Test'},
-    {'url': 'tests_page', 'icon': 'icon-date-regular', 'label': 'Componentes', 'page_name': 'Test & Views'},
-    {'url': 'dashboard', 'icon': 'icon-file-regular', 'label': 'Dashboard', 'page_name': 'Dashboard'},
-    {'url': 'proveedores', 'icon': 'icon-pencil-regular', 'label': 'Proveedores', 'page_name': 'Proveedores'},
+MENU_SIDEBAR_ITEMS_CONFIG = [
+    {'url': 'dashboard', 'icon': 'icon-home', 'label': 'Inicio', 'page_name': 'Dashboard', 'group': []},
+    {'url': '', 'icon': 'icon-products', 'label': 'Productos', 'page_name': '', 'group': [
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Maestro', 'page_name': 'Maestro de Productos', 'group': []},
+        {'url': 'proveedores', 'icon': 'icon-provider', 'label': 'Proveedores', 'page_name': 'Proveedores', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Marcas', 'page_name': 'Marcas', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Líneas', 'page_name': 'Líneas', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Categorías', 'page_name': 'Categorías', 'group': []},
+    ]},
+]
+MENU_MOBILEBAR_ITEMS_CONFIG = [
+    {'url': 'dashboard', 'icon': 'icon-home', 'label': 'Inicio', 'page_name': 'Dashboard', 'group': []},
+    {'url': '', 'icon': 'icon-products', 'label': 'Productos', 'page_name': '', 'group': [
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Maestro', 'page_name': 'Maestro de Productos', 'group': []},
+        {'url': 'proveedores', 'icon': 'icon-provider', 'label': 'Proveedores', 'page_name': 'Proveedores', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Marcas', 'page_name': 'Marcas', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Líneas', 'page_name': 'Líneas', 'group': []},
+        {'url': 'dashboard', 'icon': 'icon-user-crown', 'label': 'Categorías', 'page_name': 'Categorías', 'group': []},
+    ]},
 ]
 
 
-def build_menu_items(current_page_name: str) -> List[Dict[str, Any]]:
+def build_menu_sidebar_items(current_page_name: str) -> List[Dict[str, Any]]:
     menu_items = []
     
-    for item in MENU_ITEMS_CONFIG:
+    for item in MENU_SIDEBAR_ITEMS_CONFIG:
+        if item['page_name'] == current_page_name:
+            icon = f'{item['icon']}-fill'  # ← Icono activo
+            active = True
+        else:
+            icon = f'{item['icon']}-regular'  # ← Icono inactivo,
+            active = False
+        group_items_copy = []
+        for sub_item in item['group']:
+            sub_item_copy = sub_item.copy()  # ← Copia shallow
+            if sub_item_copy['page_name'] == current_page_name:
+                sub_item_copy['icon'] = f"{sub_item_copy['icon']}-fill"
+                sub_item_copy['is_active'] = True
+            else:
+                sub_item_copy['icon'] = f"{sub_item_copy['icon']}-regular"
+                sub_item_copy['is_active'] = False
+            group_items_copy.append(sub_item_copy)
+        
         menu_items.append({
             'url': item['url'],
-            'icon': item['icon'],
+            'icon': icon,
             'label': item['label'],
-            'is_active': item['page_name'] == current_page_name,  # ← Determina si es activo
-        })
+            'is_active': active,
+            'group': group_items_copy,
+        })  
+    return menu_items
+
+def build_menu_mobilebar_items(current_page_name: str) -> List[Dict[str, Any]]:
+    menu_items = []
     
+    for item in MENU_MOBILEBAR_ITEMS_CONFIG:
+        if item['page_name'] == current_page_name:
+            icon = f'{item['icon']}-fill'  # ← Icono activo
+            active = True
+        else:
+            icon = f'{item['icon']}-regular'  # ← Icono inactivo,
+            active = False
+        group_items_copy = []
+        for sub_item in item['group']:
+            sub_item_copy = sub_item.copy()  # ← Copia shallow
+            if sub_item_copy['page_name'] == current_page_name:
+                sub_item_copy['icon'] = f"{sub_item_copy['icon']}-fill"
+                sub_item_copy['is_active'] = True
+            else:
+                sub_item_copy['icon'] = f"{sub_item_copy['icon']}-regular"
+                sub_item_copy['is_active'] = False
+            group_items_copy.append(sub_item_copy)
+        
+        menu_items.append({
+            'url': item['url'],
+            'icon': icon,
+            'label': item['label'],
+            'is_active': active,
+            'group': group_items_copy,
+        })  
     return menu_items

@@ -16,8 +16,10 @@
         {% include "components/buttons.html#input_icon_button" with func_type='button' type='btn-icon-ghost-neutral' x_params='p-1 shrink-0' size='5' icon_name='icon-xmark-fill' action='closeModal' target=modal_id %}
       </div>
 
-      <div id="{{ modal_id }}-content" class="modal-body">
-        <!-- HTMX inyecta aquí -->
+      <div id="{{ modal_id }}-content" class="modal-body"
+          hx-target="this"
+          hx-swap="innerHTML">
+        <!-- HTMX Inyecta aquí -->
       </div>
 
       {% if show_footer %}

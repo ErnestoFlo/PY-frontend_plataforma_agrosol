@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // *********************************************************
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
+  // *********************************************************
   flatpickr("#fecha_hora", {
         enableTime: true,
         time_24hr: true,
@@ -18,37 +20,99 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const theme = document.documentElement.getAttribute('data-theme')
   updateThemeAssets(theme)
+  const skeleton = document.querySelector('#skeleton-template')
+  const aside = document.querySelector('#sidebar');
+  const accordions = document.querySelectorAll('.sidebar-accordion');
 
+  // *********************************************
   // *********** ASIGNACION DE EVENTOS ***********
+  // *********************************************
   // ***** BOTONES *****
   document.querySelectorAll('[data-action="toggleTheme"]').forEach(btn => {btn.addEventListener('click', toggleTheme)})
   document.querySelectorAll('[data-action="togglePassword"]').forEach(btn => {btn.addEventListener('click', (e) => togglePassword(e.currentTarget))})
   document.querySelectorAll('[data-action="collapseSidebar"]').forEach(btn => {btn.addEventListener('click', (e) => collapseSidebar(e.currentTarget))})
+  document.querySelectorAll('[data-action="handleBack"]').forEach(btn => {btn.addEventListener('click', (e) => handleBack())})
   // **** COMBOBOXES ****
   document.querySelectorAll('[data-action="comboboxToggle"]').forEach(trigger => {trigger.addEventListener('click', (e) => comboboxToggle(e.currentTarget))})
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
-  // ***** RANGES *****
-  document.querySelectorAll('[data-action="rangeUpdate"]').forEach(input => {
-    const inputId = input.dataset.target
-    const fill = document.getElementById(`${inputId}-fill`)
-    const thumb = document.getElementById(`${inputId}-thumb`)
-    const output = document.getElementById(`${inputId}-value`)
-    input.addEventListener('input', (e) => rangeUpdate(e.currentTarget, fill, thumb, output))
-  })
   // ***** TOGGLE *****
   document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
     btn.addEventListener('click', (e) => toggleSwitch(e.currentTarget))
   })
-  // ***** MODAL *****
-  document.querySelectorAll('[data-action="openModal"]').forEach(btn => {
-    btn.addEventListener('click', (e) => openModal(e.currentTarget.dataset.target))
-  })
-  document.querySelectorAll('[data-action="closeModal"]').forEach(btn => {
-    btn.addEventListener('click', (e) => closeModal(e.currentTarget.dataset.target))
-  })
+  
+  // ***** DELEGATED CLICK LISTENER *****
+  // Un único listener para manejar modales, popovers y overlay
+  // Funciona incluso con elementos inyectados por HTMX (muy eficiente)
   document.addEventListener('click', (e) => {
-    if (e.target.matches('.modal-overlay')) closeModal(e.target.id)
+    // Detectar acción desde data-action
+    const actionBtn = e.target.closest('[data-action="openModal"], [data-action="closeModal"], [data-action="togglePopover"], [data-action="closePopover"]')
+    
+    if (actionBtn) {
+      const action = actionBtn.dataset.action
+      const target = actionBtn.dataset.target
+      const get_url = actionBtn.getAttribute('hx-get')
+      
+      if (action === 'openModal') {
+        openModal(target, get_url)
+      } else if (action === 'closeModal') {
+        closeModal(target)
+      } else if (action === 'togglePopover') {
+        e.stopPropagation()
+        togglePopover(target)
+      } else if (action === 'closePopover') {
+        closePopover(target)
+      }
+      return // Prevenir propagación innecesaria
+    }
+    
+    // Cerrar popovers al hacer clic fuera
+    if (!e.target.closest('[data-action="popoverContainer"]')) {
+      document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
+      document.querySelectorAll('.bottombar-more-popover').forEach(p => p.setAttribute('data-open', 'false'))
+    }
   })
+  
+  // ***** HTMX EVENT LISTENERS *****
+  // Deshabilitar botón submit SOLO cuando HTMX comienza una petición validada
+  document.addEventListener('htmx:beforeRequest', (e) => {
+    const form = e.target.closest('form')
+    if (form && e.detail.xhr.upload) {
+      const submitBtn = form.querySelector('[type="submit"]')
+      if (submitBtn) {
+        submitBtn.disabled = true
+        submitBtn.style.opacity = '0.6'
+        submitBtn.style.cursor = 'not-allowed'
+      }
+    }
+  })
+  
+  // Re-habilitar botón si hay error HTTP
+  document.addEventListener('htmx:responseError', (e) => {
+    const form = e.target.closest('form')
+    if (form) {
+      const submitBtn = form.querySelector('[type="submit"]')
+      if (submitBtn) {
+        submitBtn.disabled = false
+        submitBtn.style.opacity = '1'
+        submitBtn.style.cursor = 'pointer'
+      }
+    }
+  })
+  
+  // // ***** MOUSEDOWN LISTENER PARA OVERLAY *****
+  // // Cerrar modal/popover SOLO si hubo mousedown en el overlay (no en el modal-container)
+  // document.addEventListener('mousedown', (e) => {
+  //   if (e.target.matches('.modal-overlay')) {
+  //     e.target.dataset.overlayDown = 'true'
+  //   }
+  // })
+  
+  // document.addEventListener('click', (e) => {
+  //   if (e.target.matches('.modal-overlay') && e.target.dataset.overlayDown === 'true') {
+  //     closeModal(e.target.id)
+  //     e.target.dataset.overlayDown = 'false'
+  //   }
+  // })
   // ***** FILE PICKER *****
   document.querySelectorAll('[data-action="filePickerZone"]').forEach(zone => {
     const inputId = zone.dataset.target
@@ -65,27 +129,94 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     input.addEventListener('change', () => renderFileList(inputId, input.files))
   })
-  // ***** POPOVERS *****
-  document.querySelectorAll('[data-action="togglePopover"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation()
-      togglePopover(e.currentTarget.dataset.target)
+  // ***** BOTTOM BAR *****
+  document.querySelectorAll('[data-action="bottombarItem"]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const bar = e.currentTarget.closest('.bottombar')
+      if (!bar) return
+      bar.querySelectorAll('.bottombar-item').forEach(i => i.classList.remove('active'))
+      e.currentTarget.classList.add('active')
     })
   })
-  document.querySelectorAll('[data-action="closePopover"]').forEach(btn => {
-    btn.addEventListener('click', (e) => closePopover(e.currentTarget.dataset.target))
-  })
-  // Cerrar al hacer clic fuera
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('[data-action="popoverContainer"]')) {
-      document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
-    }
-  })
 
-
+  // *********************************************
   // ***************   FUNCIONES   ***************
+  // *********************************************
 
-    // Cambiar tema de color
+  // OBSERVAR CAMBIOS EN ATRIBUTOS DE CUALQUIER ELEMENTO
+  function watchAttribute(element, attr, callback) {
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === attr) {
+          callback(element.getAttribute(attr));
+        }
+      }
+    });
+
+    observer.observe(element, {
+      attributes: true,
+      attributeFilter: [attr],
+    });
+
+    return observer;
+  }
+
+  // CAMBIOS POR ATRIBUTOS
+  // Sidebar cierra = acordeon cierra
+  function closeAccordionsInside(container) {
+    const details = container.querySelectorAll('details');
+
+    details.forEach((item) => {
+      item.removeAttribute('open');
+    });
+  }
+  watchAttribute(aside, 'data-collapsed', (value) => {
+    if (value === 'true') {
+      closeAccordionsInside(aside);
+    }
+  });
+
+
+  // Acordeon abre = sidebar abre
+  function expandSidebar() {
+    sidebar.setAttribute('data-collapsed', 'false');
+  }
+  accordions.forEach((accordion) => {
+    accordion.addEventListener('toggle', () => {
+      if (accordion.open) expandSidebar();
+    });
+  });
+
+  // Recuperar eventos de elementos recuperados por HTMX (ej. modales y formularios)
+  document.body.addEventListener("htmx:historyRestore", function (evt) {
+    const modal = evt.target.querySelector('.modal')
+    if (modal) {
+      const form = modal.querySelector('form')
+      if (form) {
+        form.addEventListener('submit', () => {
+          const submitBtn = form.querySelector('[type="submit"]')
+          if (submitBtn) {
+            submitBtn.disabled = true
+            submitBtn.style.opacity = '0.6'
+            submitBtn.style.cursor = 'not-allowed'
+          }
+        })
+      }
+    }
+  });
+  // Regresar a la página anterior
+function handleBack() {
+  try {
+    if (window.history.length > 1) {
+      history.back();
+    } else {
+      window.location.href = "/dashboard/";
+    }
+  } catch (e) {
+    window.location.href = "/dashboard/";
+  }
+}
+  // Cambiar tema de color
   function toggleTheme() {
     const html = document.documentElement
     const current = html.getAttribute('data-theme')
@@ -103,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!btn) return
     const icon = btn.querySelector('use')
     const sprite = btn.dataset.sprite;
-    console.log(icon)
     icon.setAttribute(
       'href',
       theme === 'dark'
@@ -181,18 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Actualizar valor del input-range
-  function rangeUpdate(input, fill, thumb, output){
-    const min = parseFloat(input.min) || 0
-    const max = parseFloat(input.max) || 100
-    const val = parseFloat(input.value)
-    const pct = ((val - min) / (max - min)) * 100
-
-    fill.style.width = `${pct}%`
-    thumb.style.left = `${pct}%`
-    if (output) output.value = val
-  }
-
   // Toggle switch
   function toggleSwitch(btn) {
     const isChecked = btn.dataset.checked === 'true'
@@ -200,12 +318,172 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Modal
-  function openModal(modalId) {
-    const modal = document.getElementById(modalId)
-    if (!modal) return
-    modal.classList.remove('hidden')
-    document.body.style.overflow = 'hidden'
+function openModal(modalId, get_url) {
+  const modal = document.getElementById(modalId)
+  if (!modal) return
+
+  const form_container = document.querySelector(`#${modalId}-content`)
+  form_container.innerHTML = skeleton.innerHTML
+  modal.classList.remove('hidden')
+  if (form_container && get_url) {
+    htmx.ajax('GET', `${get_url}?fragment=form`, {
+      target: form_container,
+      swap: 'innerHTML'
+    })
+    console.log("URL:", `${get_url}?fragment=form`)
   }
+
+  document.body.style.overflow = 'hidden'
+}
+
+  // ============================================================================
+  // ALERT MANAGER - Gestor centralizado de alertas
+  // ============================================================================
+  class AlertManager {
+    constructor() {
+      this.container = this.initContainer()
+      this.alerts = new Map()
+      this.config = {
+        duration: 3000,
+        position: 'bottom-right',
+        maxStack: 5
+      }
+      this.iconMap = {
+        success: 'icon-check-circle-fill',
+        danger: 'icon-xmark-circle-fill',
+        warning: 'icon-exclamation-circle-fill',
+        info: 'icon-info-circle-fill'
+      }
+    }
+    static instance = null
+    static getInstance() {
+      if (!this.instance) {
+        this.instance = new AlertManager()
+      }
+      return this.instance
+    }
+    initContainer() {
+      let container = document.getElementById('alerts-container')
+      if (!container) {
+        container = document.createElement('div')
+        container.id = 'alerts-container'
+        container.className = 'fixed top-4 right-4 z-[500] flex flex-col gap-2 max-w-md'
+        document.body.appendChild(container)
+      }
+      return container
+    }
+    /**
+     * Alerta simple: solo mensaje, desaparece automáticamente
+     * @param {string} message - Mensaje a mostrar
+     * @param {string} variant - success, error, warning, info
+     * @param {number} duration - Tiempo en ms antes de desaparecer (default: 3000)
+     */
+    simple(message, variant = 'success', duration) {
+      const alertId = `alert-${Date.now()}`
+      const durationMs = duration || this.config.duration
+      const icon = this.iconMap[variant] || this.iconMap.info
+
+      const alertDiv = document.createElement('div')
+      alertDiv.id = alertId
+      alertDiv.className = `alert-simple alert-${variant} mb-2 alert-enter`
+      alertDiv.setAttribute('role', 'alert')
+      alertDiv.innerHTML = `
+        <svg class="w-5 h-5 shrink-0">
+          <use href="/static/sprite.svg#${icon}"/>
+        </svg>
+        <span class="text-sm font-semibold">${message}</span>
+      `
+      this.container.appendChild(alertDiv)
+      this.alerts.set(alertId, { element: alertDiv, timeout: null })
+      // Auto-dismiss
+      const timeoutId = setTimeout(() => {
+        this.dismiss(alertId)
+      }, durationMs)
+      this.alerts.get(alertId).timeout = timeoutId
+      return alertId
+    }
+    /**
+     * Alerta detallada: con título y descripción, requiere cierre manual
+     * @param {string} title - Título de la alerta
+     * @param {string} body - Descripción detallada
+     * @param {string} variant - success, error, warning, info
+     */
+    detailed(title, body, variant = 'info') {
+      const alertId = `alert-${Date.now()}`
+      const icon = this.iconMap[variant] || this.iconMap.info
+
+      const alertDiv = document.createElement('div')
+      alertDiv.id = alertId
+      alertDiv.className = `alert-detailed alert-${variant} alert-enter`
+      alertDiv.setAttribute('role', 'alert')
+      alertDiv.innerHTML = `
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 shrink-0">
+              <use href="/static/sprite.svg#${icon}"/>
+            </svg>
+            <span class="font-display font-semibold text-sm">${title}</span>
+          </div>
+          <button type="button" class="shrink-0 text-fg-muted hover:text-fg transition-colors" data-alert-dismiss="${alertId}">
+            <svg class="w-4 h-4">
+              <use href="/static/sprite.svg#icon-xmark-fill"/>
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-fg-body mt-2 ml-7">${body}</p>
+      `
+      const closeBtn = alertDiv.querySelector('[data-alert-dismiss]')
+      closeBtn.addEventListener('click', () => this.dismiss(alertId))
+      this.container.appendChild(alertDiv)
+      this.alerts.set(alertId, { element: alertDiv, timeout: null })
+      return alertId
+    }
+    dismiss(alertId) {
+      const alert = this.alerts.get(alertId)
+      if (!alert) return
+      // Cancelar timeout si existe
+      if (alert.timeout) clearTimeout(alert.timeout)
+      // Animar salida
+      alert.element.classList.remove('alert-enter')
+      alert.element.classList.add('alert-exit')
+      // Remover después de animación
+      setTimeout(() => {
+        alert.element.remove()
+        this.alerts.delete(alertId)
+      }, 300)
+    }
+    dismissAll() {
+      this.alerts.forEach((_, alertId) => {
+        this.dismiss(alertId)
+      })
+    }
+    // ========== ATAJOS ESTÁTICOS (fácil acceso) ==========
+    static success(message, duration) {
+      return this.getInstance().simple(message, 'success', duration)
+    }
+    static danger(message, duration) {
+      return this.getInstance().simple(message, 'danger', duration)
+    }
+    static warning(message, duration) {
+      return this.getInstance().simple(message, 'warning', duration)
+    }
+    static info(message, duration) {
+      return this.getInstance().simple(message, 'info', duration)
+    }
+    static detailedSuccess(title, body) {
+      return this.getInstance().detailed(title, body, 'success')
+    }
+    static detailedDanger(title, body) {
+      return this.getInstance().detailed(title, body, 'danger')
+    }
+    static detailedWarning(title, body) {
+      return this.getInstance().detailed(title, body, 'warning')
+    }
+    static detailedInfo(title, body) {
+      return this.getInstance().detailed(title, body, 'info')
+    }
+  }
+  window.AlertManager = AlertManager
 
 
   // File picker
@@ -248,7 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
 })
   function closeModal(modalId) {
     const modal = document.getElementById(modalId)
-    console.log("Se ejecutó");
+    const form_container = modal.querySelector(`#${modalId}-content`)
+    form_container.innerHTML = ''
     if (!modal) return
     modal.classList.add('hidden')
     document.body.style.overflow = ''

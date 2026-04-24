@@ -9,3 +9,10 @@ class ProveedoresForm(forms.Form):
   celular = forms.CharField(max_length=240)
   email = forms.CharField(max_length=400)
   terminos_de_pago = forms.CharField(max_length=400)
+
+class LoginForm(forms.Form):
+  usuario = forms.CharField(max_length=240)
+  contrasenia = forms.CharField(max_length=720)
+
+class SearchForm(forms.Form):
+  query = forms.CharField(max_length=240, required=False)

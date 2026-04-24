@@ -2,9 +2,9 @@
 {% load partials %}
 
 {% partialdef table %}
-  <div class="table-container card {{ x_params }} px-4 py-2 flex flex-col">
-    <div class="overflow-x-auto rounded-xl flex-1">
-      <div class="max-h-[80vh] sm:max-h-[70vh] md:max-h-[68vh] overflow-y-auto rounded-xl">
+  <div class="table-container card {{ x_params }} px-4 py-2 flex flex-col h-full">
+    <div class="overflow-x-auto rounded-xl flex-1 h-full">
+      <div class="h-full overflow-y-auto rounded-xl">
         <table class="data-table rounded-t-xl">
           <thead class="card rounded-none rounded-t-xl sticky top-0 z-10 border-bottom p-0 bg-surface-1">
             <tr class="p-0 bg-transparent rounded-t-xl">
@@ -29,7 +29,7 @@
 
 {% partialdef table_rows %}
   {% for row in rows %}
-    <tr class="table-tr">
+    <tr class="table-tr" id="row-{{ row.id }}">
       <td class="table-td-num border-none">{{ row.id }}</td>
       {% if row.avatar %}
         <td class="table-td">
@@ -42,9 +42,9 @@
         <td class="table-td w-auto max-w-10" title="{{ cell }}">{{ cell }}</td>
       {% endfor %}
       {% if with_actions %}
-        <td class="table-td w-auto flex gap-2">
-          {% include "components/buttons.html#input_icon_button" with func_type='button' type='btn-icon-ghost-neutral' x_params='p-1' size='4' icon_name='icon-pencil-fill' action='openModal' target='modal-edit' hx_get=row.edit_url hx_target="#modal-edit-content" hx_swap="innerHTML" hx_trigger="click" %}
-          {% include "components/buttons.html#input_icon_button" with func_type='button' type='btn-icon-ghost-danger' x_params='p-1' size='4' icon_name='icon-trash-fill' action='openModal' target='modal-delete' hx_get=row.delete_url hx_target="#modal-edit-content" hx_swap="innerHTML" hx_trigger="click" %}
+        <td class="table-td overflow-visible w-auto flex justify-center gap-2 relative" data-action="popoverContainer">
+          {% include 'components/buttons.html#icon_button' with func_type='button' x_params='p-1 relative' type='icon-ghost-neutral' icon_name='icon-elipsis-horizontal-fill' size='4' action='togglePopover' target=row.actions_id attrs="aria-haspopup='true' aria-expanded='false'" %}
+          {% include 'components/popovers.html#row_actions' with id=row.id edit_url=row.edit_url delete_url=row.delete_url %}
         </td>
       {% endif %}
     </tr>
@@ -58,11 +58,11 @@
 {% endpartialdef %}
 
 {% partialdef table_pagination %}
-  <div class="table-pagination">
+  <div class="table-pagination h-16">
     <button class="page-btn"
       {% if current_page > 1 %}
         hx-get="?page={{ current_page|add:'-1' }}"
-        hx-target="#{{ table_id }}-body"
+        hx-target="#{{ table_id }}-container"
         hx-swap="innerHTML"
       {% else %}
         disabled
@@ -75,7 +75,7 @@
     {% for page in page_range %}
       <button class="page-btn {% if page == current_page %}page-btn-active{% endif %}"
         hx-get="?page={{ page }}"
-        hx-target="#{{ table_id }}-body"
+        hx-target="#{{ table_id }}-container"
         hx-swap="innerHTML">
         {{ page }}
       </button>
@@ -84,7 +84,7 @@
     <button class="page-btn"
       {% if current_page < total_pages %}
         hx-get="?page={{ current_page|add:'1' }}"
-        hx-target="#{{ table_id }}-body"
+        hx-target="#{{ table_id }}-container"
         hx-swap="innerHTML"
       {% else %}
         disabled

@@ -1,13 +1,32 @@
-{% extends '../layouts/pc_nav.html' %}
+{% extends '../layouts/navigation.html' %}
 
 {% block view %}
-  <section class="w-full h-full flex flex-col gap-2">
-    <section class="card tools w-full flex flex-row justify-end p-2">
-      {% include "components/buttons.html#button" with func_type='button' type='btn-primary' text='+ Nuevo' x_params='p-1' action='openModal' target='modal-create' hx_get=create_url hx_target="#modal-create-content" hx_swap="innerHTML" hx_trigger="click" %}
+  <section class="w-full h-full flex flex-col gap-2 max-w-full overflow-y-auto">
+    
+    <section class="card tools w-full flex flex-row justify-end p-2 px-4 gap-2 h-12">
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-word-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-excel-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-pdf-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-primary' size="4" icon_name="icon-plus-fill" x_params='p-2 rounded-md aspect-square ' action='openModal' target='modal-create' hx_get=create_url hx_target="#modal-create-content" hx_swap="innerHTML" %}
     </section>
-    {% include "partials/tables.html#table" with table_id='tabla-prov' columns=columns rows=rows with_actions=True current_page=current_page total_pages=total_pages page_range=page_range x_params='w-full flex-1 overflow-x-auto' %}
+    <div
+      id="tabla-prov-container"
+      class="flex-1 overflow-y-auto"
+      hx-get="{% url 'proveedores' %}?fragment=table"
+      hx-trigger="intersect once"
+      hx-target="this"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+    >
+      {% include "partials/skeletons.html#skeleton_table" %}
+    </div>
     {% include "components/modals.html#modal" with modal_id='modal-create' title='Crear Proveedor' size='modal-lg' show_footer=False %}
     {% include "components/modals.html#modal" with modal_id='modal-edit' title='Editar Proveedor' size='modal-lg' show_footer=False %}
     {% include "components/modals.html#modal" with modal_id='modal-delete' title='Eliminar Proveedor' size='modal-md' show_footer=False %}
+    <div id="skeleton-template" class="hidden w-full h-full max-h-full">
+      {% include "partials/skeletons.html#skeleton_default" %}
+    </div>
+    <!-- Contenedor de Alertas -->
+    <div id="alerts-container" class="fixed bottom-4 right-4 z-20 flex flex-col gap-2 w-auto"></div>
   </section>
 {% endblock %}

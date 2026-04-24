@@ -1,49 +1,47 @@
-{% extends '../layouts/pc_nav.html' %}
+{% extends '../layouts/navigation.html' %}
 {% load static %}
 
 {% block view %}
 <main class="flex flex-col items-center w-full h-full p-8 gap-5">
   <div class="flex items-center max-w-7xl gap-y-2 flex-wrap">
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-image-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-open-eye-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-close-eye-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-print-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-logout-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sun-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-moon-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bars-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-circle-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-clipboard-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-vertical-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-horizontal-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-expand-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-magnifyng-glass-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-excel-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pdf-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-word-regular' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-reload-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sort-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-settings-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pin-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-trash-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-check-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-down-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-up-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-right-fill' %}
-    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-left-fill' %}
-
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-open-eye-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-close-eye-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-print-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-logout-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sun-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-moon-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bars-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-check-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-exclamation-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-info-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-clipboard-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-vertical-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-horizontal-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-expand-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-magnifyng-glass-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-excel-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pdf-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-word-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-reload-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sort-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-settings-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pin-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-trash-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-down-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-right-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-left-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-up-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-check-fill' %}
   </div>
 
   <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">

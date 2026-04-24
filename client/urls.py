@@ -12,8 +12,7 @@ urlpatterns = [
     ### URLS DE DISEÑO
     path("design/test_components/", views.tests_components, name="tests_page"),
     path("design/test_form/", views.tests_form, name="test_form_page"),
-    path("design/welcome/", views.welcome, name="welcome"),
-    path("design/login/", views.login, name="login"),
+    path("design/landing_login/", views.landing_login, name="landing"),
     path("design/dashboard/", views.view1, name="dashboard"),
     
     ### URLS DE ENDPOINTS DINÁMICOS (HTMX)

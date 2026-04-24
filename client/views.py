@@ -1,32 +1,42 @@
 from django.shortcuts import render, redirect
 from .services import proveedores
-from .forms import ProveedoresForm
-from .utils import get_proveedores_for_table, build_menu_items
+from .forms import ProveedoresForm, LoginForm, SearchForm
+from django.http import HttpResponse
+from .utils import get_proveedores_for_table, build_menu_sidebar_items, build_menu_mobilebar_items
+import urllib3
+
+# Suprimir advertencia de HTTPS sin verificación de certificados
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ########## VISTAS POR DISEÑO ###########
 
-def welcome(request):
-    return render(request, "layouts/welcome.html", {
+def landing_login(request):
+    login_form = LoginForm()
+    return render(request, "layouts/landing_login.html", {
         "pagename": "Bienvenida",
-        "menu_items": build_menu_items("Bienvenida"),
+        'menu_sidebar_items': build_menu_sidebar_items('Bienvenida'),
+        'menu_mobilebar_items': build_menu_mobilebar_items('Bienvenida'),
+        'path': request.path,
+        "form": login_form
     })
 
-def login(request):
-    return render(request, "layouts/login.html", {
-        "pagename": "Inicio de Sesión",
-        "menu_items": build_menu_items("Inicio de Sesión"),
-    })
 
 def view1(request):
+    search_form = SearchForm()
     return render(request, "design/view1.html", {
         "pagename": "Dashboard",
-        "menu_items": build_menu_items("Dashboard"),
+        'menu_sidebar_items': build_menu_sidebar_items('Dashboard'),
+        'menu_mobilebar_items': build_menu_mobilebar_items('Dashboard'),
+        'path': request.path,
+        "search_form": search_form
     })
 
 def tests_form(request):
     return render(request, "design/main_form_test.html", {
         "pagename": "Main Form Test",
-        "menu_items": build_menu_items("Main Form Test"),
+        'menu_sidebar_items': build_menu_sidebar_items('Main Form Test'),
+        'menu_mobilebar_items': build_menu_mobilebar_items('Main Form Test'),
+        'path': request.path
     })
 
 def tests_components(request):
@@ -51,7 +61,9 @@ def tests_components(request):
         'total_pages': total_pages,
         'page_range': range(1, total_pages + 1),
         'pagename': 'Test & Views',
-        'menu_items': build_menu_items('Test & Views'),
+        'menu_sidebar_items': build_menu_sidebar_items('Test & Views'),
+        'menu_mobilebar_items': build_menu_mobilebar_items('Test & Views'),
+        'path': request.path
     })
 
 def get_options(request):
@@ -72,37 +84,44 @@ def get_options(request):
 
 ########## VISTAS DE PROVEEDORES ##########
 def list_proveedores(request):
-    """
-    Lista todos los proveedores con paginación.
-    
-    GET requests:
-    - Retorna página HTML completa si es navegación normal
-    - Retorna solo filas de tabla si es HTMX request (paginación)
-    
-    ANTES: 45 líneas de lógica repetida
-    DESPUÉS: 15 líneas usando helpers
-    """
+    search_form = SearchForm(request.GET)
     proveedores_data = proveedores.get_all_proveedores()
     page = int(request.GET.get('page', 1))
     
-    # Usar helper que combina: extracción datos + transformación + paginación
     table_context = get_proveedores_for_table(proveedores_data, page)
 
-    # Si es request HTMX (paginación sin recargar página)
-    if request.headers.get('HX-Request'):
-        return render(request, 'partials/tables.html#table_rows', {
+    is_htmx = request.headers.get('HX-Request')
+    fragment = request.GET.get('fragment')
+
+    # 🔹 SOLO TABLA COMPLETA (para skeleton → carga inicial)
+    if is_htmx and fragment == "table":
+        return render(request, 'partials/tables.html#table', {
             **table_context,
             'with_actions': True,
+            'table_id': 'tabla-prov',
+            'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
         })
 
-    # Si es GET normal, retorna página completa
+    # 🔹 SOLO FILAS (paginación)
+    if is_htmx:
+        return render(request, 'partials/tables.html#table', {
+            **table_context,
+            'with_actions': True,
+            'table_id': 'tabla-prov',
+            'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+        })
+
+    # 🔹 Página completa (fallback normal)
     return render(request, "proveedores/index_proveedores.html", {
         **table_context,
         'create_url': '/agrosol/proveedores/crear/',
         'pagename': 'Proveedores',
-        'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+        'columns': [...],
         'table_body_id': '#tabla-prov-body',
-        'menu_items': build_menu_items('Proveedores'),  # ← Pasar menú
+        'menu_sidebar_items': build_menu_sidebar_items('Proveedores'),
+        'menu_mobilebar_items': build_menu_mobilebar_items('Proveedores'),
+        'path': request.path,
+        'search_form': search_form
     })
 
 def create_or_edit_proveedor(request, id=None):
@@ -135,21 +154,31 @@ def create_or_edit_proveedor(request, id=None):
     if request.method == "POST":
         form = ProveedoresForm(request.POST or None, request.FILES or None)
         if form.is_valid():
-            # La lógica cambia aquí: CREATE o UPDATE
+            from .utils import build_table_rows
+            
+            # CREATE o UPDATE - Ambos retornan el objeto actualizado/creado
             if id:
-                proveedores.update(id, form.cleaned_data)  # PUT /api/Proveedores/<id>
+                # EDITAR: actualiza el proveedor existente
+                proveedores.update(id, form.cleaned_data)
+                # UPDATE retorna solo confirmación sin datos
+                # Necesitamos GET para obtener todos los datos del proveedor actualizado
+                proveedor_response = proveedores.get_by_id(id)
+                # get_by_id retorna {data: {...}} o directamente {...}
+                proveedor_dict = proveedor_response.get("data", proveedor_response) if isinstance(proveedor_response, dict) else proveedor_response
             else:
-                proveedores.create(form.cleaned_data)      # POST /api/Proveedores
+                # CREAR: crea nuevo proveedor y retorna el objeto creado
+                response_data = proveedores.create(form.cleaned_data)
+                # CREATE retorna {success, data: {...proveedor completo...}}
+                proveedor_dict = response_data.get("data", response_data) if isinstance(response_data, dict) else response_data
             
-            # Después de crear/editar, retornar tabla actualizada (flujo HTMX)
-            proveedores_data = proveedores.get_all_proveedores()
-            page = int(request.GET.get('page', 1))
-            table_context = get_proveedores_for_table(proveedores_data, page)
+            # Construir UNA SOLA FILA con los datos del proveedor
+            rows = build_table_rows([proveedor_dict]) if proveedor_dict else []
             
-            return render(request, "partials/tables.html#table_rows", {
-                **table_context,
-                'with_actions': True,
-            })
+            if rows:
+                return render(request, "partials/tables.html#table_rows", {
+                    'rows': rows,
+                    'with_actions': True,
+                })
     else:
         # GET request
         if id:
@@ -182,7 +211,14 @@ def create_or_edit_proveedor(request, id=None):
         "modal_name": modal_name,
         "submit_text": submit_text,
     }
-    return render(request, template, context)
+    is_htmx = request.headers.get('HX-Request')
+    fragment = request.GET.get('fragment')
+
+    # 🔹 SOLO FORM (para skeleton → carga inicial)
+    if is_htmx and fragment == "form":
+        return render(request, template, context)
+    else:
+        return render(request, "proveedores/form.html#form", context)
 
 def delete_proveedor(request, id):
     """
@@ -210,15 +246,9 @@ def delete_proveedor(request, id):
         # Eliminar el proveedor
         proveedores.delete(id)
         
-        # Obtener lista actualizada y retornar tabla
-        proveedores_data = proveedores.get_all_proveedores()
-        page = int(request.GET.get('page', 1))
-        table_context = get_proveedores_for_table(proveedores_data, page)
-        
-        return render(request, "partials/tables.html#table_rows", {
-            **table_context,
-            'with_actions': True,
-        })
+        # Devolver respuesta vacía
+        # HTMX con outerHTML reemplazará la fila con nada (borrándola)
+        return HttpResponse('')
     
     # Si no es POST, retornar error
     return render(request, "error.html", {

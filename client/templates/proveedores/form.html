@@ -2,29 +2,12 @@
 {% load partials %}
 {% load widget_tweaks %}
 
-{% partialdef form %}
-  {# 
-    TEMPLATE UNIFICADO para CREATE y EDIT de Proveedores
-    
-    Variables esperadas del contexto (views.py):
-    - form: ProveedoresForm instance
-    - proveedor_id: (int) ID si es EDIT, None si es CREATE
-    - submit_url: URL POST (ej: "/agrosol/proveedores/crear")
-    - modal_name: Nombre del modal para cerrar (ej: "modal-create" o "modal-edit")
-    - submit_text: Texto del botón (ej: "Crear" o "Editar")
-    
-    VENTAJAS:
-    ✅ 1 archivo en lugar de 2
-    ✅ Lógica compartida: campos, estilos, estructura
-    ✅ Flexible: maneja ambos casos con contexto
-    ✅ Fácil de mantener: cambios en un lugar
-  #}
-  
+{% partialdef form %}  
   <form method="POST" class="grid grid-cols-12 gap-x-6 gap-y-4"
     hx-post="{{ submit_url }}"
-    hx-target="#tabla-prov-body"
-    hx-swap="innerHTML"
-    hx-on::after-request="if(event.detail.successful) { closeModal('{{ modal_name }}') }"
+    hx-target="{% if proveedor_id %}#row-{{ proveedor_id }}{% else %}#tabla-prov-body{% endif %}"
+    hx-swap="{% if proveedor_id %}outerHTML{% else %}beforeend{% endif %}"
+    hx-on::after-request="if(event.detail.successful) { closeModal('{{ modal_name }}'); AlertManager.success('Proveedor {% if proveedor_id %}actualizado{% else %}creado{% endif %} exitosamente'); }"
     >
     {% csrf_token %}
     

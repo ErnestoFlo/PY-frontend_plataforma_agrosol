@@ -104,8 +104,8 @@
   /* Fondos */
   --color-surface-4:      var(--color-neutral-300);
   --color-surface-3:      var(--color-neutral-100);
-  --color-bg:             var(--color-neutral-200);
-  --color-surface-1:      var(--color-neutral-100);
+  --color-bg:             var(--color-neutral-100);
+  --color-surface-1:      var(--color-neutral-50);
   --color-surface-2:      var(--color-neutral-50);
 
   /* Textos */
@@ -213,8 +213,8 @@
     /* Fondos */
     --color-surface-4:         var(--color-neutral-300);
     --color-surface-3:         var(--color-neutral-100);
-    --color-bg:                var(--color-neutral-200);
-    --color-surface-1:         var(--color-neutral-100);
+    --color-bg:                var(--color-neutral-100);
+    --color-surface-1:         var(--color-neutral-50);
     --color-surface-2:         var(--color-neutral-50);
     --color-accent-theme:      var(--color-accent-600);
     --color-primary-theme:     var(--color-primary-600);
@@ -311,10 +311,77 @@
 }
 
 @layer components {
+  html{ scroll-behavior: smooth;}
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-fg); /* color del texto */
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset; /* fondo oscuro */
+    transition: background-color 5000s ease-in-out 0s; /* truco para evitar flash */
+  }
+  .pb-safe{
+    padding-bottom: env(safe-area-inset-bottom);
+  }
   /* *{
     @apply
     transition-colors duration-200
   } */
+  
+  .bg-login{
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(180deg, transparent 0%, #000000cf 20%, #000 100%);
+  }
+  .particle {
+    @apply w-1/2 h-1/2 absolute blur-3xl;
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+
+  /*
+  ########## ANIMACIONES ##########
+  */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+  @keyframes float {
+    0%   { transform: translate(0, 0) scale(1);   opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(var(--ds)); opacity: 0; }
+  }
+  .alert-enter {
+    @apply animate-[slideInUp_0.3s_ease-out];
+  }
+  
+  .alert-exit {
+    @apply animate-[fadeOut_0.3s_ease-in];
+  }
+  
   /*
   ########## SCROLLBARS ##########
   */
@@ -338,6 +405,14 @@
 		bg-primary-500 text-neutral-50 shadow-primary-sm	/* normal state */
 		hover:bg-primary-600 hover:shadow-primary-md /* hover state */
 		active:bg-primary-700 /* active state */
+		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+		disabled:bg-neutral-300 disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }
+  .btn-contrast {
+    @apply
+		bg-neutral-100 text-neutral-800 shadow-c-sm	/* normal state */
+		hover:bg-neutral-50 hover:shadow-c-md /* hover state */
+		active:bg-neutral-200 /* active state */
 		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
 		disabled:bg-neutral-300 disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
   }
@@ -367,10 +442,19 @@
   }
 	.btn-icon {
 		@apply
-		p-2 inline-flex items-center font-semibold rounded-full transition-colors
+		p-2 inline-flex items-center justify-center font-semibold rounded-full transition-colors
 		bg-surface-1 text-fg-body	/* normal state */
 		hover:bg-surface-3 hover:text-fg hover:shadow-up-md /* hover state */
 		active:bg-surface-4 active:text-fg-body active:shadow-none /* active state */
+		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+		disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }
+  .btn-icon-primary {
+		@apply
+		p-2 inline-flex items-center justify-center font-semibold rounded-full transition-colors
+		bg-primary-500 text-neutral-50 shadow-primary-sm	/* normal state */
+		hover:bg-primary-600 hover:shadow-primary-md /* hover state */
+		active:bg-primary-700 /* active state */
 		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
 		disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
   }
@@ -392,13 +476,57 @@
 		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
 		disabled:text-danger-200 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
   }
-  
+  .btn-icon-text-primary {
+    @apply
+    inline-flex items-center font-semibold rounded-lg transition-colors
+    bg-primary-500 text-neutral-50 shadow-primary-sm	/* normal state */
+    hover:bg-primary-600 hover:shadow-primary-md /* hover state */
+    active:bg-primary-700 /* active state */
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+    disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }  
+  .btn-icon-text-secondary {
+    @apply
+    inline-flex items-center font-semibold rounded-lg transition-colors
+    bg-none text-fg border border-fg	/* normal state */
+    hover:bg-primary-700 hover:border-primary-600 hover:text-primary-400 /* hover state */
+    active:bg-primary-800 active:border-primary-700 active:text-primary-500 /* active state */
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+    disabled:bg-none disabled:text-neutral-400 disabled:border-neutral-300 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }
+  .btn-icon-text-ghost-neutral {
+    @apply
+    inline-flex items-center font-semibold rounded-lg transition-colors
+    bg-none text-fg-body	/* normal state */
+    hover:text-fg /* hover state */
+    active:text-fg-muted /* active state */
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+    disabled:text-neutral-500 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }
+  .btn-icon-text-menu{
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-fg-body rounded-lg
+    transition-colors
+    hover:bg-surface-3 hover:text-fg
+    active:bg-surface-4 active:text-fg-body
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2
+    disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none
+    cursor-pointer w-full;
+  }
+  .btn-icon-text-menu-danger{
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-danger-500 rounded-lg
+    transition-colors
+    hover:bg-surface-danger hover:text-fg-danger
+    active:text-danger-500
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2
+    disabled:text-danger-200 disabled:cursor-not-allowed disabled:pointer-events-none
+    cursor-pointer w-full;
+  }
   /*
   ########## INPUTS ##########
   */
   .input-container{
     @apply
-    border border-fg-body inline-flex items-center rounded-lg transition-colors px-3 py-2 overflow-visible relative w-full h-10 
+    border border-fg-body inline-flex items-center justify-center rounded-lg transition-colors px-3 py-2 overflow-visible relative w-full h-10 
     focus-visible:outline-none focus-visible:border-fg-body;
     transition: border-color 200ms ease;
   }
@@ -604,7 +732,7 @@
   .card{
     box-shadow: var(--shadow-c-md);
     @apply
-    relative px-6 py-5 bg-surface-1/55 backdrop-blur-xl rounded-xl;
+    relative px-6 py-5 bg-surface-1/70 backdrop-blur-xl rounded-xl;
   }
   .card-accent {
     @apply border-l-2 border-l-primary-theme;
@@ -642,10 +770,10 @@
   ########## ALERTS ##########
   */
   .alert-simple {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg w-1/3 h-auto border;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg w-full h-auto border;
   }
   .alert-detailed {
-    @apply flex flex-col min-h-7 px-4 py-3 rounded-lg w-1/3 h-auto border;
+    @apply flex flex-col min-h-7 px-4 py-3 rounded-lg w-full h-auto border;
   }
   .alert-success {
     @apply bg-surface-success text-fg-success border-border-success;
@@ -696,7 +824,7 @@
     @apply flex items-center justify-between pb-3 border-b border-neutral-600;
   }
   .modal-body {
-    @apply text-fg-body text-sm;
+    @apply text-fg-body text-sm min-h-4/6 pb-3 flex-1 overflow-y-auto;
   }
   .modal-footer {
     @apply flex items-center justify-end gap-2 pt-3 border-t border-neutral-600;
@@ -801,7 +929,7 @@
   */
   .topbar {
     @apply 
-    col-span-2 h-full px-6
+    col-span-2 h-full px-2 pl-4 md:px-4
     flex items-center justify-between gap-4
     ;
   }
@@ -812,7 +940,7 @@
     @apply relative flex items-center flex-1 max-w-xl mx-auto;
   }
   .topbar-actions {
-    @apply flex items-center gap-1 shrink-0;
+    @apply flex items-center gap-0 md:gap-1 shrink-0;
   }
   .topbar-avatar-btn {
     @apply flex items-center gap-1.5 rounded-full p-1
@@ -824,7 +952,8 @@
   ########## POPOVER ##########
   */
   .popover {
-    @apply absolute top-full right-0 mt-2 z-10
+    z-index: 999;
+    @apply absolute top-full right-0 mt-2
     min-w-48 w-auto
     opacity-0 pointer-events-none scale-95 origin-top-right
     transition-all duration-200;
@@ -843,12 +972,48 @@
   }
   .popover-item {
     @apply flex items-center gap-3 px-4 py-2.5 text-sm text-fg-body rounded-lg
-    transition-colors hover:bg-surface-2 hover:text-fg cursor-pointer w-full;
+    transition-colors hover:bg-surface-3 hover:text-fg cursor-pointer w-full;
   }
   .popover-item-danger {
-    @apply text-danger-500 hover:bg-danger-900 hover:text-danger-400;
+    @apply text-danger-500 hover:bg-surface-danger hover:text-fg-danger;
   }
   .popover-divider {
     @apply border-t border-neutral-700/50 my-1;
   }
+  .popover-trigger{
+    anchor-name: --trigger;
+  }
+
+/*
+########## BOTTOM BAR ##########
+*/
+.bottombar {
+  @apply fixed bottom-3 left-1/2 -translate-x-1/2 z-50
+  grid grid-cols-5
+  w-[calc(100%-2rem)] max-w-sm h-20
+  p-2;
 }
+.bottombar-item {
+  @apply flex flex-col items-center justify-center gap-1 mx-0.5 px-5 py-1.5 rounded-2xl text-fg-muted text-xs font-medium transition-all duration-200 cursor-pointer select-none
+  hover:bg-surface-2 hover:text-fg;
+  min-width: 3.5rem;
+}
+.bottombar-item:hover { @apply text-fg; }
+.bottombar-item.active {
+  @apply bg-primary-theme/15 text-primary-500/60;
+}
+.bottombar-item.active svg { @apply scale-110; }
+.bottombar-item svg {
+  @apply w-6 h-6 transition-transform duration-200;
+}
+
+/* Popover del "más" — sube desde el centro */
+.bottombar-more-popover {
+  @apply absolute bottom-full left-1/2 -translate-x-1/2 mb-3
+  w-dvw max-w-72 py-2
+  invisible opacity-0 scale-95 origin-bottom
+  transition-all duration-200 z-50;
+}
+.bottombar-more-popover[data-open="true"] {
+  @apply visible opacity-100 scale-100;
+}}

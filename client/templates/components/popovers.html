@@ -16,28 +16,46 @@
 
     <!-- Opciones -->
     <nav role="none">
-      <a href="#" class="popover-item" role="menuitem"
-        data-action="closePopover" data-target="{{ popover_id|default:'user-menu' }}">
-        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
-          <use href="{% static 'sprite.svg' %}#icon-settings-fill"/>
-        </svg>
-        Configuración
+      <a href="#">
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-settings-fill' text='Configuración' %}
       </a>
 
-      <button type="button" class="popover-item" role="menuitem"
-        data-action="toggleTheme">
-        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
-          <use href="{% static 'sprite.svg' %}#icon-moon-regular"/>
-        </svg>
-        Cambiar Tema
-      </button>
+      {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-moon-regular' action='toggleTheme' text='Cambiar Tema' %}
 
-      <button type="button" class="popover-item popover-item-danger" role="menuitem">
-        <svg class="w-4 h-4 shrink-0" aria-hidden="true">
-          <use href="{% static 'sprite.svg' %}#icon-logout-fill"/>
-        </svg>
-        Cerrar Sesión
-      </button>
+      <a href="{% url 'landing' %}">
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu-danger' role='menuitem' icon_size='4' icon_name='icon-logout-fill' text='Cerrar Sesión' %}
+      </a>
     </nav>
+  </div>
+{% endpartialdef %}
+
+{% partialdef row_actions %}
+  <div id="actions-{{ id }}"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-pencil-fill' text='Editar'  action='openModal' target='modal-edit' hx_get=edit_url hx_target="#modal-edit-content" hx_swap="innerHTML" %}
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu-danger' role='menuitem' icon_size='4' icon_name='icon-trash-fill' text='Eliminar'  action='openModal' target='modal-delete' hx_get=delete_url hx_target="#modal-delete-content" hx_swap="innerHTML" %}
+      </nav>
+  </div>
+{% endpartialdef %}
+
+{% partialdef bottombar_popover %}
+  <!-- Popover -->
+  <div id="bottombar-more"
+    class="bottombar-more-popover card p-0 bg-surface-1"
+    data-open="false"
+    role="menu">
+    <div class="w-full max-w-sm px-2 py-1 grid grid-cols-3">
+      {% for group_item in item.group %}
+
+        <a href="{% url group_item.url %}" class="bottombar-item my-4 {{ link_class }} {% if item.is_active %}active{% endif %}" data-action="bottombarItem">
+          <svg aria-hidden="true"><use href="{% static 'sprite.svg' %}#{{ group_item.icon }}"/></svg>
+          <span>{{ group_item.label }}</span>
+        </a>
+      {% endfor %}
+    </div>
   </div>
 {% endpartialdef %}

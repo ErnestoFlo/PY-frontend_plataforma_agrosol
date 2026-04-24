@@ -1041,6 +1041,7 @@ django-widget-tweaks>=1.4        # Manipular widgets en templates
 requests>=2.31                   # HTTP calls (API)
 djangorestframework>=3.14        # (Instalado, puede no usarse)
 django-crispy-forms>=2.1         # (Instalado, no usado en este proyecto)
+crispy-tailwind
 ```
 
 **Instalación:**
