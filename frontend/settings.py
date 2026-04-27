@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-alya!*(=cktnyu17c6d*i(1l@m7b^9_^*hzr2=5cl$gd9k_s(@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'client.middleware.ActivityLogMiddleware',  # ← agregar esta línea
 ]
 
 ROOT_URLCONF = 'frontend.urls'
@@ -77,11 +79,19 @@ WSGI_APPLICATION = 'frontend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'master_users', # master_users es la base main 
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        "OPTIONS": {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
+            'charset': 'utf8mb4',
+            "autocommit": True,
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -107,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Tegucigalpa'
 
 USE_I18N = True
 
@@ -123,3 +133,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+############ Variables de configuración para login ###########
+LOGIN_REDIRECT_URL = '/agrosol/perfil' # A dónde va el usuario DESPUÉS de hacer login exitoso
+LOGIN_URL = '/auth/login/' # A dónde redirige si intenta acceder a una página protegida sin login
+LOGOUT_REDIRECT_URL = '/auth/login' # A dónde va después de hacer logout
+
+############ Habilitar alojamiento de servidor de imágenes ###########
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '')
+
+############ Seguridad de sesión ############
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True # La sesión muere cuando se cierra el navegador
+SESSION_COOKIE_AGE = 28800 # Tiempo máximo de sesión aunque haya actividad: 8 horas (en segundos)
+SESSION_SAVE_EVERY_REQUEST = True # Cada request renueva el tiempo de expiración

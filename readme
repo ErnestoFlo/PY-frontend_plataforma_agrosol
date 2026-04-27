@@ -1,0 +1,6 @@
+Librerias usadas
+
+- pip install mysqlclient
+- pip install pillow
+- pip install pymysql
+- pip install beautifulsoup4 (análisis de html para panel de usuarios)

@@ -1,0 +1,421 @@
+{% load static %}
+{% load static dict_extras %}
+
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurar Grupo — {{ grupo.name }} · Agrosol</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --verde:#4ade80;--verde-dim:#166534;--fondo:#0a0f0a;--card:#111a11;
+      --borde:#1f2e1f;--texto:#e2f0e2;--muted:#6b7c6b;--acento:#86efac;
+      --rojo:#f87171;--amarillo:#fbbf24;--azul:#60a5fa;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Syne',sans-serif;background:var(--fondo) radial-gradient(circle,#1a2e1a 1px,transparent 1px);background-size:28px 28px;color:var(--texto);min-height:100vh;}
+    .navbar-custom{background:rgba(10,15,10,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);padding:.75rem 2rem;position:sticky;top:0;z-index:200;}
+    .navbar-brand-custom{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;color:var(--verde)!important;text-decoration:none;}
+    .btn-logout{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);background:transparent;border:1px solid var(--borde);border-radius:6px;padding:.3rem .8rem;transition:all .2s;cursor:pointer;}
+    .btn-logout:hover{color:var(--rojo);border-color:var(--rojo);}
+    .btn-nav{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;border:1px solid var(--borde);background:transparent;color:var(--muted);text-decoration:none;transition:all .2s;}
+    .btn-nav:hover{color:var(--verde);border-color:var(--verde);}
+    /* BREADCRUMB */
+    .breadcrumb-custom{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;}
+    .breadcrumb-custom a{color:var(--muted);text-decoration:none;transition:color .2s;}
+    .breadcrumb-custom a:hover{color:var(--verde);}
+    /* SECTION TITLE */
+    .section-title{font-size:.7rem;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--borde);}
+    /* CARDS */
+    .info-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:1.25rem 1.5rem;}
+    /* MÓDULO CARD */
+    .modulo-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;overflow:hidden;margin-bottom:1rem;}
+    .modulo-header{padding:1rem 1.3rem;background:rgba(74,222,128,.03);border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;}
+    .modulo-title{font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:.6rem;}
+    .modulo-body{padding:.5rem 0;}
+    /* COMPONENTE ROW */
+    .comp-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:1rem;padding:.7rem 1.3rem;border-bottom:1px solid var(--borde);transition:background .15s;}
+    .comp-row:last-child{border-bottom:none;}
+    .comp-row:hover{background:rgba(74,222,128,.02);}
+    .comp-info{}
+    .comp-name{font-size:.88rem;font-weight:600;margin:0;}
+    .comp-meta{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:0;}
+    /* TIPO BADGE */
+    .tipo-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:.15rem .5rem;border-radius:999px;}
+    .tipo-seccion{background:rgba(96,165,250,.1);color:var(--azul);border:1px solid rgba(96,165,250,.2);}
+    .tipo-campo  {background:rgba(74,222,128,.1);color:var(--verde);border:1px solid rgba(74,222,128,.2);}
+    .tipo-boton  {background:rgba(251,191,36,.1);color:var(--amarillo);border:1px solid rgba(251,191,36,.2);}
+    .tipo-columna{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.2);}
+    /* TOGGLE */
+    .toggle-group{display:flex;align-items:center;gap:.5rem;}
+    .toggle-label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .toggle-switch{position:relative;width:38px;height:20px;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;cursor:pointer;background:var(--borde);border-radius:999px;transition:.25s;border:1px solid var(--borde);}
+    .toggle-slider::before{content:'';position:absolute;width:14px;height:14px;border-radius:50%;left:2px;top:2px;background:var(--muted);transition:.25s;}
+    .toggle-switch input:checked + .toggle-slider{background:rgba(74,222,128,.2);border-color:var(--verde);}
+    .toggle-switch input:checked + .toggle-slider::before{background:var(--verde);transform:translateX(18px);}
+    .toggle-ver  input:checked + .toggle-slider{background:rgba(96,165,250,.15);border-color:var(--azul);}
+    .toggle-ver  input:checked + .toggle-slider::before{background:var(--azul);}
+    /* BOTONES */
+    .btn-save{background:var(--verde);color:#0a0f0a;border:none;border-radius:8px;font-weight:700;font-size:.88rem;padding:.6rem 1.5rem;cursor:pointer;transition:opacity .2s;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-save:hover{opacity:.85;}
+    .btn-back{background:transparent;color:var(--muted);border:1px solid var(--borde);border-radius:8px;font-size:.88rem;padding:.6rem 1.2rem;text-decoration:none;transition:all .2s;}
+    .btn-back:hover{color:var(--texto);border-color:var(--muted);}
+    .btn-outline-sm{background:transparent;color:var(--muted);border:1px solid var(--borde);border-radius:7px;font-size:.75rem;padding:.3rem .7rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.3rem;}
+    .btn-outline-sm.add:hover{color:var(--verde);border-color:var(--verde);}
+    .btn-outline-sm.rem:hover{color:var(--rojo);border-color:var(--rojo);}
+    /* USUARIOS */
+    .user-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--borde);}
+    .user-row:last-child{border-bottom:none;}
+    .user-avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#16a34a);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#0a0f0a;flex-shrink:0;overflow:hidden;}
+    .user-avatar-sm img{width:100%;height:100%;object-fit:cover;}
+    /* BULK TOGGLES */
+    .bulk-bar{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.3rem;background:rgba(74,222,128,.03);border-bottom:1px solid var(--borde);}
+    .bulk-btn{font-family:'DM Mono',monospace;font-size:.65rem;padding:.2rem .6rem;border-radius:6px;cursor:pointer;border:1px solid var(--borde);background:transparent;color:var(--muted);transition:all .15s;}
+    .bulk-btn:hover{color:var(--verde);border-color:var(--verde);}
+    /* TOAST */
+    .toast-custom{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;min-width:260px;transform:translateY(120%);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+    .toast-custom.show{transform:translateY(0);opacity:1;}
+    .toast-custom.success{border-color:rgba(74,222,128,.3);}
+    .toast-custom.error{border-color:rgba(239,68,68,.3);}
+    .toast-icon{font-size:1.1rem;flex-shrink:0;}
+    .toast-custom.success .toast-icon{color:var(--verde);}
+    .toast-custom.error   .toast-icon{color:var(--rojo);}
+    /* STICKY SAVE */
+    .sticky-save{position:sticky;bottom:1.5rem;z-index:100;pointer-events:none;}
+    .sticky-save-inner{pointer-events:all;background:var(--card);border:1px solid rgba(74,222,128,.25);border-radius:12px;padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+    /* ANIMATIONS */
+    .fade-up{opacity:0;transform:translateY(14px);animation:fu .4s ease forwards;}
+    @keyframes fu{to{opacity:1;transform:none;}}
+    .d1{animation-delay:.08s;}.d2{animation-delay:.16s;}.d3{animation-delay:.24s;}
+    footer{border-top:1px solid var(--borde);padding:1.25rem 0;text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:5rem;}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar-custom d-flex align-items-center justify-content-between">
+    <a href="{% url 'proveedores' %}" class="navbar-brand-custom">Agrosol</a>
+    <div class="d-flex align-items-center gap-2">
+      <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);">
+        <i class="bi bi-shield-fill me-1" style="color:var(--verde);"></i>{{ request.user.username }}
+      </span>
+      <a href="{% url 'perfil' %}" class="btn-nav"><i class="bi bi-person"></i></a>
+      <form method="POST" action="{% url 'logout' %}">{% csrf_token %}
+        <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right me-1"></i>Salir</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="container py-4" style="max-width:1000px;">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb-custom fade-up">
+      <a href="{% url 'panel_permisos' %}"><i class="bi bi-shield-lock me-1"></i>Panel de Permisos</a>
+      <span style="opacity:.4;">›</span>
+      <span style="color:var(--texto);">{{ grupo.name }}</span>
+    </div>
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-center justify-content-between mb-4 fade-up">
+      <div>
+        <p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:.3rem;">
+          Configurando permisos para
+        </p>
+        <h1 style="font-size:1.7rem;font-weight:800;letter-spacing:-.04em;">
+          <i class="bi bi-people me-2" style="color:var(--verde);"></i>{{ grupo.name }}
+        </h1>
+      </div>
+      <a href="{% url 'panel_permisos' %}" class="btn-back">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+      </a>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- ══ IZQUIERDA — PERMISOS POR MÓDULO ══ -->
+      <div class="col-lg-7">
+        <p class="section-title fade-up d1">Permisos por Componente</p>
+
+        <!-- Leyenda -->
+        <div style="display:flex;gap:1.5rem;margin-bottom:1rem;" class="fade-up d1">
+          <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--azul);display:flex;align-items:center;gap:.4rem;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--azul);display:inline-block;"></span>Ver
+          </span>
+          <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--verde);display:flex;align-items:center;gap:.4rem;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--verde);display:inline-block;"></span>Usar / Editar
+          </span>
+        </div>
+
+        {% for modulo in modulos %}
+        <div class="modulo-card fade-up d2">
+          <div class="modulo-header">
+            <div class="modulo-title">
+              <i class="bi {{ modulo.icono }}" style="color:var(--verde);"></i>
+              {{ modulo.nombre }}
+            </div>
+            <!-- Bulk actions -->
+            <div style="display:flex;gap:.4rem;">
+              <button class="bulk-btn" onclick="bulkToggle({{ modulo.id }}, 'ver', true)">
+                Todo Ver
+              </button>
+              <button class="bulk-btn" onclick="bulkToggle({{ modulo.id }}, 'usar', true)">
+                Todo Usar
+              </button>
+              <button class="bulk-btn" onclick="bulkToggle({{ modulo.id }}, 'all', false)"
+                      style="color:var(--muted);">
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <div class="modulo-body">
+            {% for comp in modulo.componentes.all %}
+            {% if comp.activo %}
+            <div class="comp-row" data-modulo="{{ modulo.id }}">
+              <div class="comp-info">
+                <p class="comp-name">{{ comp.nombre }}</p>
+                <p class="comp-meta">
+                  <span class="tipo-badge tipo-{{ comp.tipo }}">{{ comp.get_tipo_display }}</span>
+                  &nbsp;·&nbsp;{{ comp.clave }}
+                </p>
+              </div>
+
+              <!-- Toggle VER -->
+              <div class="toggle-group">
+                <span class="toggle-label" style="color:var(--azul);">Ver</span>
+                <label class="toggle-switch toggle-ver">
+                  <input type="checkbox"
+                         data-comp="{{ comp.id }}"
+                         data-tipo="ver"
+                         class="perm-toggle"
+                         {% if permisos_actuales|default_if_none:'' %}
+                           {% with perm=permisos_actuales|default:'' %}
+                             {% if comp.id in permisos_actuales and permisos_actuales|get_item:comp.id %}
+                               {% if permisos_actuales|get_item:comp.id|get_item:'ver' %}checked{% endif %}
+                             {% endif %}
+                           {% endwith %}
+                         {% endif %}
+                         >
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Toggle USAR -->
+              <div class="toggle-group">
+                <span class="toggle-label">Usar</span>
+                <label class="toggle-switch">
+                  <input type="checkbox"
+                         data-comp="{{ comp.id }}"
+                         data-tipo="usar"
+                         class="perm-toggle"
+                         >
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+            </div>
+            {% endif %}
+            {% empty %}
+            <p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);padding:1rem 1.3rem;">
+              Este módulo no tiene componentes configurados.
+            </p>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      <!-- ══ DERECHA — USUARIOS DEL GRUPO ══ -->
+      <div class="col-lg-5">
+        <p class="section-title fade-up d1">Usuarios Asignados</p>
+
+        <div class="info-card mb-3 fade-up d2" id="card-usuarios-grupo">
+          {% if usuarios_del_grupo %}
+            {% for u in usuarios_del_grupo %}
+            <div class="user-row" id="user-row-{{ u.id }}">
+              <div class="d-flex align-items-center gap-2">
+                <div class="user-avatar-sm">
+                  {% if u.profile.avatar.name %}
+                    <img src="{{ u.profile.avatar.url }}" alt="">
+                  {% else %}
+                    {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+                  {% endif %}
+                </div>
+                <div>
+                  <p style="font-size:.85rem;font-weight:600;margin:0;">{{ u.get_full_name|default:u.username }}</p>
+                  <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:0;">@{{ u.username }}</p>
+                </div>
+              </div>
+              <button class="btn-outline-sm rem"
+                      onclick="asignarUsuario({{ grupo.id }}, {{ u.id }}, 'quitar')"
+                      title="Quitar del grupo">
+                <i class="bi bi-person-dash"></i>Quitar
+              </button>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">
+              Sin usuarios asignados todavía.
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Agregar usuario -->
+        <p class="section-title fade-up d2">Agregar Usuario</p>
+        <div class="info-card fade-up d2">
+          {% if usuarios_disponibles %}
+            {% for u in usuarios_disponibles %}
+            <div class="user-row">
+              <div class="d-flex align-items-center gap-2">
+                <div class="user-avatar-sm">
+                  {% if u.profile.avatar.name %}
+                    <img src="{{ u.profile.avatar.url }}" alt="">
+                  {% else %}
+                    {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+                  {% endif %}
+                </div>
+                <div>
+                  <p style="font-size:.85rem;font-weight:600;margin:0;">{{ u.get_full_name|default:u.username }}</p>
+                  <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin:0;">@{{ u.username }}</p>
+                </div>
+              </div>
+              <button class="btn-outline-sm add"
+                      onclick="asignarUsuario({{ grupo.id }}, {{ u.id }}, 'agregar')"
+                      title="Agregar al grupo">
+                <i class="bi bi-person-plus"></i>Agregar
+              </button>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">
+              Todos los usuarios activos ya están en este grupo.
+            </p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- STICKY SAVE -->
+  <div class="sticky-save">
+    <div class="sticky-save-inner">
+      <div>
+        <p style="font-weight:700;font-size:.88rem;margin:0;">Cambios sin guardar</p>
+        <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;" id="cambios-info">
+          Ajusta los toggles y guarda cuando estés listo
+        </p>
+      </div>
+      <button class="btn-save" onclick="guardarPermisos()">
+        <i class="bi bi-check2"></i>Guardar Permisos
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast-custom">
+    <i class="toast-icon bi" id="toast-icon"></i>
+    <span id="toast-msg"></span>
+  </div>
+
+  <footer>Agrosol · Configurador de Grupo · {{ grupo.name }}</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const CSRF     = "{{ csrf_token }}";
+    const GRUPO_ID = {{ grupo.id }};
+
+    // ── Cargar permisos actuales desde Django ──
+    const PERMISOS_ACTUALES = {
+      {% for comp_id, perm in permisos_actuales.items %}
+        "{{ comp_id }}": { ver: {{ perm.ver|yesno:"true,false" }}, usar: {{ perm.usar|yesno:"true,false" }} },
+      {% endfor %}
+    };
+
+    // ── Inicializar toggles con valores actuales ──
+    document.querySelectorAll('.perm-toggle').forEach(toggle => {
+      const compId = toggle.dataset.comp;
+      const tipo   = toggle.dataset.tipo;
+      if (PERMISOS_ACTUALES[compId]) {
+        toggle.checked = PERMISOS_ACTUALES[compId][tipo] || false;
+      }
+      toggle.addEventListener('change', actualizarCambiosInfo);
+    });
+
+    actualizarCambiosInfo();
+
+    function actualizarCambiosInfo() {
+      const total    = document.querySelectorAll('.perm-toggle').length;
+      const activos  = document.querySelectorAll('.perm-toggle:checked').length;
+      document.getElementById('cambios-info').textContent =
+        `${activos} de ${total} permisos activados`;
+    }
+
+    // ── Bulk toggle por módulo ──
+    function bulkToggle(moduloId, tipo, valor) {
+      const rows = document.querySelectorAll(`.comp-row[data-modulo="${moduloId}"] .perm-toggle`);
+      rows.forEach(t => {
+        if (tipo === 'all' || t.dataset.tipo === tipo) t.checked = valor;
+      });
+      actualizarCambiosInfo();
+    }
+
+    // ── Guardar permisos ──
+    async function guardarPermisos() {
+      const data = {};
+      document.querySelectorAll('.perm-toggle').forEach(t => {
+        const id = t.dataset.comp;
+        if (!data[id]) data[id] = { ver: false, usar: false };
+        data[id][t.dataset.tipo] = t.checked;
+      });
+
+      const res  = await fetch(`/agrosol/permisos/grupos/${GRUPO_ID}/guardar/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+
+      if (!json.success) { mostrarToast('Error al guardar.', 'error'); return; }
+      mostrarToast(`${json.actualizados} permisos guardados para "${json.grupo}".`, 'success');
+    }
+
+    // ── Asignar / quitar usuario ──
+    async function asignarUsuario(grupoId, userId, accion) {
+      const body = new FormData();
+      body.append('user_id', userId);
+      body.append('accion',  accion);
+      body.append('csrfmiddlewaretoken', CSRF);
+
+      const res  = await fetch(`/agrosol/permisos/grupos/${grupoId}/usuarios/`, { method:'POST', body });
+      const json = await res.json();
+
+      if (!json.success) { mostrarToast('Error.', 'error'); return; }
+      mostrarToast(json.mensaje, 'success');
+      setTimeout(() => location.reload(), 700);
+    }
+
+    // ── Toast ──
+    function mostrarToast(msg, tipo='success') {
+      const toast = document.getElementById('toast');
+      const icon  = document.getElementById('toast-icon');
+      const msgEl = document.getElementById('toast-msg');
+      const iconos = {success:'bi-check-circle-fill', error:'bi-x-circle-fill'};
+      toast.className   = `toast-custom ${tipo}`;
+      icon.className    = `toast-icon bi ${iconos[tipo]}`;
+      msgEl.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

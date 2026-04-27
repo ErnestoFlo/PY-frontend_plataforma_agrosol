@@ -1,0 +1,1284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grupos y Módulos — Agrosol</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{--verde:#4ade80;--verde-dim:#166534;--fondo:#0a0f0a;--card:#111a11;--borde:#1f2e1f;--texto:#e2f0e2;--muted:#6b7c6b;--acento:#86efac;--rojo:#f87171;--amarillo:#fbbf24;--azul:#60a5fa;--naranja:#fb923c;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Syne',sans-serif;background:var(--fondo) radial-gradient(circle,#1a2e1a 1px,transparent 1px);background-size:28px 28px;color:var(--texto);min-height:100vh;}
+    .navbar-custom{background:rgba(10,15,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--borde);padding:.75rem 2rem;position:sticky;top:0;z-index:200;}
+    .navbar-brand-custom{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;color:var(--verde)!important;text-decoration:none;}
+    .btn-logout{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);background:transparent;border:1px solid var(--borde);border-radius:6px;padding:.3rem .8rem;transition:all .2s;cursor:pointer;}
+    .btn-logout:hover{color:var(--rojo);border-color:var(--rojo);}
+    .btn-nav{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;border:1px solid var(--borde);background:transparent;color:var(--muted);text-decoration:none;transition:all .2s;}
+    .btn-nav:hover{color:var(--verde);border-color:var(--verde);}
+    .page-header{padding:2.5rem 0 1.5rem;position:relative;}
+    .page-header::before{content:'';position:absolute;top:0;left:-20px;width:400px;height:200px;background:radial-gradient(ellipse,rgba(74,222,128,.07) 0%,transparent 70%);pointer-events:none;}
+    .page-title{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;}
+    .page-subtitle{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-bottom:.4rem;}
+    .stat-card{background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:1.1rem 1.3rem;display:flex;align-items:center;gap:.85rem;}
+    .stat-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;color:var(--verde);font-size:1rem;}
+    .stat-number{font-size:1.4rem;font-weight:800;line-height:1;}
+    .stat-label{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    /* TABS */
+    .tab-bar{display:flex;gap:.3rem;background:rgba(255,255,255,.03);border:1px solid var(--borde);border-radius:12px;padding:.35rem;margin-bottom:1.75rem;}
+    .tab-btn{flex:1;font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:.55rem 1rem;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+    .tab-btn.active{background:var(--card);color:var(--verde);border:1px solid var(--borde);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+    .tab-pane{display:none;}.tab-pane.active{display:block;}
+    .section-title{font-size:.7rem;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--borde);}
+    .info-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:1.25rem 1.5rem;}
+    /* GRUPO CARD */
+    .grupo-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;overflow:hidden;margin-bottom:.75rem;transition:border-color .2s;}
+    .grupo-card:hover{border-color:var(--verde-dim);}
+    .grupo-header{padding:1rem 1.3rem;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;}
+    .grupo-body{padding:1rem 1.3rem;}
+    /* MODULO CARD */
+    .modulo-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;overflow:hidden;margin-bottom:.75rem;transition:border-color .2s;}
+    .modulo-card:hover{border-color:var(--verde-dim);}
+    .modulo-header{padding:1rem 1.3rem;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;gap:.75rem;}
+    .modulo-body{padding:.9rem 1.3rem;}
+    .modulo-icon{width:40px;height:40px;border-radius:10px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;color:var(--verde);font-size:1.1rem;flex-shrink:0;}
+    /* CHIPS */
+    .acceso-chip{display:inline-flex;align-items:center;gap:.4rem;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:999px;padding:.22rem .7rem;font-size:.76rem;margin:.15rem;color:var(--naranja);}
+    .acceso-chip i{font-size:.7rem;}
+    .acceso-chip-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.68rem;padding:0;margin-left:.1rem;transition:color .15s;line-height:1;}
+    .acceso-chip-remove:hover{color:var(--rojo);}
+    .user-chip{display:inline-flex;align-items:center;gap:.45rem;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:.25rem .75rem;font-size:.78rem;margin:.15rem;}
+    .user-chip-avatar{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#16a34a);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#0a0f0a;flex-shrink:0;overflow:hidden;}
+    .user-chip-avatar img{width:100%;height:100%;object-fit:cover;}
+    .user-chip-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.7rem;padding:0;margin-left:.1rem;transition:color .15s;line-height:1;}
+    .user-chip-remove:hover{color:var(--rojo);}
+    .badge-grupo-asignado{display:inline-flex;align-items:center;gap:.35rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:999px;font-family:'DM Mono',monospace;font-size:.65rem;padding:.2rem .6rem;color:var(--azul);margin:.15rem;}
+    .badge-sin-grupo{background:rgba(251,191,36,.08);color:var(--amarillo);border:1px solid rgba(251,191,36,.2);border-radius:999px;font-family:'DM Mono',monospace;font-size:.62rem;padding:.18rem .55rem;}
+    /* INPUTS */
+    .field-label{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+    .field-input{background:rgba(255,255,255,.04);border:1px solid var(--borde);border-radius:8px;color:var(--texto);font-family:'Syne',sans-serif;font-size:.88rem;padding:.55rem .85rem;width:100%;transition:border-color .2s;}
+    .field-input:focus{outline:none;border-color:var(--verde);background:rgba(74,222,128,.04);color:var(--texto);}
+    .field-input::placeholder{color:var(--muted);}
+    /* ICON PREVIEW */
+    .icon-prev-wrap{display:flex;align-items:center;gap:.6rem;}
+    .icon-prev{width:36px;height:36px;border-radius:8px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;color:var(--verde);font-size:1.1rem;flex-shrink:0;}
+    /* BUTTONS */
+    .btn-save{background:var(--verde);color:#0a0f0a;border:none;border-radius:8px;font-weight:700;font-size:.85rem;padding:.55rem 1.3rem;cursor:pointer;transition:opacity .2s;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-save:hover{opacity:.85;}
+    .btn-save:disabled{opacity:.45;cursor:not-allowed;}
+    .btn-outline{background:transparent;color:var(--muted);border:1px solid var(--borde);border-radius:8px;font-size:.83rem;padding:.45rem 1rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-outline:hover{color:var(--verde);border-color:var(--verde);}
+    .btn-outline.danger:hover{color:var(--rojo);border-color:var(--rojo);}
+    .btn-outline.naranja{color:var(--naranja);border-color:rgba(251,146,60,.3);}
+    .btn-outline.naranja:hover{background:rgba(251,146,60,.08);}
+    .btn-icon-sm{width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;border:1px solid var(--borde);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .btn-icon-sm.rem:hover{color:var(--rojo);border-color:var(--rojo);background:rgba(239,68,68,.07);}
+    /* MODAL */
+    .modal-custom .modal-content{background:var(--card);border:1px solid var(--borde);border-radius:16px;color:var(--texto);}
+    .modal-custom .modal-header{border-bottom:1px solid var(--borde);padding:1.25rem 1.5rem;}
+    .modal-custom .modal-footer{border-top:1px solid var(--borde);}
+    .modal-custom .modal-body{padding:1.5rem;}
+    .modal-custom .btn-close{filter:invert(1) opacity(.5);}
+    .item-row{display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--borde);}
+    .item-row:last-child{border-bottom:none;}
+    .u-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#16a34a);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:#0a0f0a;flex-shrink:0;overflow:hidden;}
+    .u-avatar img{width:100%;height:100%;object-fit:cover;}
+    .btn-add{background:rgba(74,222,128,.1);color:var(--verde);border:1px solid rgba(74,222,128,.25);border-radius:7px;font-size:.75rem;font-weight:600;padding:.28rem .7rem;cursor:pointer;transition:all .2s;}
+    .btn-add:hover{background:rgba(74,222,128,.2);}
+    .btn-add.naranja{background:rgba(251,146,60,.1);color:var(--naranja);border-color:rgba(251,146,60,.25);}
+    .btn-add.naranja:hover{background:rgba(251,146,60,.2);}
+    /* TOAST */
+    .toast-custom{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;min-width:260px;transform:translateY(120%);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+    .toast-custom.show{transform:translateY(0);opacity:1;}
+    .toast-custom.success{border-color:rgba(74,222,128,.3);}
+    .toast-custom.error{border-color:rgba(239,68,68,.3);}
+    .toast-icon{font-size:1.1rem;flex-shrink:0;}
+    .toast-custom.success .toast-icon{color:var(--verde);}
+    .toast-custom.error   .toast-icon{color:var(--rojo);}
+    /* MISC */
+    .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
+    .empty-state i{font-size:2rem;margin-bottom:.5rem;display:block;}
+    .subsection{font-family:'DM Mono',monospace;font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem;}
+    .fade-up{opacity:0;transform:translateY(14px);animation:fu .4s ease forwards;}
+    @keyframes fu{to{opacity:1;transform:none;}}
+    .d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}
+    .item-new{animation:inew .35s ease;}
+    @keyframes inew{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+    footer{border-top:1px solid var(--borde);padding:1.25rem 0;text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:3rem;}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar-custom d-flex align-items-center justify-content-between">
+    <a href="{% url 'proveedores' %}" class="navbar-brand-custom">Agrosol</a>
+    <div class="d-flex align-items-center gap-2">
+      <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);">
+        <i class="bi bi-shield-fill me-1" style="color:var(--verde);"></i>{{ request.user.username }}
+      </span>
+      <a href="{% url 'perfil' %}"        class="btn-nav"><i class="bi bi-person"></i></a>
+      <a href="{% url 'lista_usuarios' %}" class="btn-nav"><i class="bi bi-people"></i></a>
+      <form method="POST" action="{% url 'logout' %}">{% csrf_token %}
+        <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right me-1"></i>Salir</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="container py-4" style="max-width:1100px;">
+
+    <div class="page-header fade-up">
+      <p class="page-subtitle"><i class="bi bi-shield-lock me-1"></i>Solo Superusuarios</p>
+      <h1 class="page-title">Grupos y Módulos</h1>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4 fade-up d1">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-people"></i></div>
+          <div><p class="stat-number" id="stat-grupos">{{ total_grupos }}</p><p class="stat-label">Grupos</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-collection"></i></div>
+          <div><p class="stat-number" id="stat-modulos">{{ total_modulos }}</p><p class="stat-label">Módulos</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-color:rgba(251,191,36,.15);">
+          <div class="stat-icon" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.15);">
+            <i class="bi bi-person-exclamation" style="color:var(--amarillo);"></i>
+          </div>
+          <div><p class="stat-number" id="stat-sin-grupo">{{ usuarios_sin_grupo }}</p><p class="stat-label">Sin grupo</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-person-fill-check"></i></div>
+          <div><p class="stat-number" id="stat-asignados">{{ usuarios_asignados }}</p><p class="stat-label">Asignados</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar fade-up d1">
+      <button class="tab-btn active" id="tab-btn-grupos"  onclick="switchTab('grupos')">
+        <i class="bi bi-people"></i>Grupos
+      </button>
+      <button class="tab-btn"        id="tab-btn-modulos" onclick="switchTab('modulos')">
+        <i class="bi bi-collection"></i>Módulos
+      </button>
+    </div>
+
+
+    <!-- ════════════ TAB GRUPOS ════════════ -->
+    <div id="tab-grupos" class="tab-pane active">
+      <div class="row g-4">
+
+        <div class="col-lg-4">
+          <p class="section-title">Nuevo Grupo</p>
+          <div class="info-card">
+            <div class="mb-3">
+              <p class="field-label">Nombre del grupo</p>
+              <input type="text" id="nuevo-grupo-nombre" class="field-input" placeholder="Ej: Vendedores...">
+            </div>
+            <button class="btn-save w-100" id="btn-crear-grupo" onclick="crearGrupo()">
+              <i class="bi bi-plus-lg"></i>Crear Grupo
+            </button>
+          </div>
+
+          {% if lista_sin_grupo %}
+          <p class="section-title mt-4">Sin grupo</p>
+          <div class="info-card">
+            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--amarillo);margin-bottom:.75rem;">
+              <i class="bi bi-exclamation-triangle me-1"></i>Sin acceso a módulos
+            </p>
+            {% for u in lista_sin_grupo %}
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--borde);">
+              <div class="u-avatar" style="width:22px;height:22px;font-size:.5rem;">
+                {% if u.profile.avatar.name %}<img src="{{ u.profile.avatar.url }}" alt="">
+                {% else %}{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}{% endif %}
+              </div>
+              <span style="font-size:.83rem;font-weight:600;flex:1;">{{ u.get_full_name|default:u.username }}</span>
+              <span class="badge-sin-grupo">sin grupo</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="col-lg-8">
+          <p class="section-title">Grupos Configurados</p>
+          <div id="lista-grupos">
+            {% for grupo in grupos %}
+            <div class="grupo-card" id="grupo-card-{{ grupo.id }}">
+              <div class="grupo-header">
+                <div>
+                  <p style="font-weight:800;font-size:.98rem;margin:0;">
+                    <i class="bi bi-people me-1" style="color:var(--verde);"></i>{{ grupo.name }}
+                  </p>
+                  <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.2rem 0 0;"
+                     id="grupo-meta-{{ grupo.id }}">
+                    {{ grupo.user_set.count }} usuario{{ grupo.user_set.count|pluralize }} ·
+                    {{ grupo.accesos_modulos.count }} módulo{{ grupo.accesos_modulos.count|pluralize }}
+                  </p>
+                </div>
+                <div style="display:flex;gap:.5rem;flex-shrink:0;flex-wrap:wrap;">
+                  <button class="btn-outline naranja"
+                          onclick="abrirModalModulos({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Gestionar módulos">
+                    <i class="bi bi-collection"></i>Módulos
+                  </button>
+                  <button class="btn-outline"
+                          onclick="abrirModalUsuarios({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Gestionar usuarios">
+                    <i class="bi bi-person-plus"></i>Usuarios
+                  </button>
+                  <button class="btn-icon-sm rem"
+                          onclick="eliminarGrupo({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Eliminar">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="grupo-body">
+                <!-- Módulos -->
+                <p class="subsection"><i class="bi bi-collection"></i>Módulos con acceso</p>
+                <div id="modulos-grupo-{{ grupo.id }}" style="margin-bottom:.85rem;">
+                  {% for acc in grupo.accesos_modulos.all %}{% if acc.tiene_acceso %}
+                  <span class="acceso-chip" id="acceso-chip-{{ grupo.id }}-{{ acc.modulo.id }}">
+                    <i class="bi {{ acc.modulo.icono }}"></i>{{ acc.modulo.nombre }}
+                    <button class="acceso-chip-remove"
+                            onclick="revocarModulo({{ grupo.id }},{{ acc.modulo.id }},'{{ acc.modulo.nombre }}')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </span>
+                  {% endif %}{% empty %}
+                  <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);"
+                     id="empty-modulos-{{ grupo.id }}">Sin módulos asignados</p>
+                  {% endfor %}
+                </div>
+                <!-- Usuarios -->
+                <p class="subsection"><i class="bi bi-people"></i>Usuarios</p>
+                <div id="usuarios-grupo-{{ grupo.id }}">
+                  {% for u in grupo.user_set.all %}
+                  <span class="user-chip" id="chip-{{ grupo.id }}-{{ u.id }}">
+                    <div class="user-chip-avatar">
+                      {% if u.profile.avatar.name %}<img src="{{ u.profile.avatar.url }}" alt="">
+                      {% else %}{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}{% endif %}
+                    </div>
+                    {{ u.get_full_name|default:u.username }}
+                    <button class="user-chip-remove"
+                            onclick="quitarUsuario({{ grupo.id }},{{ u.id }},'{{ u.get_full_name|default:u.username }}')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </span>
+                  {% empty %}
+                  <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);"
+                     id="empty-usuarios-{{ grupo.id }}">Sin usuarios asignados</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" id="empty-grupos">
+              <i class="bi bi-people"></i>
+              <p style="font-weight:700;">No hay grupos creados</p>
+              <p style="font-size:.83rem;">Crea el primero con el formulario</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════ TAB MÓDULOS ════════════ -->
+    <div id="tab-modulos" class="tab-pane">
+      <div class="row g-4">
+
+        <div class="col-lg-4">
+          <p class="section-title">Nuevo Módulo</p>
+          <div class="info-card">
+            <div class="mb-3">
+              <p class="field-label">Nombre</p>
+              <input type="text" id="mod-nombre" class="field-input" placeholder="Ej: Proveedores, Ventas...">
+            </div>
+            <div class="mb-3">
+              <p class="field-label">Ícono <span style="font-size:.58rem;color:var(--muted);">(Bootstrap Icons)</span></p>
+              <div class="icon-prev-wrap">
+                <div class="icon-prev"><i class="bi bi-grid" id="icon-prev-el"></i></div>
+                <input type="text" id="mod-icono" class="field-input" value="bi-grid"
+                       placeholder="bi-grid" oninput="document.getElementById('icon-prev-el').className='bi '+this.value">
+              </div>
+              <p style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.3rem;">
+                <a href="https://icons.getbootstrap.com" target="_blank" style="color:var(--azul);">icons.getbootstrap.com</a>
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="field-label">URL Name <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+              <input type="text" id="mod-urlname" class="field-input" placeholder="Ej: lista_usuarios">
+              <p style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.3rem;">
+                Nombre de la URL en <code>urls.py</code> para proteger el acceso
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="field-label">Descripción <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+              <input type="text" id="mod-descripcion" class="field-input" placeholder="Breve descripción...">
+            </div>
+            <button class="btn-save w-100" id="btn-crear-modulo" onclick="crearModulo()">
+              <i class="bi bi-plus-lg"></i>Crear Módulo
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <p class="section-title">Módulos del Sistema</p>
+          <div id="lista-modulos">
+            {% for m in modulos %}
+            <div class="modulo-card" id="modulo-card-{{ m.id }}">
+              <div class="modulo-header">
+                <div style="display:flex;align-items:center;gap:.85rem;">
+                  <div class="modulo-icon"><i class="bi {{ m.icono }}"></i></div>
+                  <div>
+                    <p style="font-weight:800;font-size:.98rem;margin:0;">{{ m.nombre }}</p>
+                    <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.1rem 0 0;">
+                      {{ m.slug }}{% if m.url_name %} · <span style="color:var(--azul);">{{ m.url_name }}</span>{% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div style="display:flex;gap:.4rem;">
+                  {% if m.url_name %}
+                  <button class="btn-icon-sm" style="color:var(--verde);border-color:rgba(74,222,128,.2);"
+                          onclick="escanearModulo({{ m.id }},'{{ m.nombre }}')"
+                          title="Escanear template — detecta elementos automáticamente">
+                    <i class="bi bi-search"></i>
+                  </button>
+                  <button class="btn-icon-sm" style="color:var(--muted);"
+                          onclick="verElementos({{ m.id }},'{{ m.nombre }}')"
+                          title="Ver elementos detectados"
+                          id="btn-elementos-{{ m.id }}">
+                    <i class="bi bi-list-check"></i>
+                    {% if m.elementos.count %}<span style="font-size:.55rem;margin-left:.1rem;">{{ m.elementos.count }}</span>{% endif %}
+                  </button>
+                  {% endif %}
+                  <button class="btn-icon-sm" style="color:var(--azul);border-color:rgba(96,165,250,.2);"
+                          onclick="abrirEditarModulo({{ m.id }},'{{ m.nombre }}','{{ m.icono }}','{{ m.url_name }}','{{ m.descripcion }}')"
+                          title="Editar módulo">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-icon-sm rem" onclick="eliminarModulo({{ m.id }},'{{ m.nombre }}')" title="Eliminar módulo">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="modulo-body">
+                {% if m.descripcion %}<p style="font-size:.83rem;color:var(--muted);margin-bottom:.6rem;">{{ m.descripcion }}</p>{% endif %}
+                {% if m.url_name %}
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+                  <p class="subsection" style="margin:0;"><i class="bi bi-puzzle"></i>Elementos detectados</p>
+                  <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:{% if m.elementos.count %}var(--verde){% else %}var(--muted){% endif %};">
+                    {{ m.elementos.count }} elemento{{ m.elementos.count|pluralize }}
+                  </span>
+                </div>
+                {% if not m.elementos.count %}
+                <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.75rem;">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Haz click en <i class="bi bi-search"></i> para escanear el template
+                </p>
+                {% else %}
+                <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.75rem;" id="elementos-preview-{{ m.id }}">
+                  {% for e in m.elementos.all|slice:":6" %}
+                  <span style="font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .5rem;border-radius:999px;
+                    {% if e.tipo == 'accion' %}background:rgba(251,146,60,.08);color:var(--naranja);border:1px solid rgba(251,146,60,.2);
+                    {% elif e.tipo == 'componente' %}background:rgba(96,165,250,.08);color:var(--azul);border:1px solid rgba(96,165,250,.2);
+                    {% else %}background:rgba(74,222,128,.08);color:var(--verde);border:1px solid rgba(74,222,128,.2);{% endif %}">
+                    {{ e.label }}
+                  </span>
+                  {% endfor %}
+                  {% if m.elementos.count > 6 %}
+                  <span style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);">+{{ m.elementos.count|add:"-6" }} más</span>
+                  {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+                <p class="subsection"><i class="bi bi-people"></i>Grupos con acceso</p>
+                <div id="grupos-modulo-{{ m.id }}">
+                  {% for acc in m.accesos.all %}{% if acc.tiene_acceso %}
+                  <span class="badge-grupo-asignado" id="badge-gmod-{{ m.id }}-{{ acc.group.id }}">
+                    <i class="bi bi-people"></i>{{ acc.group.name }}
+                  </span>
+                  {% endif %}{% empty %}
+                  <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);"
+                     id="empty-gmod-{{ m.id }}">Ningún grupo tiene acceso todavía</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" id="empty-modulos">
+              <i class="bi bi-collection"></i>
+              <p style="font-weight:700;">No hay módulos creados</p>
+              <p style="font-size:.83rem;">Crea el primero con el formulario</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>Agrosol · Grupos y Módulos · Solo Superusuarios</footer>
+
+
+  <!-- MODAL USUARIOS -->
+  <div class="modal fade modal-custom" id="modal-usuarios" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-person-plus me-2" style="color:var(--verde);"></i>
+            Usuarios en <span id="modal-u-nombre" style="color:var(--verde);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div style="position:relative;margin-bottom:1rem;">
+            <i class="bi bi-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;"></i>
+            <input type="text" id="search-u" class="field-input" style="padding-left:2.4rem;"
+                   placeholder="Buscar..." oninput="renderUsuarios(this.value)">
+          </div>
+          <div id="lista-u-modal"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MÓDULOS (asignar módulos al grupo) -->
+  <div class="modal fade modal-custom" id="modal-modulos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-collection me-2" style="color:var(--naranja);"></i>
+            Módulos para <span id="modal-m-nombre" style="color:var(--naranja);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:0;">
+
+          <!-- Lista de módulos -->
+          <div id="panel-lista-modulos" style="padding:1.25rem 1.5rem;">
+            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1rem;">
+              <i class="bi bi-info-circle me-1"></i>
+              Asigna módulos al grupo. En cada módulo con elementos puedes configurar
+              qué puede ver/usar el grupo.
+            </p>
+            <div id="lista-m-modal"></div>
+          </div>
+
+          <!-- Panel de permisos de elementos (se muestra al hacer click en Permisos) -->
+          <div id="panel-permisos-elementos" style="display:none;padding:1.25rem 1.5rem;">
+            <button onclick="volverAModulos()" style="background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;margin-bottom:1rem;display:flex;align-items:center;gap:.4rem;">
+              <i class="bi bi-arrow-left"></i>Volver a módulos
+            </button>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+              <div id="perm-modulo-icon" style="width:36px;height:36px;border-radius:9px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;color:var(--naranja);font-size:1rem;flex-shrink:0;"></div>
+              <div>
+                <p style="font-weight:800;font-size:.95rem;margin:0;" id="perm-modulo-nombre"></p>
+                <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
+                  Configurando permisos para <span id="perm-grupo-nombre" style="color:var(--verde);"></span>
+                </p>
+              </div>
+            </div>
+            <div id="lista-permisos-elementos">
+              <div style="text-align:center;padding:2rem;color:var(--muted);">
+                <span class="spinner-border spinner-border-sm me-2"></span>Cargando elementos...
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ELEMENTOS (ver lista completa de elementos de un módulo) -->
+  <div class="modal fade modal-custom" id="modal-elementos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-list-check me-2" style="color:var(--verde);"></i>
+            Elementos de <span id="modal-elem-nombre" style="color:var(--verde);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1rem;">
+            Elementos detectados por escaneo automático del template
+          </p>
+          <div id="lista-elementos-modal"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast-custom">
+    <i class="toast-icon bi" id="toast-icon"></i>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- MODAL EDITAR MÓDULO -->
+  <div class="modal fade modal-custom" id="modal-editar-modulo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-pencil me-2" style="color:var(--azul);"></i>
+            Editar Módulo
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Error -->
+          <div id="edit-error" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.7rem 1rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--rojo);display:none;align-items:center;gap:.5rem;margin-bottom:1rem;">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="edit-error-msg"></span>
+          </div>
+
+          <input type="hidden" id="edit-id">
+
+          <div class="mb-3">
+            <p class="field-label">Nombre</p>
+            <input type="text" id="edit-nombre" class="field-input" placeholder="Nombre del módulo">
+          </div>
+
+          <div class="mb-3">
+            <p class="field-label">Ícono <span style="font-size:.58rem;color:var(--muted);">(Bootstrap Icons)</span></p>
+            <div class="icon-prev-wrap">
+              <div class="icon-prev"><i class="bi bi-grid" id="edit-icon-prev"></i></div>
+              <input type="text" id="edit-icono" class="field-input"
+                     placeholder="bi-grid"
+                     oninput="document.getElementById('edit-icon-prev').className='bi '+this.value">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <p class="field-label">URL Name</p>
+            <input type="text" id="edit-urlname" class="field-input" placeholder="Ej: lista_usuarios">
+            <p style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.3rem;">
+              El <code>name=</code> de tu <code>urls.py</code> — vincula el módulo con la pantalla
+            </p>
+          </div>
+
+          <div class="mb-2">
+            <p class="field-label">Descripción <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+            <input type="text" id="edit-descripcion" class="field-input" placeholder="Breve descripción...">
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn-save" id="btn-guardar-edicion" onclick="guardarEdicionModulo()">
+            <i class="bi bi-check2 me-1"></i>Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const CSRF = "{{ csrf_token }}";
+    let gId = null, gNombre = '';
+
+    // Datos desde Django
+    const USUARIOS = [{% for u in todos_usuarios %}{id:{{u.id}},username:"{{u.username}}",nombre:"{{u.get_full_name|default:u.username}}",cargo:"{{u.profile.cargo|default:''}}",avatar:"{% if u.profile.avatar.name %}{{u.profile.avatar.url}}{% endif %}",grupos:[{% for g in u.groups.all %}{{g.id}},{% endfor %}],grupo_actual:{% if u.groups.first %}"{{u.groups.first.name}}"{% else %}null{% endif %}},{% endfor %}];
+    const MODULOS  = [{% for m in modulos %}{id:{{m.id}},nombre:"{{m.nombre}}",icono:"{{m.icono}}",grupos:[{% for acc in m.accesos.all %}{% if acc.tiene_acceso %}{{acc.group.id}},{% endif %}{% endfor %}],elementos:{% if m.elementos.count %}[{% for e in m.elementos.all %}{id:{{e.id}},clave:"{{e.clave}}",tipo:"{{e.tipo}}",label:"{{e.label}}"},{% endfor %}]{% else %}[]{% endif %}},{% endfor %}];
+
+    // ── TOAST ──
+    let tt;
+    function toast(msg,tipo='success'){
+      const el=document.getElementById('toast'),iconos={success:'bi-check-circle-fill',error:'bi-x-circle-fill'};
+      clearTimeout(tt);
+      el.className=`toast-custom ${tipo}`;
+      document.getElementById('toast-icon').className=`toast-icon bi ${iconos[tipo]}`;
+      document.getElementById('toast-msg').textContent=msg;
+      el.classList.add('show');
+      tt=setTimeout(()=>el.classList.remove('show'),3200);
+    }
+
+    // ── TABS ──
+    function switchTab(t){
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById(`tab-${t}`).classList.add('active');
+      document.getElementById(`tab-btn-${t}`).classList.add('active');
+    }
+
+    // ════════════ GRUPOS ════════════
+    async function crearGrupo(){
+      const input=document.getElementById('nuevo-grupo-nombre');
+      const nombre=input.value.trim();
+      if(!nombre){toast('Escribe un nombre.','error');return;}
+      const btn=document.getElementById('btn-crear-grupo');
+      btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>Creando...';
+      const fd=new FormData(); fd.append('nombre',nombre); fd.append('csrfmiddlewaretoken',CSRF);
+      const res=await fetch("{% url 'grupo_crear' %}",{method:'POST',body:fd});
+      const json=await res.json();
+      btn.disabled=false; btn.innerHTML='<i class="bi bi-plus-lg"></i>Crear Grupo';
+      if(!json.success){toast(json.error||'Error.','error');return;}
+      input.value='';
+      document.getElementById('empty-grupos')?.remove();
+      insertarTarjetaGrupo(json.grupo);
+      const s=document.getElementById('stat-grupos'); if(s) s.textContent=parseInt(s.textContent)+1;
+      toast(`Grupo "${json.grupo.name}" creado.`);
+    }
+
+    function insertarTarjetaGrupo(g){
+      const d=document.createElement('div');
+      d.className='grupo-card item-new'; d.id=`grupo-card-${g.id}`;
+      d.innerHTML=`
+        <div class="grupo-header">
+          <div>
+            <p style="font-weight:800;font-size:.98rem;margin:0;"><i class="bi bi-people me-1" style="color:var(--verde);"></i>${g.name}</p>
+            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.2rem 0 0;" id="grupo-meta-${g.id}">0 usuarios · 0 módulos</p>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-shrink:0;flex-wrap:wrap;">
+            <button class="btn-outline naranja" onclick="abrirModalModulos(${g.id},'${g.name}')"><i class="bi bi-collection"></i>Módulos</button>
+            <button class="btn-outline" onclick="abrirModalUsuarios(${g.id},'${g.name}')"><i class="bi bi-person-plus"></i>Usuarios</button>
+            <button class="btn-icon-sm rem" onclick="eliminarGrupo(${g.id},'${g.name}')"><i class="bi bi-trash3"></i></button>
+          </div>
+        </div>
+        <div class="grupo-body">
+          <p class="subsection"><i class="bi bi-collection"></i>Módulos con acceso</p>
+          <div id="modulos-grupo-${g.id}" style="margin-bottom:.85rem;">
+            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);" id="empty-modulos-${g.id}">Sin módulos asignados</p>
+          </div>
+          <p class="subsection"><i class="bi bi-people"></i>Usuarios</p>
+          <div id="usuarios-grupo-${g.id}">
+            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);" id="empty-usuarios-${g.id}">Sin usuarios asignados</p>
+          </div>
+        </div>`;
+      document.getElementById('lista-grupos').prepend(d);
+    }
+
+    async function eliminarGrupo(id,nombre){
+      if(!confirm(`¿Eliminar el grupo "${nombre}"?`)) return;
+      const fd=new FormData(); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'grupo_eliminar' 0 %}`.replace('/0/',`/${id}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast('Error.','error');return;}
+      document.getElementById(`grupo-card-${id}`)?.remove();
+      const s=document.getElementById('stat-grupos'); if(s) s.textContent=Math.max(0,parseInt(s.textContent)-1);
+      toast(`Grupo "${nombre}" eliminado.`);
+    }
+
+    // ── MODAL USUARIOS ──
+    function abrirModalUsuarios(id,nombre){
+      gId=id; gNombre=nombre;
+      document.getElementById('modal-u-nombre').textContent=nombre;
+      document.getElementById('search-u').value='';
+      renderUsuarios('');
+      new bootstrap.Modal(document.getElementById('modal-usuarios')).show();
+    }
+
+    function renderUsuarios(q){
+      const cont=document.getElementById('lista-u-modal');
+      const lista=USUARIOS.filter(u=>!u.grupos.includes(gId)&&(u.nombre.toLowerCase().includes(q.toLowerCase())||u.username.toLowerCase().includes(q.toLowerCase())||u.cargo.toLowerCase().includes(q.toLowerCase())));
+      if(!lista.length){cont.innerHTML=`<p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);text-align:center;padding:1.5rem 0;">${q?'Sin resultados':'Todos ya están en este grupo'}</p>`;return;}
+      cont.innerHTML=lista.map(u=>`
+        <div class="item-row" id="modal-u-${u.id}">
+          <div class="d-flex align-items-center gap-2">
+            <div class="u-avatar">${u.avatar?`<img src="${u.avatar}" alt="">`:(u.nombre[0]||'?').toUpperCase()}</div>
+            <div>
+              <p style="font-weight:700;font-size:.88rem;margin:0;">${u.nombre}</p>
+              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
+                @${u.username}${u.cargo?' · '+u.cargo:''}
+                ${u.grupo_actual?`<span style="color:var(--amarillo);margin-left:.35rem;"><i class="bi bi-people-fill"></i> ${u.grupo_actual}</span>`:''}
+              </p>
+            </div>
+          </div>
+          <button class="btn-add ${u.grupo_actual?'':''}${u.grupo_actual?'':'naranja'}" style="${u.grupo_actual?'background:rgba(251,191,36,.1);color:var(--amarillo);border-color:rgba(251,191,36,.25);':''}" onclick="asignarU(${u.id},'${u.nombre}')">
+            ${u.grupo_actual?'<i class="bi bi-arrow-left-right me-1"></i>Mover':'<i class="bi bi-plus me-1"></i>Agregar'}
+          </button>
+        </div>`).join('');
+    }
+
+    async function asignarU(uid,unombre){
+      const fd=new FormData(); fd.append('user_id',uid); fd.append('accion','agregar'); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'grupo_asignar_usuario' 0 %}`.replace('/0/',`/${gId}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast('Error.','error');return;}
+      const u=USUARIOS.find(u=>u.id===uid); if(u) u.grupos.push(gId);
+      document.getElementById(`modal-u-${uid}`)?.remove();
+      addChipU(gId,json.usuario);
+      metaGrupo(gId); stats();
+      renderUsuarios(document.getElementById('search-u').value);
+      const grupoAnt = json.grupo_anterior;
+      toast(grupoAnt ? `${unombre} movido de "${grupoAnt}" a "${gNombre}".` : `${unombre} agregado a ${gNombre}.`);
+    }
+
+    function addChipU(gid,u){
+      const cont=document.getElementById(`usuarios-grupo-${gid}`);
+      document.getElementById(`empty-usuarios-${gid}`)?.remove();
+      const us=USUARIOS.find(x=>x.id===u.id);
+      const chip=document.createElement('span');
+      chip.className='user-chip item-new'; chip.id=`chip-${gid}-${u.id}`;
+      chip.innerHTML=`<div class="user-chip-avatar">${us?.avatar?`<img src="${us.avatar}" alt="">`:(u.nombre[0]||'?').toUpperCase()}</div>${u.nombre}<button class="user-chip-remove" onclick="quitarUsuario(${gid},${u.id},'${u.nombre}')"><i class="bi bi-x"></i></button>`;
+      cont.appendChild(chip);
+    }
+
+    async function quitarUsuario(gid,uid,nombre){
+      const fd=new FormData(); fd.append('user_id',uid); fd.append('accion','quitar'); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'grupo_asignar_usuario' 0 %}`.replace('/0/',`/${gid}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast('Error.','error');return;}
+      const u=USUARIOS.find(u=>u.id===uid); if(u) u.grupos=u.grupos.filter(g=>g!==gid);
+      document.getElementById(`chip-${gid}-${uid}`)?.remove();
+      const cont=document.getElementById(`usuarios-grupo-${gid}`);
+      if(cont&&!cont.querySelector('.user-chip')){
+        const p=document.createElement('p'); p.id=`empty-usuarios-${gid}`;
+        p.style.cssText="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);";
+        p.textContent='Sin usuarios asignados'; cont.appendChild(p);
+      }
+      metaGrupo(gid); stats(); toast(`${nombre} removido.`);
+    }
+
+    // ── MODAL MÓDULOS ──
+    function abrirModalModulos(id,nombre){
+      gId=id; gNombre=nombre;
+      document.getElementById('modal-m-nombre').textContent=nombre;
+      renderModulos();
+      new bootstrap.Modal(document.getElementById('modal-modulos')).show();
+    }
+
+    function renderModulos(){
+      const cont=document.getElementById('lista-m-modal');
+      if(!MODULOS.length){cont.innerHTML=`<p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);text-align:center;padding:1.5rem 0;">No hay módulos. Créalos en el tab Módulos.</p>`;return;}
+      cont.innerHTML=MODULOS.map(m=>{
+        const tiene=m.grupos.includes(gId);
+        const nElems = m.elementos ? m.elementos.length : 0;
+        return `
+          <div class="item-row" id="modal-m-${m.id}">
+            <div class="d-flex align-items-center gap-2" style="flex:1;min-width:0;">
+              <div class="modulo-icon" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;"><i class="bi ${m.icono}"></i></div>
+              <div style="min-width:0;">
+                <p style="font-weight:700;font-size:.88rem;margin:0;">${m.nombre}</p>
+                <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
+                  ${tiene
+                    ? '<span style="color:var(--verde);"><i class="bi bi-check-circle-fill me-1"></i>Con acceso</span>'
+                    : 'Sin acceso'}
+                  ${nElems ? `<span style="margin-left:.4rem;color:var(--azul);">${nElems} elem.</span>` : ''}
+                </p>
+              </div>
+            </div>
+            <div style="display:flex;gap:.35rem;flex-shrink:0;">
+              ${tiene && nElems ? `
+                <button class="btn-add" style="background:rgba(96,165,250,.1);color:var(--azul);border-color:rgba(96,165,250,.25);"
+                        onclick="abrirPermisosElementos(${m.id},'${m.nombre}','${m.icono}')">
+                  <i class="bi bi-sliders me-1"></i>Permisos
+                </button>` : ''}
+              ${tiene
+                ?`<button class="btn-outline danger" style="font-size:.75rem;padding:.28rem .7rem;" onclick="revocarM(${m.id},'${m.nombre}','${m.icono}')"><i class="bi bi-x me-1"></i>Revocar</button>`
+                :`<button class="btn-add naranja" onclick="asignarM(${m.id},'${m.nombre}','${m.icono}')"><i class="bi bi-plus me-1"></i>Asignar</button>`
+              }
+            </div>
+          </div>`;
+      }).join('');;
+    }
+
+    async function asignarM(mid,mnombre,micono){
+      const fd=new FormData(); fd.append('modulo_id',mid); fd.append('accion','asignar'); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'grupo_gestionar_modulo' 0 %}`.replace('/0/',`/${gId}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast(json.error||'Error.','error');return;}
+      const m=MODULOS.find(m=>m.id===mid); if(m) m.grupos.push(gId);
+      renderModulos();
+      addChipModulo(gId,mid,mnombre,micono);
+      addBadgeGrupoEnModulo(mid,gId,gNombre);
+      metaGrupo(gId);
+      toast(`Acceso a "${mnombre}" concedido.`);
+    }
+
+    async function revocarM(mid,mnombre,micono){
+      const fd=new FormData(); fd.append('modulo_id',mid); fd.append('accion','revocar'); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'grupo_gestionar_modulo' 0 %}`.replace('/0/',`/${gId}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast('Error.','error');return;}
+      const m=MODULOS.find(m=>m.id===mid); if(m) m.grupos=m.grupos.filter(g=>g!==gId);
+      renderModulos();
+      document.getElementById(`acceso-chip-${gId}-${mid}`)?.remove();
+      const cont=document.getElementById(`modulos-grupo-${gId}`);
+      if(cont&&!cont.querySelector('.acceso-chip')){
+        const p=document.createElement('p'); p.id=`empty-modulos-${gId}`;
+        p.style.cssText="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);";
+        p.textContent='Sin módulos asignados'; cont.appendChild(p);
+      }
+      removeBadgeGrupoEnModulo(mid,gId);
+      metaGrupo(gId);
+      toast(`Acceso a "${mnombre}" revocado.`);
+    }
+
+    async function revocarModulo(gid,mid,mnombre){
+      gId=gid;
+      await revocarM(mid,mnombre,'');
+    }
+
+    function addChipModulo(gid,mid,mnombre,micono){
+      const cont=document.getElementById(`modulos-grupo-${gid}`);
+      document.getElementById(`empty-modulos-${gid}`)?.remove();
+      const chip=document.createElement('span');
+      chip.className='acceso-chip item-new'; chip.id=`acceso-chip-${gid}-${mid}`;
+      chip.innerHTML=`<i class="bi ${micono}"></i>${mnombre}<button class="acceso-chip-remove" onclick="revocarModulo(${gid},${mid},'${mnombre}')"><i class="bi bi-x"></i></button>`;
+      cont.appendChild(chip);
+    }
+
+    function addBadgeGrupoEnModulo(mid,gid,gnombre){
+      const cont=document.getElementById(`grupos-modulo-${mid}`);
+      if(!cont) return;
+      document.getElementById(`empty-gmod-${mid}`)?.remove();
+      const span=document.createElement('span');
+      span.className='badge-grupo-asignado item-new'; span.id=`badge-gmod-${mid}-${gid}`;
+      span.innerHTML=`<i class="bi bi-people"></i>${gnombre}`;
+      cont.appendChild(span);
+    }
+
+    function removeBadgeGrupoEnModulo(mid,gid){
+      document.getElementById(`badge-gmod-${mid}-${gid}`)?.remove();
+      const cont=document.getElementById(`grupos-modulo-${mid}`);
+      if(cont&&!cont.querySelector('.badge-grupo-asignado')){
+        const p=document.createElement('p'); p.id=`empty-gmod-${mid}`;
+        p.style.cssText="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);";
+        p.textContent='Ningún grupo tiene acceso todavía'; cont.appendChild(p);
+      }
+    }
+
+    // ════════════ MÓDULOS ════════════
+    async function crearModulo(){
+      const nombre=document.getElementById('mod-nombre').value.trim();
+      const icono=document.getElementById('mod-icono').value.trim()||'bi-grid';
+      const url_name=document.getElementById('mod-urlname').value.trim();
+      const desc=document.getElementById('mod-descripcion').value.trim();
+      if(!nombre){toast('Escribe un nombre.','error');return;}
+      const btn=document.getElementById('btn-crear-modulo');
+      btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>Creando...';
+      const fd=new FormData();
+      fd.append('nombre',nombre); fd.append('icono',icono); fd.append('url_name',url_name);
+      fd.append('descripcion',desc); fd.append('csrfmiddlewaretoken',CSRF);
+      const res=await fetch("{% url 'modulo_crear' %}",{method:'POST',body:fd}); const json=await res.json();
+      btn.disabled=false; btn.innerHTML='<i class="bi bi-plus-lg"></i>Crear Módulo';
+      if(!json.success){toast(json.error||'Error.','error');return;}
+      document.getElementById('mod-nombre').value='';
+      document.getElementById('mod-urlname').value='';
+      document.getElementById('mod-descripcion').value='';
+      document.getElementById('empty-modulos')?.remove();
+      insertarTarjetaModulo(json.modulo);
+      MODULOS.push({id:json.modulo.id,nombre:json.modulo.nombre,icono:json.modulo.icono,grupos:[]});
+      const s=document.getElementById('stat-modulos'); if(s) s.textContent=parseInt(s.textContent)+1;
+      toast(`Módulo "${json.modulo.nombre}" creado.`);
+    }
+
+    function insertarTarjetaModulo(m){
+      const d=document.createElement('div');
+      d.className='modulo-card item-new'; d.id=`modulo-card-${m.id}`;
+      d.innerHTML=`
+        <div class="modulo-header">
+          <div style="display:flex;align-items:center;gap:.85rem;">
+            <div class="modulo-icon"><i class="bi ${m.icono}"></i></div>
+            <div>
+              <p style="font-weight:800;font-size:.98rem;margin:0;">${m.nombre}</p>
+              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.1rem 0 0;">
+                ${m.slug}${m.url_name?' · <span style="color:var(--azul);">'+m.url_name+'</span>':''}
+              </p>
+            </div>
+          </div>
+          <button class="btn-icon-sm rem" onclick="eliminarModulo(${m.id},'${m.nombre}')"><i class="bi bi-trash3"></i></button>
+        </div>
+        <div class="modulo-body">
+          ${m.descripcion?`<p style="font-size:.83rem;color:var(--muted);margin-bottom:.6rem;">${m.descripcion}</p>`:''}
+          <p class="subsection"><i class="bi bi-people"></i>Grupos con acceso</p>
+          <div id="grupos-modulo-${m.id}">
+            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);" id="empty-gmod-${m.id}">Ningún grupo tiene acceso todavía</p>
+          </div>
+        </div>`;
+      document.getElementById('lista-modulos').prepend(d);
+    }
+
+    async function eliminarModulo(id,nombre){
+      if(!confirm(`¿Eliminar el módulo "${nombre}"?`)) return;
+      const fd=new FormData(); fd.append('csrfmiddlewaretoken',CSRF);
+      const url=`{% url 'modulo_eliminar' 0 %}`.replace('/0/',`/${id}/`);
+      const res=await fetch(url,{method:'POST',body:fd}); const json=await res.json();
+      if(!json.success){toast('Error.','error');return;}
+      document.getElementById(`modulo-card-${id}`)?.remove();
+      const idx=MODULOS.findIndex(m=>m.id===id); if(idx>-1) MODULOS.splice(idx,1);
+      const s=document.getElementById('stat-modulos'); if(s) s.textContent=Math.max(0,parseInt(s.textContent)-1);
+      toast(`Módulo "${nombre}" eliminado.`);
+    }
+
+    // ── HELPERS ──
+    function metaGrupo(gid){
+      const meta=document.getElementById(`grupo-meta-${gid}`); if(!meta) return;
+      const nU=document.getElementById(`usuarios-grupo-${gid}`)?.querySelectorAll('.user-chip').length||0;
+      const nM=document.getElementById(`modulos-grupo-${gid}`)?.querySelectorAll('.acceso-chip').length||0;
+      meta.textContent=`${nU} usuario${nU!==1?'s':''} · ${nM} módulo${nM!==1?'s':''}`;
+    }
+
+    function stats(){
+      let a=0,s=0; USUARIOS.forEach(u=>{if(u.grupos.length>0)a++;else s++;});
+      const sA=document.getElementById('stat-asignados'),sS=document.getElementById('stat-sin-grupo');
+      if(sA) sA.textContent=a; if(sS) sS.textContent=s;
+    }
+
+
+    // ════════════════════════════════════════════════════════
+    //  FASE 2 — ESCANEO Y PERMISOS DE ELEMENTOS
+    // ════════════════════════════════════════════════════════
+
+    let moduloActivoId     = null;
+    let moduloActivoNombre = '';
+    let moduloActivoIcono  = '';
+
+    // ── Escanear template de un módulo ──────────────────────
+    async function escanearModulo(mid, mnombre) {
+      if (!confirm(`Escanear el template de "${mnombre}"?\n\nSe detectarán automáticamente todos los elementos con data-permiso.`)) return;
+
+      toast(`Escaneando "${mnombre}"...`, 'success');
+
+      const fd = new FormData();
+      fd.append('csrfmiddlewaretoken', CSRF);
+      const url = `{% url 'modulo_escanear' 0 %}`.replace('/0/', `/${mid}/`);
+      const res  = await fetch(url, { method: 'POST', body: fd });
+      const json = await res.json();
+
+      if (!json.success) {
+        toast(json.error || 'Error al escanear.', 'error');
+        return;
+      }
+
+      const n = json.creados.length;
+      const e = json.existentes.length;
+      toast(`"${mnombre}": ${n} nuevo${n!==1?'s':''}, ${e} ya existía${e!==1?'n':''}.`);
+
+      // Actualizar el botón de elementos en la tarjeta
+      const btnEl = document.getElementById(`btn-elementos-${mid}`);
+      if (btnEl) {
+        const total = json.total;
+        btnEl.innerHTML = `<i class="bi bi-list-check"></i><span style="font-size:.55rem;margin-left:.1rem;">${total}</span>`;
+        btnEl.style.color = 'var(--verde)';
+        btnEl.style.borderColor = 'rgba(74,222,128,.3)';
+      }
+
+      // Actualizar MODULOS en memoria
+      const m = MODULOS.find(m => m.id === mid);
+      if (m) m.elementos = json.elementos;
+
+      setTimeout(() => location.reload(), 1200);
+    }
+
+    // ── Ver lista de elementos de un módulo ─────────────────
+    async function verElementos(mid, mnombre) {
+      document.getElementById('modal-elem-nombre').textContent = mnombre;
+      const cont = document.getElementById('lista-elementos-modal');
+      cont.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);"><span class="spinner-border spinner-border-sm me-2"></span>Cargando...</div>';
+      new bootstrap.Modal(document.getElementById('modal-elementos')).show();
+
+      const url = `{% url 'modulo_elementos' 0 %}`.replace('/0/', `/${mid}/`);
+      const res  = await fetch(url);
+      const json = await res.json();
+
+      if (!json.success || !json.elementos.length) {
+        cont.innerHTML = `<p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);text-align:center;padding:1.5rem;">Sin elementos detectados. Usa el botón escanear.</p>`;
+        return;
+      }
+
+      // Agrupar por tipo
+      const grupos = { accion: [], componente: [], dato: [] };
+      json.elementos.forEach(e => grupos[e.tipo]?.push(e));
+
+      const tipoInfo = {
+        accion:     { icono: 'bi-lightning-fill', color: 'var(--naranja)', label: 'Acciones' },
+        componente: { icono: 'bi-puzzle',         color: 'var(--azul)',    label: 'Componentes' },
+        dato:       { icono: 'bi-table',          color: 'var(--verde)',   label: 'Datos' },
+      };
+
+      cont.innerHTML = Object.entries(grupos).map(([tipo, elems]) => {
+        if (!elems.length) return '';
+        const info = tipoInfo[tipo];
+        return `
+          <div style="margin-bottom:1rem;">
+            <p style="font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:${info.color};margin-bottom:.5rem;">
+              <i class="bi ${info.icono} me-1"></i>${info.label} (${elems.length})
+            </p>
+            ${elems.map(e => `
+              <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--borde);">
+                <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:${info.color};min-width:140px;">${e.clave}</span>
+                <span style="font-size:.83rem;font-weight:600;">${e.label}</span>
+              </div>`).join('')}
+          </div>`;
+      }).join('');
+    }
+
+    // ── Abrir panel de permisos de elementos para un módulo ─
+    async function abrirPermisosElementos(mid, mnombre, micono) {
+      moduloActivoId     = mid;
+      moduloActivoNombre = mnombre;
+      moduloActivoIcono  = micono;
+
+      document.getElementById('perm-modulo-nombre').textContent = mnombre;
+      document.getElementById('perm-grupo-nombre').textContent  = gNombre;
+      document.getElementById('perm-modulo-icon').innerHTML     = `<i class="bi ${micono}"></i>`;
+
+      // Mostrar panel de permisos, ocultar lista de módulos
+      document.getElementById('panel-lista-modulos').style.display    = 'none';
+      document.getElementById('panel-permisos-elementos').style.display = 'block';
+
+      // Cargar elementos con sus permisos actuales para este grupo
+      await cargarPermisosElementos(mid);
+    }
+
+    async function cargarPermisosElementos(mid) {
+      const cont = document.getElementById('lista-permisos-elementos');
+      cont.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);"><span class="spinner-border spinner-border-sm me-2"></span>Cargando...</div>';
+
+      const url = `{% url 'modulo_elementos' 0 %}`.replace('/0/', `/${mid}/`) + `?grupo_id=${gId}`;
+      const res  = await fetch(url);
+      const json = await res.json();
+
+      if (!json.success || !json.elementos.length) {
+        cont.innerHTML = `
+          <div style="text-align:center;padding:2rem;color:var(--muted);">
+            <i class="bi bi-puzzle" style="font-size:1.8rem;display:block;margin-bottom:.5rem;"></i>
+            <p style="font-weight:700;">Sin elementos detectados</p>
+            <p style="font-size:.82rem;">Primero escanea el template desde el tab Módulos</p>
+          </div>`;
+        return;
+      }
+
+      // Agrupar por tipo
+      const grupos = { accion: [], componente: [], dato: [] };
+      json.elementos.forEach(e => grupos[e.tipo]?.push(e));
+
+      const tipoInfo = {
+        accion:     { icono: 'bi-lightning-fill', color: 'var(--naranja)', label: 'Acciones',    dimColor: 'rgba(251,146,60,.08)',   borderColor: 'rgba(251,146,60,.2)' },
+        componente: { icono: 'bi-puzzle',         color: 'var(--azul)',    label: 'Componentes', dimColor: 'rgba(96,165,250,.08)',   borderColor: 'rgba(96,165,250,.2)' },
+        dato:       { icono: 'bi-table',          color: 'var(--verde)',   label: 'Datos',       dimColor: 'rgba(74,222,128,.08)',   borderColor: 'rgba(74,222,128,.2)' },
+      };
+
+      cont.innerHTML = Object.entries(grupos).map(([tipo, elems]) => {
+        if (!elems.length) return '';
+        const info = tipoInfo[tipo];
+        return `
+          <div style="margin-bottom:1.25rem;">
+            <p style="font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:${info.color};margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem;">
+              <i class="bi ${info.icono}"></i>${info.label} (${elems.length})
+            </p>
+            ${elems.map(e => `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;border-radius:8px;background:${info.dimColor};border:1px solid ${info.borderColor};margin-bottom:.35rem;" id="perm-row-${e.id}">
+                <span style="font-size:.86rem;font-weight:600;">${e.label}</span>
+                <div style="display:flex;gap:.75rem;align-items:center;">
+                  ${tipo !== 'dato' ? `
+                  <!-- Toggle USAR -->
+                  <div style="display:flex;align-items:center;gap:.4rem;">
+                    <span style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);">USAR</span>
+                    <label class="toggle-switch" title="Puede usar (interactuar)">
+                      <input type="checkbox" ${e.usar ? 'checked' : ''}
+                             onchange="guardarPermiso(${e.id}, 'usar', this.checked, ${e.usar}, ${e.ver})">
+                      <span class="toggle-slider" style="${e.usar?'background:rgba(74,222,128,.2);border-color:var(--verde);':''}"></span>
+                    </label>
+                  </div>` : ''}
+                  <!-- Toggle VER -->
+                  <div style="display:flex;align-items:center;gap:.4rem;">
+                    <span style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);">VER</span>
+                    <label class="toggle-switch" title="Puede ver (existe en el DOM)">
+                      <input type="checkbox" ${e.ver ? 'checked' : ''}
+                             onchange="guardarPermiso(${e.id}, 'ver', this.checked, ${e.usar}, ${e.ver})">
+                      <span class="toggle-slider" style="${e.ver?'background:rgba(74,222,128,.2);border-color:var(--verde);':''}"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>`).join('')}
+          </div>`;
+      }).join('');
+    }
+
+    function volverAModulos() {
+      document.getElementById('panel-permisos-elementos').style.display = 'none';
+      document.getElementById('panel-lista-modulos').style.display      = 'block';
+    }
+
+    // ── Guardar un permiso individual ────────────────────────
+    async function guardarPermiso(elemId, campo, valor, usarActual, verActual) {
+      // Lógica: si activas USAR → VER se activa también
+      //         si desactivas VER → USAR se desactiva también
+      let nuevoVer  = campo === 'ver'  ? valor : verActual;
+      let nuevoUsar = campo === 'usar' ? valor : usarActual;
+
+      if (campo === 'usar' && valor === true)  nuevoVer  = true;
+      if (campo === 'ver'  && valor === false) nuevoUsar = false;
+
+      const fd = new FormData();
+      fd.append('puede_ver',  nuevoVer  ? 'true' : 'false');
+      fd.append('puede_usar', nuevoUsar ? 'true' : 'false');
+      fd.append('csrfmiddlewaretoken', CSRF);
+
+      const url = `{% url 'guardar_permiso_elemento' 0 0 %}`
+                    .replace('/0/elementos/0/', `/${gId}/elementos/${elemId}/`);
+      const res  = await fetch(url, { method: 'POST', body: fd });
+      const json = await res.json();
+
+      if (!json.success) { toast('Error al guardar.', 'error'); return; }
+
+      // ── Actualizar los toggles en el DOM sin re-renderizar ──
+      // Esto evita el scroll al inicio y la experiencia de "parpadeo"
+      const row = document.getElementById(`perm-row-${elemId}`);
+      if (row) {
+        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+          const onchangeAttr = cb.getAttribute('onchange') || '';
+          if (onchangeAttr.includes("'ver'")) {
+            cb.checked = json.puede_ver;
+            // Actualizar el slider visual
+            const slider = cb.nextElementSibling;
+            if (slider) {
+              slider.style.background    = json.puede_ver ? 'rgba(74,222,128,.2)' : '';
+              slider.style.borderColor   = json.puede_ver ? 'var(--verde)' : '';
+            }
+          }
+          if (onchangeAttr.includes("'usar'")) {
+            cb.checked = json.puede_usar;
+            const slider = cb.nextElementSibling;
+            if (slider) {
+              slider.style.background    = json.puede_usar ? 'rgba(74,222,128,.2)' : '';
+              slider.style.borderColor   = json.puede_usar ? 'var(--verde)' : '';
+            }
+          }
+        });
+
+        // Actualizar los valores en los atributos onchange para la próxima llamada
+        checkboxes.forEach(cb => {
+          const attr = cb.getAttribute('onchange') || '';
+          // Reemplazar los valores de usarActual y verActual en el onchange
+          const newAttr = attr.replace(
+            /guardarPermiso\((\d+), '(\w+)', this\.checked, (true|false), (true|false)\)/,
+            (match, id, c2, u, v) => {
+              const newU = c2 === 'usar' ? String(json.puede_usar) : String(json.puede_usar);
+              const newV = c2 === 'ver'  ? String(json.puede_ver)  : String(json.puede_ver);
+              return `guardarPermiso(${id}, '${c2}', this.checked, ${newU}, ${newV})`;
+            }
+          );
+          cb.setAttribute('onchange', newAttr);
+        });
+      }
+
+      toast(`"${json.elemento}" actualizado.`);
+    }
+
+    // Enter
+    document.getElementById('nuevo-grupo-nombre').addEventListener('keydown',e=>{if(e.key==='Enter')crearGrupo();});
+    document.getElementById('mod-nombre').addEventListener('keydown',e=>{if(e.key==='Enter')crearModulo();});
+
+    // ════════════ EDITAR MÓDULO ════════════
+    function abrirEditarModulo(id, nombre, icono, urlname, desc) {
+      document.getElementById('edit-id').value          = id;
+      document.getElementById('edit-nombre').value      = nombre;
+      document.getElementById('edit-icono').value       = icono;
+      document.getElementById('edit-urlname').value     = urlname;
+      document.getElementById('edit-descripcion').value = desc;
+      document.getElementById('edit-icon-prev').className = `bi ${icono}`;
+      ocultarEditError();
+      new bootstrap.Modal(document.getElementById('modal-editar-modulo')).show();
+    }
+
+    function ocultarEditError() {
+      document.getElementById('edit-error').style.display = 'none';
+    }
+
+    function mostrarEditError(msg) {
+      const el = document.getElementById('edit-error');
+      document.getElementById('edit-error-msg').textContent = msg;
+      el.style.display = 'flex';
+    }
+
+    async function guardarEdicionModulo() {
+      const id          = document.getElementById('edit-id').value;
+      const nombre      = document.getElementById('edit-nombre').value.trim();
+      const icono       = document.getElementById('edit-icono').value.trim() || 'bi-grid';
+      const url_name    = document.getElementById('edit-urlname').value.trim();
+      const descripcion = document.getElementById('edit-descripcion').value.trim();
+
+      if (!nombre) { mostrarEditError('El nombre es requerido.'); return; }
+
+      const btn = document.getElementById('btn-guardar-edicion');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
+
+      const fd = new FormData();
+      fd.append('nombre',      nombre);
+      fd.append('icono',       icono);
+      fd.append('url_name',    url_name);
+      fd.append('descripcion', descripcion);
+      fd.append('csrfmiddlewaretoken', CSRF);
+
+      const url = `{% url 'modulo_editar' 0 %}`.replace('/0/', `/${id}/`);
+      const res  = await fetch(url, { method: 'POST', body: fd });
+      const json = await res.json();
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Guardar Cambios';
+
+      if (!json.success) { mostrarEditError(json.error || 'Error al guardar.'); return; }
+
+      // Cerrar modal
+      bootstrap.Modal.getInstance(document.getElementById('modal-editar-modulo')).hide();
+
+      // Actualizar la tarjeta en el DOM sin recargar
+      const m = json.modulo;
+      const card = document.getElementById(`modulo-card-${m.id}`);
+      if (card) {
+        // Actualizar ícono
+        card.querySelector('.modulo-icon i').className = `bi ${m.icono}`;
+        // Actualizar nombre
+        const nameEl = card.querySelector('.modulo-header p');
+        if (nameEl) nameEl.textContent = m.nombre;
+        // Actualizar slug y url_name
+        const metaEl = card.querySelector('.modulo-header p:nth-child(2)');
+        if (metaEl) metaEl.innerHTML = `${m.slug}${m.url_name?' · <span style="color:var(--azul);">' + m.url_name + '</span>':''}`;
+        // Actualizar descripción si existe
+        const descEl = card.querySelector('.modulo-body p:first-child');
+        if (descEl && descEl.style.color.includes('muted') || descEl?.style.color === '') {
+          if (m.descripcion) descEl.textContent = m.descripcion;
+        }
+        // Actualizar botón de editar con nuevos datos
+        const editBtn = card.querySelector('.btn-icon-sm:first-child');
+        if (editBtn) {
+          editBtn.setAttribute('onclick',
+            `abrirEditarModulo(${m.id},'${m.nombre}','${m.icono}','${m.url_name}','${m.descripcion}')`
+          );
+        }
+      }
+
+      // Actualizar en el array MODULOS
+      const idx = MODULOS.findIndex(x => x.id === m.id);
+      if (idx > -1) { MODULOS[idx].nombre = m.nombre; MODULOS[idx].icono = m.icono; }
+
+      toast(`Módulo "${m.nombre}" actualizado.`);
+    }
+  </script>
+</body>
+</html>
