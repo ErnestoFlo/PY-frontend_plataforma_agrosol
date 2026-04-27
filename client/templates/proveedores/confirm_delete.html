@@ -23,8 +23,8 @@
   <form method="POST" 
         class="flex justify-end gap-2 mt-2 col-span-12"
         hx-post="{{ delete_url }}"
-        hx-target="#row-{{ row_id }}"
-        hx-swap="outerHTML"
+        hx-target="{% if is_mobile_view %}#tabla-prov-container{% else %}#row-{{ row_id }}{% endif %}"
+        hx-swap="{% if is_mobile_view %}innerHTML{% else %}outerHTML{% endif %}"
         hx-on::after-request="if(event.detail.successful) { closeModal('modal-delete'); AlertManager.danger('Proveedor eliminado exitosamente'); }"
         >
     {% csrf_token %}

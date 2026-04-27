@@ -51,7 +51,7 @@
     <div class="w-full max-w-sm px-2 py-1 grid grid-cols-3">
       {% for group_item in item.group %}
 
-        <a href="{% url group_item.url %}" class="bottombar-item my-4 {{ link_class }} {% if item.is_active %}active{% endif %}" data-action="bottombarItem">
+        <a href="{% url group_item.url %}" class="bottombar-item my-4 {% if group_item.is_active %}active{% endif %}" data-action="bottombarItem">
           <svg aria-hidden="true"><use href="{% static 'sprite.svg' %}#{{ group_item.icon }}"/></svg>
           <span>{{ group_item.label }}</span>
         </a>

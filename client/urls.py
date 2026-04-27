@@ -2,17 +2,17 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    ### BIENVENIDA
+    path("landing_login/", views.landing_login, name="landing"),
     ### URLS DE PROVEEDORES
     path("proveedores/", views.list_proveedores, name="proveedores"),
     path("proveedores/crear/", views.create_or_edit_proveedor, name="proveedores_crear"),
     path("proveedores/editar/<int:id>/", views.create_or_edit_proveedor, name="proveedores_editar"),
     path("proveedores/confirmar/<int:id>/", views.confirm_delete, name="confirm_delete"),
     path("proveedores/eliminar/<int:id>/", views.delete_proveedor, name="proveedores_eliminar"),
-    
+
     ### URLS DE DISEÑO
     path("design/test_components/", views.tests_components, name="tests_page"),
-    path("design/test_form/", views.tests_form, name="test_form_page"),
-    path("design/landing_login/", views.landing_login, name="landing"),
     path("design/dashboard/", views.view1, name="dashboard"),
     
     ### URLS DE ENDPOINTS DINÁMICOS (HTMX)

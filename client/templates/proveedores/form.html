@@ -3,10 +3,14 @@
 {% load widget_tweaks %}
 
 {% partialdef form %}  
+  {# Regla de swap:
+    - create o mobile: refrescar contenedor completo (#tabla-prov-container)
+    - edit desktop: reemplazar solo la fila afectada (#row-<id>)
+  #}
   <form method="POST" class="grid grid-cols-12 gap-x-6 gap-y-4"
     hx-post="{{ submit_url }}"
-    hx-target="{% if proveedor_id %}#row-{{ proveedor_id }}{% else %}#tabla-prov-body{% endif %}"
-    hx-swap="{% if proveedor_id %}outerHTML{% else %}beforeend{% endif %}"
+    hx-target="{% if is_create_operation or is_mobile_view %}#tabla-prov-container{% elif proveedor_id %}#row-{{ proveedor_id }}{% else %}#tabla-prov-container{% endif %}"
+    hx-swap="{% if is_create_operation or is_mobile_view %}innerHTML{% elif proveedor_id %}outerHTML{% else %}innerHTML{% endif %}"
     hx-on::after-request="if(event.detail.successful) { closeModal('{{ modal_name }}'); AlertManager.success('Proveedor {% if proveedor_id %}actualizado{% else %}creado{% endif %} exitosamente'); }"
     >
     {% csrf_token %}

@@ -6,9 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agrosol - {{ pagename }}</title>
-    <!-- Evitar flasheos de tema de color incorrecto en cualquier plataforma-->
+    <!-- Evitar flasheos y parapadeos al cambiar la ui de preferencia del usuario en cualquier plataforma-->
     <script>
       (function() {
+        // Tema de color 
         const saved = localStorage.getItem('theme')
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const theme = saved || (prefersDark ? 'dark' : 'light')
@@ -26,6 +27,7 @@
     <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
     <script src="{% static 'js/flatpickr.js' %}"></script>
     <script src="{% static 'js/es.js' %}"></script>
+    <script src="{% static 'js/modules/proveedores_ui.js' %}"></script>
     <script src="{% static 'js/ui.js' %}"></script>
   </body>
 </html>

@@ -10,6 +10,7 @@ class ProveedoresForm(forms.Form):
   email = forms.CharField(max_length=400)
   terminos_de_pago = forms.CharField(max_length=400)
 
+# Formularios de Login y Búsqueda de prueba, usado solamente por testeo
 class LoginForm(forms.Form):
   usuario = forms.CharField(max_length=240)
   contrasenia = forms.CharField(max_length=720)

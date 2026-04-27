@@ -101,10 +101,10 @@
 
   <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
     {# Con acciones #}
-    {% include "partials/tables.html#table" with table_id='tabla-prov' columns=columns rows=rows with_actions=True current_page=current_page total_pages=total_pages page_range=page_range %}
+    {% include "partials/tables.html#table" with table_id='tabla-prov' columns=columns rows=rows with_actions=True current_page=current_page total_pages=total_pages page_items=page_items fragment='table' %}
 
     {# Sin acciones #}
-    {% include "partials/tables.html#table" with table_id='tabla-simple' columns=columns rows=rows with_actions=False current_page=current_page total_pages=total_pages page_range=page_range %}
+    {% include "partials/tables.html#table" with table_id='tabla-simple' columns=columns rows=rows with_actions=False current_page=current_page total_pages=total_pages page_items=page_items fragment='table' %}
   </div>
 
   <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">

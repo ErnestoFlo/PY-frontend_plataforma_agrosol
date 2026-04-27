@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // *********************************************************
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
+  if (window.ProveedoresUI) {
+    window.ProveedoresUI.initResponsiveTable('[data-responsive-table="proveedores"]')
+  }
   flatpickr("#fecha_hora", {
         enableTime: true,
         time_24hr: true,
@@ -18,6 +21,19 @@ document.addEventListener('DOMContentLoaded', () => {
         disableMobile: true,
         showMonths: 1,
   });
+  // Estado del sidebar
+  const SIDEBAR_STATE_KEY = 'sidebarCollapsed'
+  const sidebar = document.getElementById('sidebar')
+
+  if (sidebar) {
+    const saved = localStorage.getItem(SIDEBAR_STATE_KEY)
+    if (saved === 'true' || saved === 'false') {
+      sidebar.dataset.collapsed = saved
+    } else {
+      // valor por defecto (abierta)
+      sidebar.dataset.collapsed = 'false'
+    }
+  }
   const theme = document.documentElement.getAttribute('data-theme')
   updateThemeAssets(theme)
   const skeleton = document.querySelector('#skeleton-template')
@@ -39,80 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
     btn.addEventListener('click', (e) => toggleSwitch(e.currentTarget))
   })
-  
-  // ***** DELEGATED CLICK LISTENER *****
-  // Un único listener para manejar modales, popovers y overlay
-  // Funciona incluso con elementos inyectados por HTMX (muy eficiente)
-  document.addEventListener('click', (e) => {
-    // Detectar acción desde data-action
-    const actionBtn = e.target.closest('[data-action="openModal"], [data-action="closeModal"], [data-action="togglePopover"], [data-action="closePopover"]')
-    
-    if (actionBtn) {
-      const action = actionBtn.dataset.action
-      const target = actionBtn.dataset.target
-      const get_url = actionBtn.getAttribute('hx-get')
-      
-      if (action === 'openModal') {
-        openModal(target, get_url)
-      } else if (action === 'closeModal') {
-        closeModal(target)
-      } else if (action === 'togglePopover') {
-        e.stopPropagation()
-        togglePopover(target)
-      } else if (action === 'closePopover') {
-        closePopover(target)
-      }
-      return // Prevenir propagación innecesaria
-    }
-    
-    // Cerrar popovers al hacer clic fuera
-    if (!e.target.closest('[data-action="popoverContainer"]')) {
-      document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
-      document.querySelectorAll('.bottombar-more-popover').forEach(p => p.setAttribute('data-open', 'false'))
-    }
-  })
-  
-  // ***** HTMX EVENT LISTENERS *****
-  // Deshabilitar botón submit SOLO cuando HTMX comienza una petición validada
-  document.addEventListener('htmx:beforeRequest', (e) => {
-    const form = e.target.closest('form')
-    if (form && e.detail.xhr.upload) {
-      const submitBtn = form.querySelector('[type="submit"]')
-      if (submitBtn) {
-        submitBtn.disabled = true
-        submitBtn.style.opacity = '0.6'
-        submitBtn.style.cursor = 'not-allowed'
-      }
-    }
-  })
-  
-  // Re-habilitar botón si hay error HTTP
-  document.addEventListener('htmx:responseError', (e) => {
-    const form = e.target.closest('form')
-    if (form) {
-      const submitBtn = form.querySelector('[type="submit"]')
-      if (submitBtn) {
-        submitBtn.disabled = false
-        submitBtn.style.opacity = '1'
-        submitBtn.style.cursor = 'pointer'
-      }
-    }
-  })
-  
-  // // ***** MOUSEDOWN LISTENER PARA OVERLAY *****
-  // // Cerrar modal/popover SOLO si hubo mousedown en el overlay (no en el modal-container)
-  // document.addEventListener('mousedown', (e) => {
-  //   if (e.target.matches('.modal-overlay')) {
-  //     e.target.dataset.overlayDown = 'true'
-  //   }
-  // })
-  
-  // document.addEventListener('click', (e) => {
-  //   if (e.target.matches('.modal-overlay') && e.target.dataset.overlayDown === 'true') {
-  //     closeModal(e.target.id)
-  //     e.target.dataset.overlayDown = 'false'
-  //   }
-  // })
   // ***** FILE PICKER *****
   document.querySelectorAll('[data-action="filePickerZone"]').forEach(zone => {
     const inputId = zone.dataset.target
@@ -138,84 +80,82 @@ document.addEventListener('DOMContentLoaded', () => {
       e.currentTarget.classList.add('active')
     })
   })
+  // ***** DELEGATED CLICK LISTENER *****
+  // Un único listener para acciones globales.
+  // Clave para HTMX: también cubre nodos inyectados después del load inicial.
+  document.addEventListener('click', (e) => {
+    // Detectar acción desde data-action
+    const actionBtn = e.target.closest('[data-action="openModal"], [data-action="closeModal"], [data-action="togglePopover"], [data-action="closePopover"]')
+    
+    if (actionBtn) {
+      // Evita que HTMX procese también el click en el mismo botón.
+      e.preventDefault()
+      const action = actionBtn.dataset.action
+      const target = actionBtn.dataset.target
+      const get_url = actionBtn.getAttribute('hx-get')
+      
+      if (action === 'openModal') {
+        openModal(target, get_url)
+      } else if (action === 'closeModal') {
+        closeModal(target)
+      } else if (action === 'togglePopover') {
+        e.stopPropagation()
+        togglePopover(target)
+      } else if (action === 'closePopover') {
+        closePopover(target)
+      } 
+      return // Prevenir propagación innecesaria
+    }
+    
+    // Cerrar popovers al hacer clic fuera
+    if (!e.target.closest('[data-action="popoverContainer"]')) {
+      document.querySelectorAll('.popover').forEach(p => p.setAttribute('data-open', 'false'))
+      document.querySelectorAll('.bottombar-more-popover').forEach(p => p.setAttribute('data-open', 'false'))
+    }
+  })
+  // ***** HTMX EVENT LISTENERS *****
+  // Deshabilitar botón submit SOLO cuando HTMX comienza una petición validada
+  document.addEventListener('htmx:beforeRequest', (e) => {
+    const form = e.target.closest('form')
+    if (form && e.detail.xhr.upload) {
+      const submitBtn = form.querySelector('[type="submit"]')
+      if (submitBtn) {
+        submitBtn.disabled = true
+        submitBtn.style.opacity = '0.6'
+        submitBtn.style.cursor = 'not-allowed'
+      }
+    }
+  })
+  // Re-habilitar botón si hay error HTTP
+  document.addEventListener('htmx:responseError', (e) => {
+    const form = e.target.closest('form')
+    if (form) {
+      const submitBtn = form.querySelector('[type="submit"]')
+      if (submitBtn) {
+        submitBtn.disabled = false
+        submitBtn.style.opacity = '1'
+        submitBtn.style.cursor = 'pointer'
+      }
+    }
+  })
+
 
   // *********************************************
   // ***************   FUNCIONES   ***************
   // *********************************************
 
-  // OBSERVAR CAMBIOS EN ATRIBUTOS DE CUALQUIER ELEMENTO
-  function watchAttribute(element, attr, callback) {
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.attributeName === attr) {
-          callback(element.getAttribute(attr));
-        }
-      }
-    });
-
-    observer.observe(element, {
-      attributes: true,
-      attributeFilter: [attr],
-    });
-
-    return observer;
-  }
-
-  // CAMBIOS POR ATRIBUTOS
-  // Sidebar cierra = acordeon cierra
-  function closeAccordionsInside(container) {
-    const details = container.querySelectorAll('details');
-
-    details.forEach((item) => {
-      item.removeAttribute('open');
-    });
-  }
-  watchAttribute(aside, 'data-collapsed', (value) => {
-    if (value === 'true') {
-      closeAccordionsInside(aside);
-    }
-  });
-
-
-  // Acordeon abre = sidebar abre
-  function expandSidebar() {
-    sidebar.setAttribute('data-collapsed', 'false');
-  }
-  accordions.forEach((accordion) => {
-    accordion.addEventListener('toggle', () => {
-      if (accordion.open) expandSidebar();
-    });
-  });
-
-  // Recuperar eventos de elementos recuperados por HTMX (ej. modales y formularios)
-  document.body.addEventListener("htmx:historyRestore", function (evt) {
-    const modal = evt.target.querySelector('.modal')
-    if (modal) {
-      const form = modal.querySelector('form')
-      if (form) {
-        form.addEventListener('submit', () => {
-          const submitBtn = form.querySelector('[type="submit"]')
-          if (submitBtn) {
-            submitBtn.disabled = true
-            submitBtn.style.opacity = '0.6'
-            submitBtn.style.cursor = 'not-allowed'
-          }
-        })
-      }
-    }
-  });
   // Regresar a la página anterior
-function handleBack() {
-  try {
-    if (window.history.length > 1) {
-      history.back();
-    } else {
+  function handleBack() {
+    try {
+      if (window.history.length > 1) {
+        history.back();
+      } else {
+        window.location.href = "/dashboard/";
+      }
+    } catch (e) {
       window.location.href = "/dashboard/";
     }
-  } catch (e) {
-    window.location.href = "/dashboard/";
   }
-}
   // Cambiar tema de color
   function toggleTheme() {
     const html = document.documentElement
@@ -248,6 +188,71 @@ function handleBack() {
     )
   }
 
+  // OBSERVAR CAMBIOS EN ATRIBUTOS DE CUALQUIER ELEMENTO
+  function watchAttribute(element, attr, callback) {
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === attr) {
+          callback(element.getAttribute(attr));
+        }
+      }
+    });
+
+    observer.observe(element, {
+      attributes: true,
+      attributeFilter: [attr],
+    });
+
+    return observer;
+  }
+
+  // CAMBIOS POR ATRIBUTOS
+  // Sidebar cierra = acordeon cierra
+  function closeAccordionsInside(container) {
+    const details = container.querySelectorAll('details');
+
+    details.forEach((item) => {
+      item.removeAttribute('open');
+    });
+  }
+  if (aside) {
+    watchAttribute(aside, 'data-collapsed', (value) => {
+      if (value === 'true') {
+        closeAccordionsInside(aside);
+      }
+    });
+  }
+
+  // Acordeon abre = sidebar abre
+  function expandSidebar() {
+    if (aside) {
+      aside.setAttribute('data-collapsed', 'false');
+    }
+  }
+  accordions.forEach((accordion) => {
+    accordion.addEventListener('toggle', () => {
+      if (accordion.open) expandSidebar();
+    });
+  });
+
+  // Recuperar eventos de elementos recuperados por HTMX (ej. modales y formularios)
+  document.body.addEventListener("htmx:historyRestore", function (evt) {
+    const modal = evt.target.querySelector('.modal')
+    if (modal) {
+      const form = modal.querySelector('form')
+      if (form) {
+        form.addEventListener('submit', () => {
+          const submitBtn = form.querySelector('[type="submit"]')
+          if (submitBtn) {
+            submitBtn.disabled = true
+            submitBtn.style.opacity = '0.6'
+            submitBtn.style.cursor = 'not-allowed'
+          }
+        })
+      }
+    }
+  });
+
   // Mostrar - Ocultar Contraseña
   function togglePassword(btn){
     const inputId = btn.dataset.target
@@ -266,11 +271,16 @@ function handleBack() {
     )
   }
 
+  // Cerrar el sidebar cuando hay un clic en el botón cerrar
   function collapseSidebar(btn){
     const sidebarId = btn.dataset.target;
     const sidebar = document.getElementById(sidebarId);
+    if (!sidebar) return;
+
     const isCollapsed = sidebar.dataset.collapsed === 'true'
-    sidebar.dataset.collapsed = isCollapsed ? 'false' : 'true'
+    const next = isCollapsed ? 'false' : 'true'
+    sidebar.dataset.collapsed = next
+    localStorage.setItem('sidebarCollapsed', next)
   }
 
   // Abrir y cerrar el dropdown de un combobox
@@ -288,7 +298,8 @@ function handleBack() {
     if (!dropdown) return
     dropdown.classList.remove('hidden')
   })
-  // Seleccionar una opción — usa delegación porque las opciones las inyecta HTMX
+
+  // Seleccionar una opción de un combobox — usa delegación porque las opciones las inyecta HTMX
   document.addEventListener('click', (e) => {
     const option = e.target.closest('[data-action="combobox-select"]')
     if (!option) return
@@ -318,23 +329,50 @@ function handleBack() {
   }
 
   // Modal
-function openModal(modalId, get_url) {
-  const modal = document.getElementById(modalId)
-  if (!modal) return
+  function openModal(modalId, get_url) {
+    const modal = document.getElementById(modalId)
+    if (!modal) return
 
-  const form_container = document.querySelector(`#${modalId}-content`)
-  form_container.innerHTML = skeleton.innerHTML
-  modal.classList.remove('hidden')
-  if (form_container && get_url) {
-    htmx.ajax('GET', `${get_url}?fragment=form`, {
-      target: form_container,
-      swap: 'innerHTML'
+    // Fix temporal de jerarquía: cerrar cualquier modal abierta antes de abrir otra.
+    document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+      if (overlay.id !== modalId) {
+        const content = overlay.querySelector('[id$="-content"]')
+        if (content) content.innerHTML = ''
+        overlay.classList.add('hidden')
+      }
     })
-    console.log("URL:", `${get_url}?fragment=form`)
-  }
 
-  document.body.style.overflow = 'hidden'
-}
+    const form_container = document.querySelector(`#${modalId}-content`)
+    form_container.innerHTML = skeleton.innerHTML
+    modal.classList.remove('hidden')
+    if (form_container && get_url) {
+      // Normaliza query params para que backend retorne el fragmento correcto
+      // según contexto (viewport/página y modal de formulario).
+      let requestUrl = get_url
+      const url = new URL(get_url, window.location.origin)
+      const isFormModal = modalId === 'modal-create' || modalId === 'modal-edit'
+      const isMobileViewport = window.matchMedia('(max-width: 767px)').matches
+      if (!url.searchParams.has('viewport')) {
+        url.searchParams.set('viewport', isMobileViewport ? 'mobile' : 'desktop')
+      }
+      if (!url.searchParams.has('page')) {
+        const currentPage = new URLSearchParams(window.location.search).get('page') || '1'
+        url.searchParams.set('page', currentPage)
+      }
+      if (isFormModal && !url.searchParams.has('fragment')) {
+        url.searchParams.set('fragment', 'form')
+      }
+      requestUrl = `${url.pathname}${url.search}`
+
+      htmx.ajax('GET', requestUrl, {
+        target: form_container,
+        swap: 'innerHTML'
+      })
+      console.log("URL:", requestUrl)
+    }
+
+    document.body.style.overflow = 'hidden'
+  }
 
   // ============================================================================
   // ALERT MANAGER - Gestor centralizado de alertas
@@ -524,12 +562,21 @@ function openModal(modalId, get_url) {
 
   window.closePopover = closePopover
 })
+
+  // Cerrar el modal cuando hay un clic en el botón cerrar
   function closeModal(modalId) {
     const modal = document.getElementById(modalId)
-    const form_container = modal.querySelector(`#${modalId}-content`)
-    form_container.innerHTML = ''
     if (!modal) return
+    const form_container = modal.querySelector(`#${modalId}-content`)
+    if (form_container) form_container.innerHTML = ''
     modal.classList.add('hidden')
     document.body.style.overflow = ''
+
+    // Si por cualquier flujo se cambió la URL a rutas de acción, vuelve a listado.
+    const currentPath = window.location.pathname
+    const isProveedorActionPath = /^\/agrosol\/proveedores\/(crear|editar\/[^/]+|confirmar\/[^/]+|eliminar\/[^/]+)\/?$/.test(currentPath)
+    if (isProveedorActionPath) {
+      window.history.replaceState(null, '', '/agrosol/proveedores/')
+    }
   }
   window.closeModal = closeModal

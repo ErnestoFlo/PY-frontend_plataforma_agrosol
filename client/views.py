@@ -2,25 +2,23 @@ from django.shortcuts import render, redirect
 from .services import proveedores
 from .forms import ProveedoresForm, LoginForm, SearchForm
 from django.http import HttpResponse
-from .utils import get_proveedores_for_table, build_menu_sidebar_items, build_menu_mobilebar_items
+from .utils import get_data_for_table, build_menu_sidebar_items, build_menu_mobilebar_items, build_pagination_window, build_table_rows
 import urllib3
 
 # Suprimir advertencia de HTTPS sin verificación de certificados
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-########## VISTAS POR DISEÑO ###########
-
+########## VISTA DE BIENVENIDA #########
 def landing_login(request):
     login_form = LoginForm()
     return render(request, "layouts/landing_login.html", {
         "pagename": "Bienvenida",
         'menu_sidebar_items': build_menu_sidebar_items('Bienvenida'),
         'menu_mobilebar_items': build_menu_mobilebar_items('Bienvenida'),
-        'path': request.path,
         "form": login_form
     })
 
-
+########## VISTAS POR DISEÑO ###########
 def view1(request):
     search_form = SearchForm()
     return render(request, "design/view1.html", {
@@ -29,14 +27,6 @@ def view1(request):
         'menu_mobilebar_items': build_menu_mobilebar_items('Dashboard'),
         'path': request.path,
         "search_form": search_form
-    })
-
-def tests_form(request):
-    return render(request, "design/main_form_test.html", {
-        "pagename": "Main Form Test",
-        'menu_sidebar_items': build_menu_sidebar_items('Main Form Test'),
-        'menu_mobilebar_items': build_menu_mobilebar_items('Main Form Test'),
-        'path': request.path
     })
 
 def tests_components(request):
@@ -59,7 +49,7 @@ def tests_components(request):
         'columns': ['Avatar', 'Header', 'Long Text Column', 'Header'],
         'current_page': page,
         'total_pages': total_pages,
-        'page_range': range(1, total_pages + 1),
+        'page_items': build_pagination_window(page, total_pages),
         'pagename': 'Test & Views',
         'menu_sidebar_items': build_menu_sidebar_items('Test & Views'),
         'menu_mobilebar_items': build_menu_mobilebar_items('Test & Views'),
@@ -84,14 +74,59 @@ def get_options(request):
 
 ########## VISTAS DE PROVEEDORES ##########
 def list_proveedores(request):
+    """Controlador principal de listado + fragmentos HTMX de proveedores.
+
+    Fragmentos soportados:
+    - `table`: tabla desktop completa
+    - `table_mobile`: cards mobile
+    - `detail=true&id=<id>`: modal de detalle mobile
+    """
     search_form = SearchForm(request.GET)
     proveedores_data = proveedores.get_all_proveedores()
     page = int(request.GET.get('page', 1))
+    viewport = request.GET.get('viewport', 'desktop')
     
-    table_context = get_proveedores_for_table(proveedores_data, page)
+    table_context = get_data_for_table(proveedores_data, page, 'proveedores')
 
     is_htmx = request.headers.get('HX-Request')
     fragment = request.GET.get('fragment')
+    detail_id = request.GET.get('id')
+    is_detail = request.GET.get('detail')
+
+    # 🔹 DETALLE DEL PROVEEDOR (modal)
+    if is_htmx and is_detail and detail_id:
+        proveedor_data = proveedores.get_by_id(detail_id)
+        proveedor_dict = proveedor_data.get("data", proveedor_data) if isinstance(proveedor_data, dict) else proveedor_data
+        
+        # Preparar URLs de acciones
+        item_id = proveedor_dict.get('proveedoresID') or proveedor_dict.get('id')
+        edit_url = f"agrosol/proveedores/editar/{item_id}"
+        delete_url = f"agrosol/proveedores/confirmar/{item_id}"
+        if viewport == 'mobile':
+            state_query = f"?viewport=mobile&page={page}"
+            edit_url = f"{edit_url}{state_query}"
+            delete_url = f"{delete_url}{state_query}"
+        columns = ['ID', 'Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago']
+        data = dict(zip(columns, proveedor_dict.values()))
+
+        return render(request, 'components/modals.html#item_detail_modal', {
+            'row': data,
+            'id_col': data['Proveedor'],
+            'edit_url': edit_url,
+            'delete_url': delete_url,
+        })
+
+    # Si no llega fragmento explícito en HTMX, usar desktop por defecto.
+    if is_htmx and fragment not in ("table", "table_mobile"):
+        fragment = "table"
+
+    # 🔹 TABLA MOBILE (cards)
+    if is_htmx and fragment == "table_mobile":
+        return render(request, 'partials/tables.html#table_mobile', {
+            **table_context,
+            'table_id': 'tabla-prov',
+            'fragment': 'table_mobile',
+        })
 
     # 🔹 SOLO TABLA COMPLETA (para skeleton → carga inicial)
     if is_htmx and fragment == "table":
@@ -100,6 +135,7 @@ def list_proveedores(request):
             'with_actions': True,
             'table_id': 'tabla-prov',
             'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+            'fragment': 'table',
         })
 
     # 🔹 SOLO FILAS (paginación)
@@ -109,6 +145,7 @@ def list_proveedores(request):
             'with_actions': True,
             'table_id': 'tabla-prov',
             'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+            'fragment': 'table',
         })
 
     # 🔹 Página completa (fallback normal)
@@ -126,7 +163,7 @@ def list_proveedores(request):
 
 def create_or_edit_proveedor(request, id=None):
     """
-    Crea O edita un proveedor - FUNCIÓN UNIFICADA.
+    Crea o edita un proveedor - FUNCIÓN UNIFICADA.
     
     ¿POR QUÉ UNA SOLA FUNCIÓN?
     - create_proveedor() y edit_proveedor() eran 90% idénticas
@@ -139,23 +176,26 @@ def create_or_edit_proveedor(request, id=None):
     
     ¿BACKEND SE ENTERA?
     - NO, el backend recibe exactamente lo mismo:
-      - create_proveedor() → requests.POST → backend recibe POST /api/Proveedores
-      - edit_proveedor(id) → requests.PUT → backend recibe PUT /api/Proveedores/<id>
+        - create_proveedor() → requests.POST → backend recibe POST /api/Proveedores
+        - edit_proveedor(id) → requests.PUT → backend recibe PUT /api/Proveedores/<id>
     - El cambio es 100% frontend, transparente para backend
     
-    FLU LÓGICO:
+    FLUJO LÓGICO:
     1. GET /crear → Renderiza form vacío
     2. POST /crear + form válido → create() + retorna tabla actualizada
     3. GET /editar/<id> → Renderiza form pre-llenado con datos del proveedor
     4. POST /editar/<id> + form válido → update() + retorna tabla actualizada
     """
+    is_htmx = request.headers.get('HX-Request')
+    viewport = request.GET.get('viewport', 'desktop')
+    page = int(request.GET.get('page', 1))
+    is_mobile_view = viewport == 'mobile'
+    is_create_operation = id is None
     form = None
     
     if request.method == "POST":
         form = ProveedoresForm(request.POST or None, request.FILES or None)
         if form.is_valid():
-            from .utils import build_table_rows
-            
             # CREATE o UPDATE - Ambos retornan el objeto actualizado/creado
             if id:
                 # EDITAR: actualiza el proveedor existente
@@ -172,13 +212,40 @@ def create_or_edit_proveedor(request, id=None):
                 proveedor_dict = response_data.get("data", response_data) if isinstance(response_data, dict) else response_data
             
             # Construir UNA SOLA FILA con los datos del proveedor
-            rows = build_table_rows([proveedor_dict]) if proveedor_dict else []
+            rows = build_table_rows([proveedor_dict], 'proveedores') if proveedor_dict else []
             
-            if rows:
+            if is_htmx and is_create_operation:
+                proveedores_data = proveedores.get_all_proveedores()
+                table_context = get_data_for_table(proveedores_data, page, 'proveedores')
+                if is_mobile_view:
+                    return render(request, "partials/tables.html#table_mobile", {
+                        **table_context,
+                        'table_id': 'tabla-prov',
+                        'fragment': 'table_mobile',
+                    })
+                return render(request, "partials/tables.html#table", {
+                    **table_context,
+                    'with_actions': True,
+                    'table_id': 'tabla-prov',
+                    'columns': ['Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago'],
+                    'fragment': 'table',
+                })
+
+            if rows and is_htmx and is_mobile_view:
+                proveedores_data = proveedores.get_all_proveedores()
+                table_context = get_data_for_table(proveedores_data, page, 'proveedores')
+                return render(request, "partials/tables.html#table_mobile", {
+                    **table_context,
+                    'table_id': 'tabla-prov',
+                    'fragment': 'table_mobile',
+                })
+
+            if rows and is_htmx:
                 return render(request, "partials/tables.html#table_rows", {
                     'rows': rows,
                     'with_actions': True,
                 })
+            return redirect('proveedores')
     else:
         # GET request
         if id:
@@ -194,12 +261,12 @@ def create_or_edit_proveedor(request, id=None):
     # Variables dinámicas determinan comportamiento:
     if id:
         # MODO EDITAR
-        submit_url = f'/agrosol/proveedores/editar/{id}/'
+        submit_url = f'/agrosol/proveedores/editar/{id}/?viewport={viewport}&page={page}'
         modal_name = 'modal-edit'
         submit_text = 'Editar'
     else:
         # MODO CREAR
-        submit_url = '/agrosol/proveedores/crear/'
+        submit_url = f'/agrosol/proveedores/crear/?viewport={viewport}&page={page}'
         modal_name = 'modal-create'
         submit_text = 'Crear'
     
@@ -210,15 +277,43 @@ def create_or_edit_proveedor(request, id=None):
         "submit_url": submit_url,
         "modal_name": modal_name,
         "submit_text": submit_text,
+        "is_mobile_view": is_mobile_view,
+        "is_create_operation": is_create_operation,
     }
-    is_htmx = request.headers.get('HX-Request')
     fragment = request.GET.get('fragment')
 
     # 🔹 SOLO FORM (para skeleton → carga inicial)
     if is_htmx and fragment == "form":
         return render(request, template, context)
-    else:
+    if is_htmx:
         return render(request, "proveedores/form.html#form", context)
+    return redirect('proveedores')
+
+def confirm_delete(request, id):
+    """
+    Renderiza modal de confirmación antes de eliminar.
+    
+    FLUJO:
+    1. User hace click en "Eliminar" en tabla
+    2. HTMX GET /agrosol/proveedores/confirm-delete/<id>/
+    3. Esta función renderiza modal con variables:
+    - delete_url: POST /agrosol/proveedores/eliminar/<id>/
+    - table_body_id: #tabla-prov-body (para HTMX reemplace)
+    
+    VARIABLES ESPERADAS EN TEMPLATE:
+    - row_id: ID del proveedor (para referencia)
+    - delete_url: URL POST para eliminar
+    - table_body_id: Selector CSS del contenedor a actualizar
+    """
+    viewport = request.GET.get('viewport', 'desktop')
+    page = int(request.GET.get('page', 1))
+    delete_url = f"/agrosol/proveedores/eliminar/{id}/?viewport={viewport}&page={page}"
+    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
+        'row_id': id,
+        'delete_url': delete_url,  # ← POST a esta URL
+        'table_body_id': '#tabla-prov-body',  # ← HTMX reemplaza este elemento
+        'is_mobile_view': viewport == 'mobile',
+    })
 
 def delete_proveedor(request, id):
     """
@@ -243,37 +338,24 @@ def delete_proveedor(request, id):
     - Solo acepta POST (no GET)
     """
     if request.method == "POST":
+        viewport = request.GET.get('viewport', 'desktop')
+        page = int(request.GET.get('page', 1))
         # Eliminar el proveedor
         proveedores.delete(id)
-        
-        # Devolver respuesta vacía
-        # HTMX con outerHTML reemplazará la fila con nada (borrándola)
+
+        if request.headers.get('HX-Request') and viewport == 'mobile':
+            proveedores_data = proveedores.get_all_proveedores()
+            table_context = get_data_for_table(proveedores_data, page, 'proveedores')
+            return render(request, "partials/tables.html#table_mobile", {
+                **table_context,
+                'table_id': 'tabla-prov',
+                'fragment': 'table_mobile',
+            })
+
+        # Desktop: reemplaza la fila con vacío.
         return HttpResponse('')
     
     # Si no es POST, retornar error
     return render(request, "error.html", {
         'error': "Method not allowed. Use POST to delete."
     }, status=405)
-
-
-def confirm_delete(request, id):
-    """
-    Renderiza modal de confirmación antes de eliminar.
-    
-    FLUJO:
-    1. User hace click en "Eliminar" en tabla
-    2. HTMX GET /agrosol/proveedores/confirm-delete/<id>/
-    3. Esta función renderiza modal con variables:
-       - delete_url: POST /agrosol/proveedores/eliminar/<id>/
-       - table_body_id: #tabla-prov-body (para HTMX reemplace)
-    
-    VARIABLES ESPERADAS EN TEMPLATE:
-    - row_id: ID del proveedor (para referencia)
-    - delete_url: URL POST para eliminar
-    - table_body_id: Selector CSS del contenedor a actualizar
-    """
-    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
-        'row_id': id,
-        'delete_url': f"/agrosol/proveedores/eliminar/{id}/",  # ← POST a esta URL
-        'table_body_id': '#tabla-prov-body'  # ← HTMX reemplaza este elemento
-    })

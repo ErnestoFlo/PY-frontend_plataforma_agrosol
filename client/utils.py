@@ -1,67 +1,109 @@
-from typing import Dict, List, Any, Tuple
+"""Helpers de presentación para vistas server-rendered + HTMX.
 
+Este módulo concentra:
+- transformación de payloads API a filas de UI reutilizables
+- paginación consistente para desktop/mobile
+- configuración de menú para sidebar/mobilebar
+"""
 
+from typing import Dict, List, Any, Tuple, Union
 # ============================================================================
 # CONFIG
 # ============================================================================
-
-PROVEEDOR_ID_FIELD = 'proveedoresID'
-PROVEEDOR_CELL_FIELDS = [
-    'proveedor', 
-    'direccion', 
-    'contacto', 
-    'cargo', 
-    'telefono', 
-    'celular', 
-    'email', 
-    'terminos_de_pago'
-]
-PROVEEDOR_PER_PAGE = 100
-PROVEEDOR_BASE_URL = '/agrosol/proveedores'
-
-PROVEEDOR_COLUMNS_CONFIG = [
-    {'label': 'proveedor', 'visibility': 'always', 'priority': 1},
-    {'label': 'direccion', 'visibility': 'lg', 'priority': 3},
-    {'label': 'contacto', 'visibility': 'always', 'priority': 2},
-    {'label': 'cargo', 'visibility': 'xl', 'priority': 4},
-    {'label': 'teléfono', 'visibility': 'always', 'priority': 5},
-    {'label': 'celular', 'visibility': 'xl', 'priority': 6},
-    {'label': 'email', 'visibility': 'lg', 'priority': 7},
-    {'label': 'terminos_de_pago', 'visibility': 'xl', 'priority': 8},
-]
+# Punto de extensión principal para nuevos módulos CRUD basados en tabla.
+# Agregar aquí un nuevo modelo evita condicionales dispersos en vistas/templates.
+MODELS_CONFIG = {
+    'PER_PAGE': 25,
+    'proveedores': {
+        'id_field': 'proveedoresID',
+        'cell_fields': [
+            'proveedor', 
+            'direccion', 
+            'contacto', 
+            'cargo', 
+            'telefono', 
+            'celular', 
+            'email', 
+            'terminos_de_pago'
+        ],
+        'card_fields': [
+            'proveedor',
+            'contacto',
+            'telefono',
+            'celular',
+        ],
+        'base_url': '/agrosol/proveedores',
+    },
+}
 
 # ============================================================================
 # HELPERS
 # ============================================================================
 
 def extract_api_data(api_response: Dict[str, Any]) -> List[Dict]:
+    """Normaliza respuestas API heterogéneas a una lista de items."""
     if isinstance(api_response, dict):
         return api_response.get("data", [])
     elif isinstance(api_response, list):
         return api_response
     return []
 
+def get_item_id(item: Dict[str, Any], model: str) -> str:
+    """Obtiene el ID de un item con fallback genérico."""
+    return item.get(MODELS_CONFIG[model]['id_field']) or item.get('id')
 
-def get_item_id(item: Dict[str, Any]) -> str:
-    return item.get(PROVEEDOR_ID_FIELD) or item.get('id')
+def build_table_rows(items: List[Dict[str, Any]], model: str) -> List[Dict[str, Any]]:
+    """Construye el contrato que consumen `partials/tables.html` y cards mobile.
 
-
-def build_table_rows(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    Campos clave del contrato:
+    - id / cells / prior_cols / id_col
+    - edit_url / delete_url / detail_url
+    - actions_id (ID único del popover por fila)
+    """
     rows = []
     for item in items:
-        item_id = get_item_id(item)
+        item_id = get_item_id(item, model)
+        cells = dict(zip(
+                MODELS_CONFIG[model]['cell_fields'],
+                [item.get(field, '') for field in MODELS_CONFIG[model]['cell_fields']]))
+        prior_cols = {k: cells.get(k, '') for k in MODELS_CONFIG[model]['card_fields']}
         row = {
             'id': item_id,
-            'cells': [item.get(field, '') for field in PROVEEDOR_CELL_FIELDS],
-            'edit_url': f"{PROVEEDOR_BASE_URL}/editar/{item_id}",
-            'delete_url': f"{PROVEEDOR_BASE_URL}/confirmar/{item_id}",
-            'actions_id': f"actions-{item_id}"
+            'cells': cells,
+            'prior_cols': prior_cols,
+            'id_col': cells.get(MODELS_CONFIG[model]['card_fields'][0], ''),
+            'edit_url': f"{MODELS_CONFIG[model]['base_url']}/editar/{item_id}",
+            'delete_url': f"{MODELS_CONFIG[model]['base_url']}/confirmar/{item_id}",
+            'detail_url': f"{MODELS_CONFIG[model]['base_url']}/?id={item_id}&detail=true&viewport=mobile",
+            'actions_id': f"actions-{item_id}",
         }
         rows.append(row)
     return rows
 
+def build_pagination_window(current_page: int, total_pages: int, window: int = 2) -> List[Union[int, str]]:
+    """Genera la ventana de paginación con elipsis para tablas HTMX."""
+    if total_pages <= 1:
+        return [1]
 
-def paginate(items: List[Dict[str, Any]], page: int, per_page: int = PROVEEDOR_PER_PAGE) -> Tuple[List[Dict], int, int, range]:
+    pages = set([1, total_pages])
+    start = max(1, current_page - window)
+    end = min(total_pages, current_page + window)
+
+    for page in range(start, end + 1):
+        pages.add(page)
+
+    sorted_pages = sorted(pages)
+    result: List[Union[int, str]] = []
+    previous = None
+    for page in sorted_pages:
+        if previous is not None and page - previous > 1:
+            result.append('ellipsis')
+        result.append(page)
+        previous = page
+    return result
+
+def paginate(items: List[Dict[str, Any]], page: int, per_page: int = MODELS_CONFIG['PER_PAGE']) -> Tuple[List[Dict], int, int]:
+    """Pagina una lista en memoria y corrige páginas fuera de rango."""
     if page < 1:
         page = 1
         
@@ -76,36 +118,35 @@ def paginate(items: List[Dict[str, Any]], page: int, per_page: int = PROVEEDOR_P
     end = start + per_page
     paginated = items[start:end]
     
-    return paginated, total_pages, page, range(1, total_pages + 1)
-
+    return paginated, total_pages, page
 
 def get_paginated_table_data(items: List[Dict[str, Any]], page: int) -> Dict[str, Any]:
-    paginated, total_pages, current_page, page_range = paginate(items, page)
+    """Empaqueta filas paginadas + metadatos para `tables.html`."""
+    paginated, total_pages, current_page = paginate(items, page)
     
     return {
-        'columns': PROVEEDOR_COLUMNS_CONFIG,
         'rows': paginated,
         'total_pages': total_pages,
         'current_page': current_page,
-        'page_range': page_range,
+        'page_items': build_pagination_window(current_page, total_pages),
     }
 
-
 # ============================================================================
-# COMPOSITE HELPERS - Llujo completo de data
+# COMPOSITE HELPERS - Flujo completo de data
 # ============================================================================
 
-def get_proveedores_for_table(api_response: Dict[str, Any], page: int) -> Dict[str, Any]:
+def get_data_for_table(api_response: Dict[str, Any], page: int, model: str) -> Dict[str, Any]:
+    """Pipeline completo: API response -> rows UI -> paginación."""
     rows_raw = extract_api_data(api_response)
-    rows = build_table_rows(rows_raw)
+    rows = build_table_rows(rows_raw, model)
     return get_paginated_table_data(rows, page)
-
 
 # ============================================================================
 # MENU - Gestión del menú lateral
 # ============================================================================
 
-# Definición centralizada de items del menú
+# Definición centralizada de items del menú.
+# `page_name` determina qué item se renderiza como activo.
 MENU_SIDEBAR_ITEMS_CONFIG = [
     {'url': 'dashboard', 'icon': 'icon-home', 'label': 'Inicio', 'page_name': 'Dashboard', 'group': []},
     {'url': '', 'icon': 'icon-products', 'label': 'Productos', 'page_name': '', 'group': [
@@ -127,8 +168,8 @@ MENU_MOBILEBAR_ITEMS_CONFIG = [
     ]},
 ]
 
-
 def build_menu_sidebar_items(current_page_name: str) -> List[Dict[str, Any]]:
+    """Entrega estructura lista para renderizar `components/sidebar.html`."""
     menu_items = []
     
     for item in MENU_SIDEBAR_ITEMS_CONFIG:
@@ -159,6 +200,7 @@ def build_menu_sidebar_items(current_page_name: str) -> List[Dict[str, Any]]:
     return menu_items
 
 def build_menu_mobilebar_items(current_page_name: str) -> List[Dict[str, Any]]:
+    """Versión mobile del menú, con el mismo contrato visual del sidebar."""
     menu_items = []
     
     for item in MENU_MOBILEBAR_ITEMS_CONFIG:

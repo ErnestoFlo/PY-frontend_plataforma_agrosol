@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @source "../client/templates";
 
+/* Guía rápida:
+   - @theme: tokens globales (color, tipografía, espaciado, sombras).
+   - @layer base: variables por tema (light/dark) y defaults globales.
+   - @layer components: clases semánticas reutilizables (btn, table, modal, badge, etc.).
+*/
+
 @font-face {
   font-family: 'Montserrat';
   src: url('../fonts/Montserrat-VariableFont_wght.woff2') format('woff2');
