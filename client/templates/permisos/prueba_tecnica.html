@@ -1,0 +1,944 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba Técnica de Componentes — Agrosol</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --verde:    #4ade80; --verde-dim: #166534;
+      --fondo:    #0a0f0a; --card:      #111a11;
+      --borde:    #1f2e1f; --texto:     #e2f0e2;
+      --muted:    #6b7c6b; --acento:    #86efac;
+      --rojo:     #f87171; --amarillo:  #fbbf24;
+      --azul:     #60a5fa; --naranja:   #fb923c;
+      --violeta:  #a78bfa;
+
+      /* Colores por categoría */
+      --accion-color:     #fb923c;
+      --accion-dim:       rgba(251,146,60,.12);
+      --componente-color: #60a5fa;
+      --componente-dim:   rgba(96,165,250,.12);
+      --dato-color:       #4ade80;
+      --dato-dim:         rgba(74,222,128,.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--fondo) radial-gradient(circle, #1a2e1a 1px, transparent 1px);
+      background-size: 28px 28px; color: var(--texto); min-height: 100vh;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar-custom {
+      background: rgba(10,15,10,.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--borde);
+      padding: .75rem 2rem; position: sticky; top: 0; z-index: 300;
+    }
+    .navbar-brand-custom { font-size:1.4rem; font-weight:800; letter-spacing:-.03em; color:var(--verde)!important; text-decoration:none; }
+    .btn-logout { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--muted); background:transparent; border:1px solid var(--borde); border-radius:6px; padding:.3rem .8rem; transition:all .2s; cursor:pointer; }
+    .btn-logout:hover { color:var(--rojo); border-color:var(--rojo); }
+    .btn-nav { width:32px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:.85rem; border:1px solid var(--borde); background:transparent; color:var(--muted); text-decoration:none; transition:all .2s; }
+    .btn-nav:hover { color:var(--verde); border-color:var(--verde); }
+
+    /* ── PAGE HEADER ── */
+    .page-header { padding: 2.5rem 0 1.5rem; position: relative; }
+    .page-header::before { content:''; position:absolute; top:0; left:-20px; width:500px; height:250px; background:radial-gradient(ellipse,rgba(74,222,128,.06) 0%,transparent 70%); pointer-events:none; }
+    .page-title { font-size:1.9rem; font-weight:800; letter-spacing:-.04em; }
+    .page-subtitle { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--muted); margin-bottom:.4rem; }
+
+    /* ── CATEGORY LABELS ── */
+    .cat-label {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Mono', monospace; font-size: .68rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .3rem .8rem; border-radius: 999px; font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .cat-accion     { background: var(--accion-dim);     color: var(--accion-color);     border: 1px solid rgba(251,146,60,.25); }
+    .cat-componente { background: var(--componente-dim); color: var(--componente-color); border: 1px solid rgba(96,165,250,.25); }
+    .cat-dato       { background: var(--dato-dim);       color: var(--dato-color);       border: 1px solid rgba(74,222,128,.25); }
+
+    /* ── SECTION TITLE ── */
+    .section-title { font-size:.7rem; font-family:'DM Mono',monospace; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; display:flex; align-items:center; gap:.6rem; }
+    .section-title::after { content:''; flex:1; height:1px; background:var(--borde); }
+
+    /* ── CARDS ── */
+    .panel-card { background:var(--card); border:1px solid var(--borde); border-radius:16px; padding:1.5rem; margin-bottom:1rem; }
+    .panel-card.accion-card     { border-color: rgba(251,146,60,.2); }
+    .panel-card.componente-card { border-color: rgba(96,165,250,.15); }
+    .panel-card.dato-card       { border-color: rgba(74,222,128,.15); }
+
+    /* ── FORM ELEMENTS ── */
+    .field-label { font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem; display:flex; align-items:center; gap:.4rem; }
+    .field-label .tipo-chip { font-size:.6rem; padding:.1rem .4rem; border-radius:4px; background:var(--componente-dim); color:var(--componente-color); border:1px solid rgba(96,165,250,.2); }
+
+    /* Textbox */
+    .field-input { background:rgba(255,255,255,.04); border:1px solid var(--borde); border-radius:9px; color:var(--texto); font-family:'Syne',sans-serif; font-size:.88rem; padding:.6rem .9rem; width:100%; transition:border-color .2s, box-shadow .2s; }
+    .field-input:focus { outline:none; border-color:var(--azul); box-shadow:0 0 0 3px rgba(96,165,250,.1); color:var(--texto); }
+    .field-input::placeholder { color:var(--muted); }
+
+    /* Password */
+    .input-group-custom { position:relative; }
+    .input-group-custom .field-input { padding-right:2.5rem; }
+    .input-toggle-eye { position:absolute; right:.75rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; transition:color .2s; padding:0; }
+    .input-toggle-eye:hover { color:var(--texto); }
+
+    /* Combobox */
+    select.field-input option { background:var(--card); color:var(--texto); }
+
+    /* Checkbox custom */
+    .check-custom { display:flex; align-items:center; gap:.75rem; padding:.5rem 0; cursor:pointer; }
+    .check-custom input[type=checkbox] { display:none; }
+    .check-box { width:20px; height:20px; border-radius:5px; border:2px solid var(--borde); background:transparent; display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0; }
+    .check-custom input:checked + .check-box { background:var(--azul); border-color:var(--azul); }
+    .check-custom input:checked + .check-box::after { content:'\F26E'; font-family:'bootstrap-icons'; color:#0a0f0a; font-size:.75rem; }
+    .check-text { font-size:.88rem; }
+
+    /* Radio custom */
+    .radio-custom { display:flex; align-items:center; gap:.75rem; padding:.5rem 0; cursor:pointer; }
+    .radio-custom input[type=radio] { display:none; }
+    .radio-circle { width:20px; height:20px; border-radius:50%; border:2px solid var(--borde); background:transparent; display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0; }
+    .radio-custom input:checked + .radio-circle { border-color:var(--violeta); }
+    .radio-custom input:checked + .radio-circle::after { content:''; width:8px; height:8px; border-radius:50%; background:var(--violeta); }
+
+    /* Toggle/Switch */
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:.6rem 0; border-bottom:1px solid var(--borde); }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-switch { position:relative; width:44px; height:24px; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; cursor:pointer; background:var(--borde); border-radius:999px; transition:.3s; border:1px solid var(--borde); }
+    .toggle-slider::before { content:''; position:absolute; width:18px; height:18px; border-radius:50%; left:2px; top:2px; background:var(--muted); transition:.3s; }
+    .toggle-switch input:checked + .toggle-slider { background:rgba(74,222,128,.2); border-color:var(--verde); }
+    .toggle-switch input:checked + .toggle-slider::before { background:var(--verde); transform:translateX(20px); }
+
+    /* Rangebox / Slider */
+    .range-custom { -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:999px; background:var(--borde); outline:none; }
+    .range-custom::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%; background:var(--verde); cursor:pointer; border:2px solid var(--fondo); box-shadow:0 0 6px rgba(74,222,128,.4); }
+    .range-value { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--verde); min-width:40px; text-align:right; }
+
+    /* Color picker */
+    .color-input-wrap { display:flex; align-items:center; gap:.75rem; }
+    .color-picker { width:44px; height:44px; border-radius:9px; border:1px solid var(--borde); background:transparent; cursor:pointer; padding:2px; overflow:hidden; }
+    .color-picker::-webkit-color-swatch-wrapper { padding:0; }
+    .color-picker::-webkit-color-swatch { border-radius:6px; border:none; }
+    .color-hex { font-family:'DM Mono',monospace; font-size:.82rem; color:var(--texto); background:rgba(255,255,255,.04); border:1px solid var(--borde); border-radius:8px; padding:.5rem .75rem; width:110px; }
+
+    /* File / Image upload */
+    .upload-zone { border:2px dashed var(--borde); border-radius:12px; padding:1.5rem; text-align:center; cursor:pointer; transition:all .25s; background:rgba(255,255,255,.02); }
+    .upload-zone:hover { border-color:var(--azul); background:rgba(96,165,250,.04); }
+    .upload-zone.dragover { border-color:var(--verde); background:rgba(74,222,128,.06); }
+    .upload-icon { font-size:2rem; color:var(--muted); margin-bottom:.5rem; }
+    .upload-text { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--muted); }
+    .upload-text strong { color:var(--azul); }
+    .upload-preview { display:none; margin-top:.75rem; }
+    .upload-preview img { width:60px; height:60px; border-radius:8px; object-fit:cover; border:1px solid var(--borde); }
+
+    /* Datepicker */
+    input[type=date].field-input::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
+
+    /* Searcher */
+    .search-wrapper { position:relative; }
+    .search-icon { position:absolute; left:.85rem; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.85rem; pointer-events:none; }
+    .search-input { padding-left:2.4rem !important; }
+    .search-results { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--card); border:1px solid var(--borde); border-radius:10px; z-index:50; overflow:hidden; display:none; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+    .search-results.show { display:block; }
+    .search-result-item { padding:.65rem 1rem; font-size:.85rem; cursor:pointer; transition:background .15s; display:flex; align-items:center; gap:.6rem; }
+    .search-result-item:hover { background:rgba(74,222,128,.06); }
+    .search-result-item i { color:var(--verde); font-size:.8rem; }
+
+    /* ── BOTONES DE ACCIÓN ── */
+    .btn-crear    { background:var(--verde); color:#0a0f0a; border:none; border-radius:9px; font-weight:700; font-size:.85rem; padding:.6rem 1.3rem; cursor:pointer; transition:opacity .2s; display:inline-flex; align-items:center; gap:.45rem; }
+    .btn-crear:hover { opacity:.85; }
+    .btn-editar-a { background:rgba(96,165,250,.12); color:var(--azul); border:1px solid rgba(96,165,250,.25); border-radius:9px; font-weight:700; font-size:.85rem; padding:.6rem 1.3rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:.45rem; }
+    .btn-editar-a:hover { background:rgba(96,165,250,.2); }
+    .btn-eliminar-a { background:rgba(239,68,68,.1); color:var(--rojo); border:1px solid rgba(239,68,68,.25); border-radius:9px; font-weight:700; font-size:.85rem; padding:.6rem 1.3rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:.45rem; }
+    .btn-eliminar-a:hover { background:rgba(239,68,68,.18); }
+    .btn-ver-a { background:rgba(251,191,36,.08); color:var(--amarillo); border:1px solid rgba(251,191,36,.22); border-radius:9px; font-weight:700; font-size:.85rem; padding:.6rem 1.3rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:.45rem; }
+    .btn-ver-a:hover { background:rgba(251,191,36,.15); }
+    .btn-cancelar-a { background:transparent; color:var(--muted); border:1px solid var(--borde); border-radius:9px; font-size:.85rem; padding:.6rem 1.3rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:.45rem; }
+    .btn-cancelar-a:hover { color:var(--texto); border-color:var(--muted); }
+
+    /* Acción icon buttons inline */
+    .icon-btn { width:30px; height:30px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center; font-size:.78rem; border:1px solid var(--borde); background:transparent; color:var(--muted); cursor:pointer; transition:all .2s; }
+    .icon-btn.edit:hover  { color:var(--azul);  border-color:var(--azul);  background:rgba(96,165,250,.08); }
+    .icon-btn.del:hover   { color:var(--rojo);  border-color:var(--rojo);  background:rgba(239,68,68,.08); }
+    .icon-btn.view:hover  { color:var(--amarillo); border-color:var(--amarillo); background:rgba(251,191,36,.08); }
+
+    /* ── TABLA ── */
+    .table-card { background:var(--card); border:1px solid rgba(74,222,128,.15); border-radius:16px; overflow:hidden; }
+    .table-custom { margin:0; }
+    .table-custom thead th { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); background:transparent; border:none; padding:.9rem 1.1rem; font-weight:500; border-bottom:1px solid var(--borde); }
+    .table-custom tbody tr { border-bottom:1px solid var(--borde); transition:background .15s; }
+    .table-custom tbody tr:last-child { border-bottom:none; }
+    .table-custom tbody tr:hover { background:rgba(74,222,128,.025); }
+    .table-custom tbody td { padding:.8rem 1.1rem; vertical-align:middle; border:none; font-size:.87rem; }
+    .table-footer { padding:.75rem 1.1rem; border-top:1px solid var(--borde); display:flex; align-items:center; justify-content:space-between; }
+
+    /* Badges tabla */
+    .status-badge { font-family:'DM Mono',monospace; font-size:.62rem; padding:.18rem .55rem; border-radius:999px; white-space:nowrap; }
+    .s-activo   { background:rgba(74,222,128,.1);  color:var(--verde);   border:1px solid rgba(74,222,128,.2); }
+    .s-inactivo { background:rgba(239,68,68,.1);   color:var(--rojo);    border:1px solid rgba(239,68,68,.2); }
+    .s-pendiente{ background:rgba(251,191,36,.1);  color:var(--amarillo);border:1px solid rgba(251,191,36,.2); }
+    .s-revision { background:rgba(96,165,250,.1);  color:var(--azul);    border:1px solid rgba(96,165,250,.2); }
+    .color-dot  { width:14px; height:14px; border-radius:50%; display:inline-block; border:2px solid rgba(255,255,255,.15); }
+
+    /* TOAST */
+    .toast-custom { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; background:var(--card); border:1px solid var(--borde); border-radius:12px; padding:.85rem 1.25rem; display:flex; align-items:center; gap:.75rem; font-size:.85rem; min-width:260px; transform:translateY(120%); opacity:0; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+    .toast-custom.show { transform:translateY(0); opacity:1; }
+    .toast-custom.success { border-color:rgba(74,222,128,.3); }
+    .toast-custom.error   { border-color:rgba(239,68,68,.3); }
+    .toast-custom.info    { border-color:rgba(96,165,250,.3); }
+    .toast-custom.warning { border-color:rgba(251,191,36,.3); }
+    .toast-icon { font-size:1.1rem; flex-shrink:0; }
+    .toast-custom.success .toast-icon { color:var(--verde); }
+    .toast-custom.error   .toast-icon { color:var(--rojo); }
+    .toast-custom.info    .toast-icon { color:var(--azul); }
+    .toast-custom.warning .toast-icon { color:var(--amarillo); }
+
+    /* MODAL */
+    .modal-custom .modal-content { background:var(--card); border:1px solid var(--borde); border-radius:16px; color:var(--texto); }
+    .modal-custom .modal-header  { border-bottom:1px solid var(--borde); padding:1.25rem 1.5rem; }
+    .modal-custom .modal-footer  { border-top:1px solid var(--borde); }
+
+    /* FORM ROW ACTIVE */
+    .form-editing { border-color: rgba(96,165,250,.35) !important; background: rgba(96,165,250,.03) !important; }
+
+    /* ANIMATIONS */
+    .fade-up { opacity:0; transform:translateY(14px); animation:fu .4s ease forwards; }
+    @keyframes fu { to { opacity:1; transform:none; } }
+    .d1{animation-delay:.06s} .d2{animation-delay:.12s} .d3{animation-delay:.18s} .d4{animation-delay:.24s}
+    .row-new { animation: rowhl .8s ease; }
+    @keyframes rowhl { 0%,100%{background:transparent} 40%{background:rgba(74,222,128,.07)} }
+
+    footer { border-top:1px solid var(--borde); padding:1.25rem 0; text-align:center; font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); margin-top:3rem; }
+
+    /* ── PERMISOS — estados visuales ── */
+    .perm-disabled {
+      opacity: .35 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      filter: grayscale(.6);
+    }
+    .perm-disabled-input {
+      opacity: .4 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+    }
+    .perm-card-disabled {
+      opacity: .3 !important;
+      pointer-events: none !important;
+      filter: grayscale(.5);
+      position: relative;
+    }
+    .perm-card-disabled::after {
+      content: 'Sin acceso';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: .75rem;
+      color: var(--muted); letter-spacing: .08em;
+      background: rgba(10,15,10,.5); border-radius: inherit;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar-custom d-flex align-items-center justify-content-between">
+    <a href="{% url 'proveedores' %}" class="navbar-brand-custom">Agrosol</a>
+    <div class="d-flex align-items-center gap-2">
+      <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);">
+        {{ request.user.username }}
+      </span>
+      <a href="{% url 'perfil' %}" class="btn-nav"><i class="bi bi-person"></i></a>
+      {% if request.user.is_superuser %}
+        <a href="{% url 'lista_usuarios' %}" class="btn-nav"><i class="bi bi-people"></i></a>
+        <a href="{% url 'panel_permisos' %}" class="btn-nav"><i class="bi bi-shield-lock"></i></a>
+      {% endif %}
+      <form method="POST" action="{% url 'logout' %}">{% csrf_token %}
+        <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right me-1"></i>Salir</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="container py-4" style="max-width:1200px;">
+
+    <!-- ══ HEADER ══ -->
+    <div class="page-header fade-up">
+      <p class="page-subtitle"><i class="bi bi-cpu me-1"></i>Módulo de Prueba Técnica</p>
+      <h1 class="page-title">Biblioteca de Componentes</h1>
+      <p style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);margin-top:.5rem;">
+        Accesible para todos los usuarios · Prueba visual de acciones, componentes y datos
+      </p>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN 1 — ACCIONES
+    ══════════════════════════════════════════ -->
+    <p class="section-title fade-up d1">
+      <span class="cat-label cat-accion"><i class="bi bi-lightning-fill"></i>Acciones</span>
+    </p>
+
+    {% if not permisos or permisos.seccion_acciones.ver %}
+    <div class="panel-card accion-card fade-up d1" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones"{% if permisos and not permisos.seccion_acciones.usar %} style="pointer-events:none;opacity:.5;"{% endif %}>
+      <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accion-color);margin-bottom:1.25rem;">
+        Botones de CRUD + acciones auxiliares — disparan peticiones al servidor
+      </p>
+
+      <!-- CRUD principal -->
+      <div class="mb-4">
+        <p class="field-label" style="margin-bottom:.75rem;">CRUD Principal</p>
+        <div class="d-flex gap-2 flex-wrap">
+          {% if not permisos or permisos.btn_crear.ver %}
+          <button class="btn-crear{% if permisos and not permisos.btn_crear.usar %} perm-disabled{% endif %}" data-permiso="btn_crear" data-tipo="accion" data-label="Botón Crear" {% if not permisos or permisos.btn_crear.usar %}onclick="accionToast('Crear', 'success')"{% endif %}>
+            <i class="bi bi-plus-lg"></i>Crear
+          </button>
+          {% endif %}
+          {% if not permisos or permisos.btn_editar.ver %}
+          <button class="btn-editar-a{% if permisos and not permisos.btn_editar.usar %} perm-disabled{% endif %}" data-permiso="btn_editar" data-tipo="accion" data-label="Botón Editar" {% if not permisos or permisos.btn_editar.usar %}onclick="accionToast('Editar', 'info')"{% endif %}>
+            <i class="bi bi-pencil"></i>Editar
+          </button>
+          {% endif %}
+          {% if not permisos or permisos.btn_eliminar.ver %}
+          <button class="btn-eliminar-a{% if permisos and not permisos.btn_eliminar.usar %} perm-disabled{% endif %}" data-permiso="btn_eliminar" data-tipo="accion" data-label="Botón Eliminar" {% if not permisos or permisos.btn_eliminar.usar %}onclick="accionToast('Eliminar', 'error')"{% endif %}>
+            <i class="bi bi-trash3"></i>Eliminar
+          </button>
+          {% endif %}
+          {% if not permisos or permisos.btn_ver.ver %}
+          <button class="btn-ver-a{% if permisos and not permisos.btn_ver.usar %} perm-disabled{% endif %}" data-permiso="btn_ver" data-tipo="accion" data-label="Botón Ver" {% if not permisos or permisos.btn_ver.usar %}onclick="accionToast('Ver detalle', 'warning')"{% endif %}>
+            <i class="bi bi-eye"></i>Ver
+          </button>
+          {% endif %}
+          {% if not permisos or permisos.btn_cancelar.ver %}
+          <button class="btn-cancelar-a{% if permisos and not permisos.btn_cancelar.usar %} perm-disabled{% endif %}" data-permiso="btn_cancelar" data-tipo="accion" data-label="Botón Cancelar" {% if not permisos or permisos.btn_cancelar.usar %}onclick="accionToast('Cancelado', 'info')"{% endif %}>
+            <i class="bi bi-x-lg"></i>Cancelar
+          </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Icon buttons inline -->
+      <div>
+        <p class="field-label" style="margin-bottom:.75rem;">Icon Buttons (acciones inline en tabla)</p>
+        {% if not permisos or permisos.btn_iconos.ver %}
+        <div class="d-flex gap-2 align-items-center flex-wrap{% if permisos and not permisos.btn_iconos.usar %} perm-card-disabled{% endif %}" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline">
+          <button class="icon-btn edit" title="Editar" onclick="accionToast('Editar registro', 'info')">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="icon-btn del" title="Eliminar" onclick="accionToast('Eliminar registro', 'error')">
+            <i class="bi bi-trash3"></i>
+          </button>
+          <button class="icon-btn view" title="Ver" onclick="accionToast('Ver detalle', 'warning')">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button class="icon-btn" style="color:var(--verde);" title="Aprobar"
+                  onclick="accionToast('Aprobado ✓', 'success')" onmouseover="this.style.color='var(--verde)';this.style.borderColor='var(--verde)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--borde)'">
+            <i class="bi bi-check2"></i>
+          </button>
+          <button class="icon-btn" title="Exportar"
+                  onclick="accionToast('Exportando...', 'info')">
+            <i class="bi bi-download"></i>
+          </button>
+          <button class="icon-btn" title="Duplicar"
+                  onclick="accionToast('Registro duplicado', 'success')">
+            <i class="bi bi-copy"></i>
+          </button>
+          <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-left:.5rem;">
+            ← Hover para ver estados
+          </span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN 2 — COMPONENTES
+    ══════════════════════════════════════════ -->
+    <p class="section-title fade-up d2 mt-4">
+      <span class="cat-label cat-componente"><i class="bi bi-puzzle"></i>Componentes</span>
+    </p>
+
+    <div class="row g-3">
+
+      <!-- COL 1 -->
+      <div class="col-lg-6">
+
+        <!-- Textbox -->
+        {% if not permisos or permisos.c_textbox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_textbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_textbox" data-tipo="componente" data-label="Textbox">
+          <p class="field-label">Textbox <span class="tipo-chip">texto</span></p>
+          <input type="text" class="field-input" id="c-textbox"
+                 placeholder="Escribe aquí..." oninput="actualizarTabla()">
+          <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
+            Input de texto libre · máx. 255 caracteres
+          </p>
+        </div>
+                {% endif %}
+
+        <!-- Password -->
+        {% if not permisos or permisos.c_password.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_password.usar %} perm-card-disabled{% endif %}" data-permiso="c_password" data-tipo="componente" data-label="Password Textbox">
+          <p class="field-label">Password Textbox <span class="tipo-chip">password</span></p>
+          <div class="input-group-custom">
+            <input type="password" class="field-input" id="c-password" placeholder="••••••••">
+            <button class="input-toggle-eye" onclick="togglePassword()" tabindex="-1">
+              <i class="bi bi-eye" id="eye-icon"></i>
+            </button>
+          </div>
+        </div>
+                {% endif %}
+
+        <!-- Combobox -->
+        {% if not permisos or permisos.c_combobox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_combobox.usar %} perm-card-disabled{% endif %}" data-permiso="c_combobox" data-tipo="componente" data-label="Combobox / Select">
+          <p class="field-label">Combobox / Select <span class="tipo-chip">select</span></p>
+          <select class="field-input" id="c-combobox" onchange="actualizarTabla()">
+            <option value="">Seleccionar categoría...</option>
+            <option value="Electrónica">Electrónica</option>
+            <option value="Ropa">Ropa</option>
+            <option value="Alimentos">Alimentos</option>
+            <option value="Herramientas">Herramientas</option>
+            <option value="Software">Software</option>
+          </select>
+        </div>
+                {% endif %}
+
+        <!-- Datepicker -->
+        {% if not permisos or permisos.c_datepicker.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_datepicker.usar %} perm-card-disabled{% endif %}" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker">
+          <p class="field-label">Datepicker <span class="tipo-chip">fecha</span></p>
+          <input type="date" class="field-input" id="c-datepicker" onchange="actualizarTabla()">
+        </div>
+                {% endif %}
+
+        <!-- Rangebox / Slider -->
+        {% if not permisos or permisos.c_range.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_range.usar %} perm-card-disabled{% endif %}" data-permiso="c_range" data-tipo="componente" data-label="Rangebox / Slider">
+          <p class="field-label">Rangebox / Slider <span class="tipo-chip">rango</span></p>
+          <div class="d-flex align-items-center gap-3">
+            <input type="range" class="range-custom flex-grow-1" id="c-range"
+                   min="0" max="100" value="45"
+                   oninput="document.getElementById('range-val').textContent=this.value; actualizarTabla()">
+            <span class="range-value" id="range-val">45</span>
+          </div>
+          <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
+            Rango 0–100 · valor actual: <span id="range-val-2" style="color:var(--verde);">45</span>
+          </p>
+        </div>
+                {% endif %}
+
+      </div>
+
+      <!-- COL 2 -->
+      <div class="col-lg-6">
+
+        <!-- Searcher -->
+        {% if not permisos or permisos.c_searcher.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_searcher.usar %} perm-card-disabled{% endif %}" data-permiso="c_searcher" data-tipo="componente" data-label="Searcher">
+          <p class="field-label">Searcher <span class="tipo-chip">búsqueda</span></p>
+          <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" class="field-input search-input" id="c-searcher"
+                   placeholder="Buscar producto..." autocomplete="off"
+                   oninput="filtrarSugerencias(this.value)">
+            <div class="search-results" id="search-results"></div>
+          </div>
+          <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
+            Búsqueda con sugerencias dinámicas
+          </p>
+        </div>
+                {% endif %}
+
+        <!-- Checkboxes -->
+        {% if not permisos or permisos.c_checkbox.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_checkbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_checkbox" data-tipo="componente" data-label="Checkboxes">
+          <p class="field-label">Checkboxes <span class="tipo-chip">múltiple</span></p>
+          <label class="check-custom">
+            <input type="checkbox" id="c-check1" checked onchange="actualizarTabla()">
+            <span class="check-box"></span>
+            <span class="check-text">Opción A — Disponible</span>
+          </label>
+          <label class="check-custom">
+            <input type="checkbox" id="c-check2" onchange="actualizarTabla()">
+            <span class="check-box"></span>
+            <span class="check-text">Opción B — En revisión</span>
+          </label>
+          <label class="check-custom">
+            <input type="checkbox" id="c-check3" onchange="actualizarTabla()">
+            <span class="check-box"></span>
+            <span class="check-text">Opción C — Pendiente</span>
+          </label>
+        </div>
+                {% endif %}
+
+        <!-- Radiobuttons -->
+        {% if not permisos or permisos.c_radio.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_radio.usar %} perm-card-disabled{% endif %}" data-permiso="c_radio" data-tipo="componente" data-label="Radiobutton">
+          <p class="field-label">Radiobutton <span class="tipo-chip">único</span></p>
+          <label class="radio-custom">
+            <input type="radio" name="c-radio" value="Alto" checked onchange="actualizarTabla()">
+            <span class="radio-circle"></span>
+            <span class="check-text">Prioridad Alta</span>
+          </label>
+          <label class="radio-custom">
+            <input type="radio" name="c-radio" value="Medio" onchange="actualizarTabla()">
+            <span class="radio-circle"></span>
+            <span class="check-text">Prioridad Media</span>
+          </label>
+          <label class="radio-custom">
+            <input type="radio" name="c-radio" value="Bajo" onchange="actualizarTabla()">
+            <span class="radio-circle"></span>
+            <span class="check-text">Prioridad Baja</span>
+          </label>
+        </div>
+                {% endif %}
+
+        <!-- Toggle / Switch -->
+        {% if not permisos or permisos.c_toggle.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_toggle.usar %} perm-card-disabled{% endif %}" data-permiso="c_toggle" data-tipo="componente" data-label="Toggle / Switch">
+          <p class="field-label">Toggle / Switch <span class="tipo-chip">booleano</span></p>
+          <div class="toggle-row">
+            <div>
+              <p style="font-size:.88rem;font-weight:600;margin:0;">Notificaciones</p>
+              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">Recibir alertas del sistema</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="c-toggle1" checked onchange="actualizarTabla()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <p style="font-size:.88rem;font-weight:600;margin:0;">Modo público</p>
+              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">Visible para otros usuarios</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="c-toggle2" onchange="actualizarTabla()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+                {% endif %}
+
+        <!-- Color picker + File upload en row -->
+        <div class="row g-3">
+          <div class="col-6">
+            {% if not permisos or permisos.c_color.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_color.usar %} perm-card-disabled{% endif %}" data-permiso="c_color" data-tipo="componente" data-label="Color Picker">
+              <p class="field-label">Color Picker <span class="tipo-chip">color</span></p>
+              <div class="color-input-wrap">
+                <input type="color" class="color-picker" id="c-color" value="#4ade80"
+                       oninput="actualizarColor(this.value)">
+                <input type="text" class="color-hex" id="color-hex-val"
+                       value="#4ade80" maxlength="7"
+                       oninput="sincronizarColor(this.value)">
+              </div>
+            </div>
+                    {% endif %}
+          </div>
+          <div class="col-6">
+            {% if not permisos or permisos.c_file.ver %}
+        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_file.usar %} perm-card-disabled{% endif %}" data-permiso="c_file" data-tipo="componente" data-label="File / Image Upload">
+              <p class="field-label">File / Image <span class="tipo-chip">archivo</span></p>
+              <div class="upload-zone" id="upload-zone"
+                   ondragover="event.preventDefault();this.classList.add('dragover')"
+                   ondragleave="this.classList.remove('dragover')"
+                   ondrop="handleDrop(event)"
+                   onclick="document.getElementById('c-file').click()">
+                <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <p class="upload-text"><strong>Click</strong> o arrastra aquí</p>
+                <div class="upload-preview" id="upload-preview">
+                  <img id="upload-img" src="" alt="">
+                </div>
+              </div>
+              <input type="file" id="c-file" accept="image/*" style="display:none"
+                     onchange="previewFile(this)">
+            </div>
+                    {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN 3 — DATOS
+    ══════════════════════════════════════════ -->
+    <p class="section-title fade-up d3 mt-4">
+      <span class="cat-label cat-dato"><i class="bi bi-table"></i>Datos</span>
+    </p>
+
+    <!-- Barra de herramientas de la tabla -->
+    {% if not permisos or permisos.barra_tabla.ver %}
+    <div class="d-flex align-items-center justify-content-between mb-3 gap-3 flex-wrap fade-up d3{% if permisos and not permisos.barra_tabla.usar %} perm-disabled{% endif %}" data-permiso="barra_tabla" data-tipo="accion" data-label="Barra de Herramientas Tabla">
+      <div class="search-wrapper" style="max-width:280px;flex:1;">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="field-input search-input" id="tabla-search"
+               placeholder="Filtrar tabla..." oninput="filtrarTabla(this.value)">
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn-cancelar-a" onclick="resetearTabla()" style="font-size:.78rem;padding:.4rem .9rem;">
+          <i class="bi bi-arrow-clockwise"></i>Reset
+        </button>
+        {% if not permisos or permisos.btn_agregar_fila.ver %}
+        <button class="btn-crear{% if permisos and not permisos.btn_agregar_fila.usar %} perm-disabled{% endif %}" data-permiso="btn_agregar_fila" data-tipo="accion" data-label="Botón Agregar Fila" {% if not permisos or permisos.btn_agregar_fila.usar %}onclick="agregarRegistro()"{% endif %} style="font-size:.78rem;padding:.4rem .9rem;">
+          <i class="bi bi-plus-lg"></i>Agregar fila
+        </button>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if not permisos or permisos.tabla_datos.ver %}
+    <div class="table-card fade-up d3" data-permiso="tabla_datos" data-tipo="dato" data-label="Tabla de Datos">
+      <table class="table table-custom" id="tabla-datos">
+        <thead>
+          <tr>
+            <th>#</th>
+            {% if not permisos or permisos.col_nombre.ver %}<th data-permiso="col_nombre" data-tipo="dato" data-label="Columna Nombre">Nombre</th>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<th data-permiso="col_categoria" data-tipo="dato" data-label="Columna Categoría">Categoría</th>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<th data-permiso="col_fecha" data-tipo="dato" data-label="Columna Fecha">Fecha</th>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<th data-permiso="col_valor" data-tipo="dato" data-label="Columna Valor">Valor</th>{% endif %}
+            <th>Color</th>
+            {% if not permisos or permisos.col_prioridad.ver %}<th data-permiso="col_prioridad" data-tipo="dato" data-label="Columna Prioridad">Prioridad</th>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<th data-permiso="col_estado" data-tipo="dato" data-label="Columna Estado">Estado</th>{% endif %}
+            <th>Notif.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-datos">
+          <!-- Datos ficticios iniciales -->
+          <tr class="fila-dato">
+            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#001</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Proyecto Alpha</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Software</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">12/01/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">78</td>{% endif %}
+            <td><span class="color-dot" style="background:#4ade80;"></span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
+            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
+            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #001','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
+          </tr>
+          <tr class="fila-dato">
+            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#002</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Stock Herramientas</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Herramientas</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">05/02/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">32</td>{% endif %}
+            <td><span class="color-dot" style="background:#f87171;"></span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-pendiente">Medio</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-pendiente">Pendiente</span></td>{% endif %}
+            <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
+            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #002','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
+          </tr>
+          <tr class="fila-dato">
+            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#003</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Lote Alimentos Q1</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Alimentos</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">20/03/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">91</td>{% endif %}
+            <td><span class="color-dot" style="background:#fbbf24;"></span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-activo">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
+            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
+            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #003','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
+          </tr>
+          <tr class="fila-dato">
+            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#004</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Colección Ropa Verano</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Ropa</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">01/04/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">55</td>{% endif %}
+            <td><span class="color-dot" style="background:#a78bfa;"></span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);">Bajo</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-inactivo">Inactivo</span></td>{% endif %}
+            <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
+            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #004','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
+          </tr>
+          <tr class="fila-dato">
+            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#005</td>
+            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Dispositivos Electrónicos</td>{% endif %}
+            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Electrónica</span></td>{% endif %}
+            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">14/03/2026</td>{% endif %}
+            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">67</td>{% endif %}
+            <td><span class="color-dot" style="background:#60a5fa;"></span></td>
+            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
+            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-revision">Revisión</span></td>{% endif %}
+            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
+            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #005','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);" id="tabla-info">
+          5 registros · datos ficticios en memoria
+        </span>
+        <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);">
+          Los cambios de los componentes se reflejan aquí
+        </span>
+      </div>
+    </div>
+    {% endif %}
+
+  </main>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast-custom">
+    <i class="toast-icon bi" id="toast-icon"></i>
+    <span id="toast-msg"></span>
+  </div>
+
+  <footer>Agrosol · Prueba Técnica de Componentes · Acceso general</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ══════════════════════════════════════════
+    //  TOAST
+    // ══════════════════════════════════════════
+    let toastTimer;
+    function mostrarToast(msg, tipo = 'success') {
+      const toast  = document.getElementById('toast');
+      const icon   = document.getElementById('toast-icon');
+      const msgEl  = document.getElementById('toast-msg');
+      const iconos = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill', warning:'bi-exclamation-triangle-fill' };
+      clearTimeout(toastTimer);
+      toast.className   = `toast-custom ${tipo}`;
+      icon.className    = `toast-icon bi ${iconos[tipo]}`;
+      msgEl.textContent = msg;
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function accionToast(accion, tipo) {
+      mostrarToast(`Acción ejecutada: ${accion}`, tipo);
+    }
+
+    // ══════════════════════════════════════════
+    //  REGISTRO DE ACTIVIDAD — Logs automáticos
+    //  Envía un log al servidor cuando el usuario
+    //  interactúa con un elemento data-permiso
+    // ══════════════════════════════════════════
+    const CSRF_LOG    = "{{ csrf_token }}";
+    const MODULO_URL  = "prueba_tecnica";
+    const LOG_URL     = "{% url 'registro_elemento' %}";
+
+    function registrarLog(clave, label) {
+      // No loguear si el usuario es superusuario (opcional)
+      // Falla silenciosamente — nunca interrumpe la UX
+      try {
+        const fd = new FormData();
+        fd.append('csrfmiddlewaretoken', CSRF_LOG);
+        fd.append('elemento_clave',     clave);
+        fd.append('elemento_label',     label);
+        fd.append('modulo_url',         MODULO_URL);
+        fetch(LOG_URL, { method: 'POST', body: fd }).catch(() => {});
+      } catch(e) {}
+    }
+
+    // Adjuntar listeners automáticamente a TODOS los elementos con data-permiso
+    // Se ejecuta una sola vez al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-permiso]').forEach(el => {
+        const clave = el.dataset.permiso;
+        const label = el.dataset.label || clave;
+        const tipo  = el.dataset.tipo  || 'componente';
+
+        // Para acciones: escuchar click
+        if (tipo === 'accion') {
+          el.addEventListener('click', () => registrarLog(clave, label), { passive: true });
+        }
+
+        // Para componentes: escuchar cambio/interacción
+        if (tipo === 'componente') {
+          const tag = el.tagName.toLowerCase();
+          if (tag === 'input' || tag === 'select' || tag === 'textarea') {
+            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
+          } else {
+            // Wrapper div/section — escuchar cualquier interacción interna
+            el.addEventListener('click',  () => registrarLog(clave, label), { passive: true });
+            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
+          }
+        }
+      });
+    });
+
+    // ══════════════════════════════════════════
+    //  PASSWORD TOGGLE
+    // ══════════════════════════════════════════
+    function togglePassword() {
+      const input = document.getElementById('c-password');
+      const icon  = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+      }
+    }
+
+    // ══════════════════════════════════════════
+    //  COLOR PICKER SYNC
+    // ══════════════════════════════════════════
+    function actualizarColor(val) {
+      document.getElementById('color-hex-val').value = val;
+    }
+    function sincronizarColor(val) {
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        document.getElementById('c-color').value = val;
+      }
+    }
+
+    // ══════════════════════════════════════════
+    //  FILE UPLOAD PREVIEW
+    // ══════════════════════════════════════════
+    function previewFile(input) {
+      if (!input.files || !input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('upload-img').src = e.target.result;
+        document.getElementById('upload-preview').style.display = 'block';
+        mostrarToast(`Archivo cargado: ${input.files[0].name}`, 'success');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('upload-img').src = ev.target.result;
+        document.getElementById('upload-preview').style.display = 'block';
+        mostrarToast(`Archivo arrastrado: ${file.name}`, 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ══════════════════════════════════════════
+    //  RANGE SYNC
+    // ══════════════════════════════════════════
+    document.getElementById('c-range').addEventListener('input', function() {
+      document.getElementById('range-val').textContent  = this.value;
+      document.getElementById('range-val-2').textContent = this.value;
+    });
+
+    // ══════════════════════════════════════════
+    //  SEARCHER CON SUGERENCIAS
+    // ══════════════════════════════════════════
+    const SUGERENCIAS = ['Proyecto Alpha','Stock Herramientas','Lote Alimentos Q1','Colección Ropa Verano','Dispositivos Electrónicos','Fertilizante NPK','Semillas Maíz','Abono Orgánico','Fungicida Mancozeb'];
+
+    function filtrarSugerencias(q) {
+      const results = document.getElementById('search-results');
+      if (!q.trim()) { results.classList.remove('show'); return; }
+      const matches = SUGERENCIAS.filter(s => s.toLowerCase().includes(q.toLowerCase()));
+      if (!matches.length) { results.classList.remove('show'); return; }
+      results.innerHTML = matches.map(m =>
+        `<div class="search-result-item" onclick="seleccionarSugerencia('${m}')">
+          <i class="bi bi-search"></i>${m}
+        </div>`
+      ).join('');
+      results.classList.add('show');
+    }
+
+    function seleccionarSugerencia(val) {
+      document.getElementById('c-searcher').value = val;
+      document.getElementById('search-results').classList.remove('show');
+      mostrarToast(`Seleccionado: ${val}`, 'info');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-wrapper')) {
+        document.getElementById('search-results').classList.remove('show');
+      }
+    });
+
+    // ══════════════════════════════════════════
+    //  AGREGAR FILA A LA TABLA (desde componentes)
+    // ══════════════════════════════════════════
+    let filaCount = 6;
+
+    function actualizarTabla() {
+      // Sincroniza range label
+      document.getElementById('range-val-2').textContent = document.getElementById('c-range').value;
+    }
+
+    function agregarRegistro() {
+      const nombre    = document.getElementById('c-textbox').value.trim()     || `Registro #00${filaCount}`;
+      const categoria = document.getElementById('c-combobox').value            || '—';
+      const fecha     = document.getElementById('c-datepicker').value          || new Date().toLocaleDateString('es-HN');
+      const valor     = document.getElementById('c-range').value               || '0';
+      const color     = document.getElementById('c-color').value               || '#4ade80';
+      const radio     = document.querySelector('input[name="c-radio"]:checked')?.value || 'Medio';
+      const notif     = document.getElementById('c-toggle1').checked;
+
+      const prioClass = { 'Alto':'s-revision','Medio':'s-pendiente','Bajo':'' }[radio] || '';
+      const prioStyle = radio === 'Bajo' ? 'style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);"' : '';
+
+      const id = String(filaCount).padStart(3, '0');
+      const tbody = document.getElementById('tbody-datos');
+
+      const fila = document.createElement('tr');
+      fila.className = 'fila-dato row-new';
+      fila.innerHTML = `
+        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#${id}</td>
+        <td style="font-weight:600;">${nombre}</td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">${categoria}</span></td>
+        <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">${fecha}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${valor}</td>
+        <td><span class="color-dot" style="background:${color};"></span></td>
+        <td><span class="status-badge ${prioClass}" ${prioStyle}>${radio}</span></td>
+        <td><span class="status-badge s-activo">Activo</span></td>
+        <td><i class="bi bi-${notif ? 'check-circle-fill" style="color:var(--verde)' : 'x-circle-fill" style="color:var(--muted)'};font-size:.85rem;"></i></td>
+        <td>
+          <div class="d-flex gap-1">
+            <button class="icon-btn edit" onclick="accionToast('Editando fila #${id}','info')"><i class="bi bi-pencil"></i></button>
+            <button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button>
+          </div>
+        </td>`;
+
+      tbody.insertBefore(fila, tbody.firstChild);
+      filaCount++;
+      actualizarContador();
+      mostrarToast(`Registro #${id} agregado a la tabla.`, 'success');
+    }
+
+    function eliminarFila(btn) {
+      const fila = btn.closest('tr');
+      fila.style.transition = 'opacity .3s, transform .3s';
+      fila.style.opacity = '0';
+      fila.style.transform = 'translateX(20px)';
+      setTimeout(() => { fila.remove(); actualizarContador(); }, 300);
+      mostrarToast('Registro eliminado.', 'error');
+    }
+
+    function actualizarContador() {
+      const n = document.querySelectorAll('.fila-dato:not([style*="opacity: 0"])').length;
+      document.getElementById('tabla-info').textContent = `${n} registros · datos ficticios en memoria`;
+    }
+
+    // ══════════════════════════════════════════
+    //  FILTRAR TABLA
+    // ══════════════════════════════════════════
+    function filtrarTabla(q) {
+      document.querySelectorAll('.fila-dato').forEach(f => {
+        f.style.display = f.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+
+    function resetearTabla() {
+      document.querySelectorAll('.fila-dato').forEach(f => f.style.display = '');
+      document.getElementById('tabla-search').value = '';
+      mostrarToast('Tabla reseteada.', 'info');
+    }
+  </script>
+</body>
+</html>

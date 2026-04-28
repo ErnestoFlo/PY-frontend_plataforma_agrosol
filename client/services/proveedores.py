@@ -1,7 +1,7 @@
 import requests
 import os
 
-API_BASE_URL = "https://127.0.0.1:7155/api/Proveedores"
+API_BASE_URL = "https://192.168.1.55:7155/api/Proveedores"
 
 # Configura verify según el ambiente
 VERIFY_SSL = os.getenv('VERIFY_SSL', 'False') == 'True'

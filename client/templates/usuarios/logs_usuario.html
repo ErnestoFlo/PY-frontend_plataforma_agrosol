@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actividad de {{ usuario_visto.get_full_name|default:usuario_visto.username }} — Agrosol</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{--verde:#4ade80;--verde-dim:#166534;--fondo:#0a0f0a;--card:#111a11;--borde:#1f2e1f;--texto:#e2f0e2;--muted:#6b7c6b;--acento:#86efac;--rojo:#f87171;--amarillo:#fbbf24;--azul:#60a5fa;--naranja:#fb923c;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Syne',sans-serif;background:var(--fondo) radial-gradient(circle,#1a2e1a 1px,transparent 1px);background-size:28px 28px;color:var(--texto);min-height:100vh;}
+    .navbar-custom{background:rgba(10,15,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--borde);padding:.75rem 2rem;position:sticky;top:0;z-index:100;}
+    .navbar-brand-custom{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;color:var(--verde)!important;text-decoration:none;}
+    .btn-logout{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);background:transparent;border:1px solid var(--borde);border-radius:6px;padding:.3rem .8rem;transition:all .2s;cursor:pointer;}
+    .btn-logout:hover{color:var(--rojo);border-color:var(--rojo);}
+    .btn-nav{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;border:1px solid var(--borde);background:transparent;color:var(--muted);text-decoration:none;transition:all .2s;}
+    .btn-nav:hover{color:var(--verde);border-color:var(--verde);}
+    /* PAGE */
+    .page-header{padding:2.5rem 0 1.5rem;}
+    .page-title{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;}
+    .page-subtitle{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);margin-bottom:.4rem;}
+    /* STATS */
+    .stat-card{background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.85rem;}
+    .stat-icon{width:36px;height:36px;border-radius:9px;flex-shrink:0;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;color:var(--verde);font-size:.95rem;}
+    .stat-number{font-size:1.3rem;font-weight:800;line-height:1;}
+    .stat-label{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    /* USER CARD */
+    .user-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+    .user-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#16a34a);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#0a0f0a;flex-shrink:0;overflow:hidden;box-shadow:0 0 0 3px var(--card),0 0 0 4px var(--verde-dim);}
+    .user-avatar img{width:100%;height:100%;object-fit:cover;}
+    /* FILTROS */
+    .filtro-bar{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+    .filtro-btn{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:999px;border:1px solid var(--borde);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .filtro-btn:hover{color:var(--verde);border-color:var(--verde);}
+    .filtro-activo{background:rgba(74,222,128,.1)!important;color:var(--verde)!important;border-color:rgba(74,222,128,.3)!important;}
+    /* SEARCH */
+    .search-wrap{position:relative;flex:1;max-width:280px;}
+    .search-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;}
+    .search-input{background:var(--card);border:1px solid var(--borde);border-radius:10px;color:var(--texto);font-family:'Syne',sans-serif;font-size:.85rem;padding:.5rem 1rem .5rem 2.3rem;width:100%;transition:border-color .2s;}
+    .search-input:focus{outline:none;border-color:var(--verde);}
+    .search-input::placeholder{color:var(--muted);}
+    /* TABLA LOGS */
+    .logs-card{background:var(--card);border:1px solid var(--borde);border-radius:14px;overflow:hidden;}
+    .log-row{display:flex;align-items:center;gap:1rem;padding:.85rem 1.2rem;border-bottom:1px solid var(--borde);transition:background .15s;}
+    .log-row:last-child{border-bottom:none;}
+    .log-row:hover{background:rgba(74,222,128,.02);}
+    .log-row.oculto{display:none!important;}
+    .log-icon{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+    .log-icon-verde  {background:rgba(74,222,128,.1); color:var(--verde);  border:1px solid rgba(74,222,128,.2);}
+    .log-icon-rojo   {background:rgba(239,68,68,.1);  color:var(--rojo);   border:1px solid rgba(239,68,68,.2);}
+    .log-icon-azul   {background:rgba(96,165,250,.1); color:var(--azul);   border:1px solid rgba(96,165,250,.2);}
+    .log-icon-naranja{background:rgba(251,146,60,.1); color:var(--naranja);border:1px solid rgba(251,146,60,.2);}
+    .log-icon-muted  {background:rgba(107,124,107,.1);color:var(--muted);  border:1px solid var(--borde);}
+    /* SECTION TITLE */
+    .section-title{font-size:.7rem;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--borde);}
+    /* BACK BTN */
+    .btn-back{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);background:transparent;border:1px solid var(--borde);border-radius:8px;padding:.4rem .9rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;}
+    .btn-back:hover{color:var(--verde);border-color:var(--verde);}
+    /* EMPTY */
+    .empty-state{text-align:center;padding:3rem;color:var(--muted);}
+    .empty-state i{font-size:2rem;display:block;margin-bottom:.5rem;}
+    /* FADE */
+    .fade-up{opacity:0;transform:translateY(12px);animation:fu .4s ease forwards;}
+    @keyframes fu{to{opacity:1;transform:none;}}
+    .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}
+    footer{border-top:1px solid var(--borde);padding:1.25rem 0;text-align:center;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin-top:3rem;}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar-custom d-flex align-items-center justify-content-between">
+    <a href="{% url 'proveedores' %}" class="navbar-brand-custom">Agrosol</a>
+    <div class="d-flex align-items-center gap-2">
+      <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);">
+        <i class="bi bi-shield-fill me-1" style="color:var(--verde);"></i>{{ request.user.username }}
+      </span>
+      <a href="{% url 'lista_usuarios' %}" class="btn-nav"><i class="bi bi-people"></i></a>
+      <a href="{% url 'perfil' %}" class="btn-nav"><i class="bi bi-person"></i></a>
+      <form method="POST" action="{% url 'logout' %}">{% csrf_token %}
+        <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right me-1"></i>Salir</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="container py-4" style="max-width:1000px;">
+
+    <!-- HEADER -->
+    <div class="page-header fade-up">
+      <a href="{% url 'lista_usuarios' %}" class="btn-back mb-3">
+        <i class="bi bi-arrow-left"></i>Volver a usuarios
+      </a>
+      <p class="page-subtitle"><i class="bi bi-activity me-1"></i>Registro de Actividad</p>
+      <h1 class="page-title">Logs de Usuario</h1>
+    </div>
+
+    <!-- USUARIO -->
+    <div class="user-card fade-up d1">
+      <div class="user-avatar">
+        {% if usuario_visto.profile.avatar.name %}
+          <img src="{{ usuario_visto.profile.avatar.url }}" alt="">
+        {% else %}
+          {{ usuario_visto.first_name|first|upper }}{{ usuario_visto.last_name|first|upper }}
+        {% endif %}
+      </div>
+      <div style="flex:1;">
+        <p style="font-weight:800;font-size:1rem;margin:0;">
+          {{ usuario_visto.get_full_name|default:usuario_visto.username }}
+        </p>
+        <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin:.1rem 0 0;">
+          @{{ usuario_visto.username }}
+          {% if usuario_visto.profile.cargo %} · {{ usuario_visto.profile.cargo }}{% endif %}
+          {% if usuario_visto.profile.area %} · {{ usuario_visto.profile.area }}{% endif %}
+        </p>
+        <div style="margin-top:.4rem;">
+          {% for g in usuario_visto.groups.all %}
+          <span style="font-family:'DM Mono',monospace;font-size:.63rem;background:rgba(74,222,128,.08);color:var(--verde);border:1px solid rgba(74,222,128,.2);border-radius:999px;padding:.18rem .55rem;margin-right:.25rem;">
+            <i class="bi bi-people me-1"></i>{{ g.name }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- Form limpieza manual -->
+      <form method="POST" action="{% url 'logs_limpiar_usuario' usuario_visto.id %}"
+            onsubmit="return confirm('¿Eliminar todos los logs de este usuario?')">
+        {% csrf_token %}
+        <button type="submit" style="font-family:'DM Mono',monospace;font-size:.72rem;background:transparent;color:var(--muted);border:1px solid var(--borde);border-radius:8px;padding:.35rem .8rem;cursor:pointer;transition:all .2s;"
+                onmouseover="this.style.color='var(--rojo)';this.style.borderColor='var(--rojo)'"
+                onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--borde)'">
+          <i class="bi bi-trash3 me-1"></i>Limpiar logs
+        </button>
+      </form>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4 fade-up d1">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="bi bi-activity"></i></div>
+          <div><p class="stat-number">{{ total_logs }}</p><p class="stat-label">Total</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-color:rgba(74,222,128,.2);">
+          <div class="stat-icon"><i class="bi bi-box-arrow-in-right"></i></div>
+          <div><p class="stat-number">{{ total_login }}</p><p class="stat-label">Logins</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-color:rgba(96,165,250,.2);">
+          <div class="stat-icon" style="background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.15);color:var(--azul);"><i class="bi bi-collection"></i></div>
+          <div><p class="stat-number">{{ total_modulos }}</p><p class="stat-label">Módulos</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card" style="border-color:rgba(251,146,60,.2);">
+          <div class="stat-icon" style="background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.15);color:var(--naranja);"><i class="bi bi-cursor-fill"></i></div>
+          <div><p class="stat-number">{{ total_elementos }}</p><p class="stat-label">Interacciones</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS Y BÚSQUEDA -->
+    <p class="section-title fade-up d2">Registro completo</p>
+    <div class="filtro-bar fade-up d2">
+      <div class="search-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="search-input" id="search-logs"
+               placeholder="Buscar en logs..." oninput="buscarLogs(this.value)">
+      </div>
+      <button onclick="filtrarLogs('todos')"    id="f-todos"    class="filtro-btn filtro-activo">Todos</button>
+      <button onclick="filtrarLogs('login')"    id="f-login"    class="filtro-btn">Login</button>
+      <button onclick="filtrarLogs('logout')"   id="f-logout"   class="filtro-btn">Logout</button>
+      <button onclick="filtrarLogs('modulo')"   id="f-modulo"   class="filtro-btn">Módulos</button>
+      <button onclick="filtrarLogs('elemento')" id="f-elemento" class="filtro-btn">Elementos</button>
+    </div>
+
+    <!-- LOGS -->
+    <div class="logs-card fade-up d3" id="logs-container">
+      {% if logs %}
+        {% for log in logs %}
+        <div class="log-row" data-tipo="{{ log.tipo_evento }}"
+             data-texto="{{ log.descripcion|lower }} {{ log.ip|default:'' }} {{ log.dispositivo|lower }} {{ log.modulo.nombre|default:''|lower }}">
+          <div class="log-icon log-icon-{{ log.color }}">
+            <i class="bi {{ log.icono }}"></i>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p style="font-weight:600;font-size:.88rem;margin:0;">
+              {{ log.descripcion|default:log.tipo_evento }}
+            </p>
+            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.1rem 0 0;">
+              {% if log.modulo %}<span style="color:var(--azul);">{{ log.modulo.nombre }}</span> · {% endif %}
+              {% if log.elemento_clave %}<span style="color:var(--naranja);">{{ log.elemento_clave }}</span> · {% endif %}
+              {{ log.ip|default:"IP desconocida" }} · {{ log.dispositivo|default:"Dispositivo desconocido" }}
+            </p>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <p style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--texto);margin:0;font-weight:600;">
+              {{ log.fecha|date:"d/m/Y" }}
+            </p>
+            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
+              {{ log.fecha|date:"H:i:s" }}
+            </p>
+          </div>
+        </div>
+        {% endfor %}
+        <div style="padding:.75rem 1.2rem;border-top:1px solid var(--borde);">
+          <span style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);"
+                id="logs-info">{{ logs|length }} registro{{ logs|length|pluralize }}</span>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="bi bi-activity"></i>
+          <p style="font-weight:700;">Sin actividad registrada</p>
+          <p style="font-size:.83rem;">Este usuario no tiene logs todavía</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+
+  <footer>Agrosol · Logs de Actividad · Solo Superusuarios</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let filtroActual = 'todos';
+
+    function filtrarLogs(tipo) {
+      filtroActual = tipo;
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('filtro-activo'));
+      document.getElementById('f-' + tipo)?.classList.add('filtro-activo');
+      aplicarFiltros();
+    }
+
+    function buscarLogs(q) {
+      aplicarFiltros(q.toLowerCase());
+    }
+
+    function aplicarFiltros(q = '') {
+      if (!q) q = document.getElementById('search-logs').value.toLowerCase();
+      let visibles = 0;
+      document.querySelectorAll('.log-row').forEach(row => {
+        const tipoOk  = filtroActual === 'todos' || row.dataset.tipo === filtroActual;
+        const textoOk = !q || row.dataset.texto.includes(q) || row.textContent.toLowerCase().includes(q);
+        if (tipoOk && textoOk) {
+          row.classList.remove('oculto');
+          visibles++;
+        } else {
+          row.classList.add('oculto');
+        }
+      });
+      const info = document.getElementById('logs-info');
+      if (info) {
+        const total = document.querySelectorAll('.log-row').length;
+        info.textContent = visibles === total
+          ? `${total} registro${total !== 1 ? 's' : ''}`
+          : `${visibles} de ${total} registros`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -2,11 +2,11 @@
 {% load partials %}
 {% load widget_tweaks %}
 
+{# Regla de swap:
+  - create o mobile: refrescar contenedor completo (#tabla-prov-container)
+  - edit desktop: reemplazar solo la fila afectada (#row-<id>)
+#}
 {% partialdef form %}  
-  {# Regla de swap:
-    - create o mobile: refrescar contenedor completo (#tabla-prov-container)
-    - edit desktop: reemplazar solo la fila afectada (#row-<id>)
-  #}
   <form method="POST" class="grid grid-cols-12 gap-x-6 gap-y-4"
     hx-post="{{ submit_url }}"
     hx-target="{% if is_create_operation or is_mobile_view %}#tabla-prov-container{% elif proveedor_id %}#row-{{ proveedor_id }}{% else %}#tabla-prov-container{% endif %}"
