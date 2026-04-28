@@ -1,0 +1,23 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef alert_simple %}
+  <div class="alert-simple opacity-0 translate-y-5 alert-{{ variant }} {{ x_params }}" role="alert">
+    <svg class="w-5 h-5 shrink-0">
+      <use id="alert-icon" href="{% static 'sprite.svg' %}#{{ icon }}"/>
+    </svg>
+    <span class="text-sm font-semibold">{{ message }}</span>
+  </div>
+{% endpartialdef %}
+
+{% partialdef alert_detailed %}
+  <div class="alert-detailed alert-{{ variant }} {{ x_params }}" role="alert">
+    <div class="flex items-center gap-2">
+      <svg class="w-5 h-5 shrink-0">
+        <use href="{% static 'sprite.svg' %}#{{ icon }}"/>
+      </svg>
+      <span class="font-display font-semibold text-sm">{{ title }}</span>
+    </div>
+    <p class="text-sm text-fg-body mt-2 ml-7">{{ body }}</p>
+  </div>
+{% endpartialdef %}

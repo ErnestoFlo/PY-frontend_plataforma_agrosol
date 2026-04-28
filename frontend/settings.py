@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-alya!*(=cktnyu17c6d*i(1l@m7b^9_^*hzr2=5cl$gd9k_s(@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Renderizado y ergonomía de templates del proyecto.
     'widget_tweaks',
+    'template_partials',
+    'crispy_forms',
+    'crispy_tailwind',
     "client"
 ]
 
@@ -134,6 +138,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+STATICFILES_DIRS = [BASE_DIR / "client" / "static"]
+
+# Crispy se mantiene para compatibilidad de formularios con Tailwind.
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 ############ Variables de configuración para login ###########
 LOGIN_REDIRECT_URL = '/agrosol/perfil' # A dónde va el usuario DESPUÉS de hacer login exitoso

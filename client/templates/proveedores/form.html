@@ -1,0 +1,47 @@
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+
+{# Regla de swap:
+  - create o mobile: refrescar contenedor completo (#tabla-prov-container)
+  - edit desktop: reemplazar solo la fila afectada (#row-<id>)
+#}
+{% partialdef form %}  
+  <form method="POST" class="grid grid-cols-12 gap-x-6 gap-y-4"
+    hx-post="{{ submit_url }}"
+    hx-target="{% if is_create_operation or is_mobile_view %}#tabla-prov-container{% elif proveedor_id %}#row-{{ proveedor_id }}{% else %}#tabla-prov-container{% endif %}"
+    hx-swap="{% if is_create_operation or is_mobile_view %}innerHTML{% elif proveedor_id %}outerHTML{% else %}innerHTML{% endif %}"
+    hx-on::after-request="if(event.detail.successful) { closeModal('{{ modal_name }}'); AlertManager.success('Proveedor {% if proveedor_id %}actualizado{% else %}creado{% endif %} exitosamente'); }"
+    >
+    {% csrf_token %}
+    
+      {# — Sección: Datos generales — #}
+      <div role="group" aria-labelledby="seccion-datos-generales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Datos generales</p>
+        {% include "components/inputs.html#input" with field=form.proveedor x_params="col-span-12" name='proveedor' label='Nombre de Proveedor' type='text' %}
+        {% include "components/inputs.html#input" with field=form.direccion x_params="col-span-12" name='direccion' label='Dirección' type='text' %}
+        {% include "components/inputs.html#input" with field=form.contacto x_params="col-span-12" name='contacto' label='Contacto' type='text' %}
+        {% include "components/inputs.html#input" with field=form.cargo x_params="col-span-12" name='cargo' label='Cargo' type='text' %}
+      </div>
+
+      {# — Sección: Contacto — #}
+      <div role="group" aria-labelledby="seccion-contacto" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-contacto" class="col-span-12 text-sm font-medium text-neutral-500">Contacto</p>
+        {% include "components/inputs.html#input" with field=form.telefono x_params="col-span-12" name='telefono' label='Teléfono' type='text' %}
+        {% include "components/inputs.html#input" with field=form.celular x_params="col-span-12" name='celular' label='Celular' type='text' %}
+        {% include "components/inputs.html#input" with field=form.email x_params="col-span-12" name='email' label='Email' type='text' %}
+      </div>
+
+      {# — Sección: Otros — #}
+      <div role="group" aria-labelledby="seccion-otros" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+        <p id="seccion-otros" class="col-span-12 text-sm font-medium text-neutral-500">Otros</p>
+        {% include "components/inputs.html#input" with field=form.terminos_de_pago x_params="col-span-12" name='terminos-de-pago' label='Términos de Pago' type='text' %}
+      </div>
+      
+      {# — Botones de acción — #}
+      <div class="flex justify-end gap-2 mt-2 col-span-12">
+        {% include "components/buttons.html#button" with func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target=modal_name %}
+        {% include 'components/buttons.html#button' with func_type='submit' type='btn-primary' text=submit_text %}      
+      </div>
+  </form>
+{% endpartialdef %}

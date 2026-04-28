@@ -1,0 +1,84 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef kpi_simple %}
+  <div class="kpi-card card {{ x_params }}">
+    <div class="kpi-header">
+      <div class="flex flex-col gap-1">
+        <span class="kpi-label">{{ label }}</span>
+        {% if sublabel %}<span class="text-xs text-fg-muted">{{ sublabel }}</span>{% endif %}
+      </div>
+      <svg class="w-6 h-6 text-fg-muted shrink-0">
+        <use href="{% static 'sprite.svg' %}#{{ icon|default:'icon-clipboard-fill' }}"/>
+      </svg>
+    </div>
+    <div class="flex items-end justify-between">
+      <span class="kpi-value">{{ value }}</span>
+      {% if trend %}
+        <span class="{% if trend_up %}kpi-trend-up{% else %}kpi-trend-down{% endif %} pb-1">
+          {% if trend_up %}↑↑{% else %}↓↓{% endif %} {{ trend }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+{% endpartialdef %}
+
+{% partialdef kpi_bar %}
+  <div class="kpi-card card {{ x_params }}">
+    <div class="kpi-header">
+      <div class="flex flex-col gap-1">
+        <span class="kpi-label">{{ label }}</span>
+        {% if sublabel %}<span class="text-xs text-fg-muted">{{ sublabel }}</span>{% endif %}
+      </div>
+      <svg class="w-6 h-6 text-fg-muted shrink-0">
+        <use href="{% static 'sprite.svg' %}#{{ icon|default:'icon-clipboard-fill' }}"/>
+      </svg>
+    </div>
+    <span class="kpi-value text-primary-400">{{ value }}</span>
+    <!-- Barras CSS — bars es una lista de porcentajes 0-100, el ultimo es el activo -->
+    <div class="kpi-bar-chart">
+      {% for bar in bars %}
+        <div class="kpi-bar {% if forloop.last %}kpi-bar-active{% endif %}"
+          style="height: {{ bar }}%">
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endpartialdef %}
+
+{% partialdef kpi_donut %}
+  <div class="kpi-card card{{ x_params }}">
+    <div class="kpi-header">
+      <div class="flex flex-col gap-1">
+        <span class="kpi-label">{{ label }}</span>
+        {% if sublabel %}<span class="text-xs text-fg-muted">{{ sublabel }}</span>{% endif %}
+      </div>
+      <svg class="w-6 h-6 text-fg-muted shrink-0">
+        <use href="{% static 'sprite.svg' %}#{{ icon|default:'icon-clipboard-fill' }}"/>
+      </svg>
+    </div>
+    <!-- Donut SVG — percentage es 0-100 -->
+    <div class="flex items-center justify-center mt-1">
+      <div class="relative w-20 h-20">
+        <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+          <!-- Track -->
+          <circle cx="18" cy="18" r="15.9"
+            fill="none"
+            stroke="var(--color-neutral-700)"
+            stroke-width="3"/>
+          <!-- Fill — stroke-dasharray = percentage, 100 -->
+          <circle cx="18" cy="18" r="15.9"
+            fill="none"
+            stroke="var(--color-primary-500)"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-dasharray="{{ percentage }} 100"
+            style="transition: stroke-dasharray 600ms ease;"/>
+        </svg>
+        <span class="absolute inset-0 flex items-center justify-center font-display font-bold text-sm text-fg">
+          {{ percentage }}%
+        </span>
+      </div>
+    </div>
+  </div>
+{% endpartialdef %}

@@ -1,0 +1,14 @@
+{% load static %}
+{% load partials %}
+  
+{% partialdef avatar %}
+
+  <div class="flex flex-col items-center justify-center w-{{ size }} h-{{ size }} max-w-{{ size }} overflow-hidden bg-surface-3 rounded-full shadow-md relative">
+    {% if user_img == "" or user_img == none or user_img == undefined %}
+      <div class="text-fg font-display font-bold text-xl"> {{ initials }} </div>
+    {% else %}
+      <img src="{% static 'images' %}/{{ user_img }}" alt="Foto de perfil de usuario" class="w-full h-full object-cover">
+    {% endif %}
+  </div>
+
+{% endpartialdef %}

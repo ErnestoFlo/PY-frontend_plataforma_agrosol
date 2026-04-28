@@ -1,0 +1,125 @@
+{% extends '../layouts/navigation.html' %}
+{% load static %}
+
+{% block view %}
+<main class="flex flex-col items-center w-full h-full p-8 gap-5">
+  <div class="flex items-center max-w-7xl gap-y-2 flex-wrap">
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-file-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-date-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bell-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-open-eye-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-close-eye-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-print-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pencil-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-logout-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sun-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-moon-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-bars-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-check-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-exclamation-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-info-circle-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-clipboard-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-vertical-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-elipsis-horizontal-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-expand-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-magnifyng-glass-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-excel-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pdf-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-word-regular' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-reload-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-sort-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-settings-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-pin-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-trash-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-xmark-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-down-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-right-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-left-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-chevron-up-fill' %}
+{% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-check-fill' %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {% include "components/buttons.html#button" with type='btn-primary' text='Primary' %}
+    {% include "components/buttons.html#button" with type='btn-secondary' text='Secondary' %}
+    {% include "components/buttons.html#button" with type='btn-ghost' text='Ghost' %}
+    {% include "components/buttons.html#button" with type='btn-danger' text='Danger' %}
+    {% include "components/buttons.html#toggle_button" %}
+    {% include "components/buttons.html#icon_button" with type='btn-icon' size='6' icon_name='icon-home-regular' %}
+    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' %}
+    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-neutral' size='6' icon_name='icon-home-fill' action='toggleTheme' %}
+    {% include "components/buttons.html#icon_button" with type='btn-icon-ghost-danger' size='6' icon_name='icon-home-regular' %}
+
+    <!-- {% include "components/inputs.html#input" with type='text' name='name' label='Input Label' %} -->
+    {% include "components/inputs.html#input_icon" with type='number' name='another_name' label='Input Label' icon='icon-sort-fill' %}
+    {% include "components/inputs.html#input_icon" with type='text' name='fecha_hora' label='Fecha y Hora' icon='icon-date-fill' %}
+    {% include "components/inputs.html#input_password" with name='another3_name' label='Input Label' icon='icon-open-eye-regular' %}
+    {% include "components/inputs.html#input_combobox" with name='another4_name' label='Input Label' icon='icon-chevron-down-fill' url='/agrosol/proveedores/obtener_opciones/' %}
+    {% include "components/inputs.html#input_icon" with type='text' name='fecha' label='Solo Fecha' icon='icon-date-fill' %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {% include "components/avatars.html#avatar" with size="16" user_img="cat_avatar.jpg" initials="FH" %}
+    {% include "components/avatars.html#avatar" with size="16" user_img="" initials="FH" %}
+    {% include "components/inputs.html#input_checkbox" with size="6" label="checkbox input" %}
+    {% include "components/inputs.html#input_radiobutton" with size="6" label="radio input" %}
+    {% include "components/inputs.html#input_range" with name='precio' label='Precio máximo' min=0 max=1000 value=500 step=10 %}
+    {% include "components/inputs.html#input_color" %}
+    {% include "components/inputs.html#input_file" %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6 justify-center">
+    {% include "components/alerts.html#alert_simple" with variant='success' icon='icon-xmark-circle-fill' message='Operación exitosa' %}
+    {% include "components/alerts.html#alert_simple" with variant='warning' icon='icon-xmark-circle-fill' message='Operación dudosa' %}
+    {% include "components/alerts.html#alert_simple" with variant='info' icon='icon-xmark-circle-fill' message='Informacion de operacion' %}
+    {% include "components/alerts.html#alert_simple" with variant='danger' icon='icon-xmark-circle-fill' message='Ocurrió un error' %}
+    {% include "components/alerts.html#alert_detailed" with variant='success' icon='icon-xmark-circle-fill' title='Success Alert Title' body='Warning Alert Body and different details' %}
+    {% include "components/alerts.html#alert_detailed" with variant='warning' icon='icon-xmark-circle-fill' title='Warning Alert Title' body='Warning Alert Body and different details' %}
+    {% include "components/alerts.html#alert_detailed" with variant='info' icon='icon-xmark-circle-fill' title='Info Alert Title' body='Warning Alert Body and different details' %}
+    {% include "components/alerts.html#alert_detailed" with variant='danger' icon='icon-xmark-circle-fill' title='Danger Alert Title' body='Warning Alert Body and different details' %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {% include "components/badges.html#badge" with variant='success' text='Success Badge' %}
+    {% include "components/badges.html#badge" with variant='warning' text='Primary Badge' %}
+    {% include "components/badges.html#badge" with variant='info' text='Info Badge' %}
+    {% include "components/badges.html#badge" with variant='danger' text='Danger Badge' %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {# En el template, declaras el modal vacío #}
+    {% include "components/modals.html#modal" with modal_id='modal-proveedor' title='Detalle Proveedor' size='modal-md' show_footer=True confirm_text='Guardar' %}
+
+    {# El botón que lo abre y carga contenido vía HTMX #}
+    
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {# Con acciones #}
+    {% include "partials/tables.html#table" with table_id='tabla-prov' columns=columns rows=rows with_actions=True current_page=current_page total_pages=total_pages page_items=page_items fragment='table' %}
+
+    {# Sin acciones #}
+    {% include "partials/tables.html#table" with table_id='tabla-simple' columns=columns rows=rows with_actions=False current_page=current_page total_pages=total_pages page_items=page_items fragment='table' %}
+  </div>
+
+  <div class="flex items-center max-w-7xl flex-wrap gap-2 gap-y-6">
+    {# Sin tendencia #}
+    {% include "partials/kpi_cards.html#kpi_simple" with label='KPI' sublabel='Without Trend' value='20' icon='icon-clipboard-fill' %}
+
+    {# Con tendencia #}
+    {% include "partials/kpi_cards.html#kpi_simple" with label='KPI' sublabel='With Trend' value='20,568 lps.' icon='icon-clipboard-fill' trend='4.2%' trend_up=True %}
+
+    {# Con barras — bars es una lista de porcentajes #}
+    {% include "partials/kpi_cards.html#kpi_bar" with label='KPI' sublabel='With Bar Graphic' value='20,568 lps.' icon='icon-clipboard-fill' bars='20,45,60,35,80,55,100' %}
+
+    {# Con donut #}
+    {% include "partials/kpi_cards.html#kpi_donut" with label='KPI' sublabel='With Donut Graphic' icon='icon-clipboard-fill' percentage='85' %}
+  </div>
+</main>
+
+{% endblock %}

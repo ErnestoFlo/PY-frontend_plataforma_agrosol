@@ -1,0 +1,23 @@
+{% load 'partials' %}
+{% load static %}
+
+{% partialdef welcome %}
+  <main class="w-full flex flex-col md:flex-row flex-nowrap items-center min-h-dvh px-10 md:px-20 max-w-screen relative overflow-hidden">
+    <div class="w-full h-full flex flex-col justify-between md:justify-center items-center gap-10 md:gap-20">
+      <div class="text-neutral-200 text-6xl lg:text-8xl font-display font-semibold flex-5 md:flex-6 flex flex-col justify-end md:items-center gap-5">
+        <div class="md:text-center">
+          De La <span class="text-neutral-50"><br>Mano</span>
+          Del<span class="text-neutral-50"><br> Agricultor</span>
+        </div>
+        <div class="text-neutral-200 text-base md:text-center lg:text-base w-4/5">
+          Esta es una descripción corta para la plataforma administrativa
+        </div>
+      </div>
+      <a href="{% url 'login' %}" class="flex-1 w-full md:w-30 flex flex-col justify-end md:justify-start py-20 md:py-10">
+        {% include '../components/buttons.html#button' with type='btn-contrast' x_params='w-full' text='Ingresar' %}
+      </a>
+    </div>
+    <!-- <div class="highlight w-1/2 aspect-square bg-primary-200/40 blur-3xl bottom-1/2 left-2/3 -z-10"></div>
+    <div class="highlight w-1/2 aspect-square bg-accent-200/35 blur-3xl bottom-1/2 right-2/3 -z-10"></div> -->
+  </main>
+{% endpartialdef %}

@@ -1,0 +1,33 @@
+{% load static %}
+{% load partials %}
+<!DOCTYPE html>
+<html lang="en" prefers-color-scheme="light" class="selection:bg-primary-500 selection:text-neutral-50">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrosol - {{ pagename }}</title>
+    <!-- Evitar flasheos y parapadeos al cambiar la ui de preferencia del usuario en cualquier plataforma-->
+    <script>
+      (function() {
+        // Tema de color 
+        const saved = localStorage.getItem('theme')
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const theme = saved || (prefersDark ? 'dark' : 'light')
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
+    <link rel="stylesheet" href="{% static 'css/material_green.css' %}">
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+  </head>
+  <body class="bg-bg relative flex flex-col items-center">
+    {% block content %}
+    {% endblock %}
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'js/flatpickr.js' %}"></script>
+    <script src="{% static 'js/es.js' %}"></script>
+    <script src="{% static 'js/modules/proveedores_ui.js' %}"></script>
+    <script src="{% static 'js/ui.js' %}"></script>
+  </body>
+</html>

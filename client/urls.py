@@ -5,17 +5,22 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    ### URLS DE EJEMPLO ###
-    path("", views.listar, name="listar"),
-    path("nuevo/", views.crear, name="crear"),
-    path("editar/<int:id>", views.editar, name="editar"),
-    path("eliminar/<int:id>", views.eliminar, name="eliminar"),
+    ### BIENVENIDA
+    path("landing_login/", views.landing_login, name="landing"),
     ### URLS DE PROVEEDORES
     path("proveedores/", views.list_proveedores, name="proveedores"),
-    path("proveedores/crear", views.create_proveedor, name="proveedores_crear"),
-    path("proveedores/editar/<int:id>", views.edit_proveedor, name="proveedores_editar"),
-    path("proveedores/eliminar/<int:id>", views.delete_proveedor, name="proveedores_eliminar"),
+    path("proveedores/crear/", views.create_or_edit_proveedor, name="proveedores_crear"),
+    path("proveedores/editar/<int:id>/", views.create_or_edit_proveedor, name="proveedores_editar"),
+    path("proveedores/confirmar/<int:id>/", views.confirm_delete, name="confirm_delete"),
+    path("proveedores/eliminar/<int:id>/", views.delete_proveedor, name="proveedores_eliminar"),
 
+    ### URLS DE DISEÑO
+    path("design/test_components/", views.tests_components, name="tests_page"),
+    path("design/dashboard/", views.view1, name="dashboard"),
+    
+    ### URLS DE ENDPOINTS DINÁMICOS (HTMX)
+    path("api/proveedores/opciones/", views.get_options, name="get_proveedores_options"),
+    
     ### URLS DE LOGIN ###
     path("principio/", views.principio, name="principio"),
 
@@ -48,6 +53,5 @@ urlpatterns = [
     ### LOGS ###
     path("logs/elemento/", views.registro_elemento, name="registro_elemento"),
     path("usuarios/<int:id>/logs/",         views.logs_usuario,        name="logs_usuario"),
-    path("usuarios/<int:id>/logs/limpiar/", views.logs_limpiar_usuario, name="logs_limpiar_usuario"),
-
+    path("usuarios/<int:id>/logs/limpiar/", views.logs_limpiar_usuario, name="logs_limpiar_usuario")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

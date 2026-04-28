@@ -1,49 +1,35 @@
-{% extends '../layouts/base.html' %}
+{% extends '../layouts/navigation.html' %}
 
-{% block content %}
-  <section class="container-fluid d-flex flex-row">
-    <section class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Proveedor</th>
-            <th scope="col">Dirección</th>
-            <th scope="col">Contacto</th>
-            <th scope="col">Cargo</th>
-            <th scope="col">Teléfono</th>
-            <th scope="col">Celular</th>
-            <th scope="col">Email</th>
-            <th scope="col">Términos de Pago</th>
-            <th scope="col">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for proveedor in lista %}
-          <tr>
-            <th scope="row" class="fs-6">{{proveedor.proveedoresID}}</th>
-            <td class="fs-6">{{ proveedor.proveedor }}</td>
-            <td class="fs-6">{{ proveedor.direccion }}</td>
-            <td class="fs-6">{{ proveedor.contacto }}</td>
-            <td class="fs-6">{{ proveedor.cargo }}</td>
-            <td class="fs-6">{{ proveedor.telefono }}</td>
-            <td class="fs-6">{{ proveedor.celular }}</td>
-            <td class="fs-6">{{ proveedor.email }}</td>
-            <td class="fs-6">{{ proveedor.terminos_de_pago }}</td>
-            <td>
-              <button class="btn btn-danger">
-                <a href="{% url 'proveedores_eliminar' proveedor.proveedoresID %}" class="text-decoration-none">Eliminar</a>
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-success">
-                <a href="{% url 'proveedores_editar' proveedor.proveedoresID %}" class="text-decoration-none">Editar</a>
-                <i class="bi bi-trash3-fill"></i>
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+{% block view %}
+  <section class="w-full h-full flex flex-col gap-2 max-w-full overflow-y-auto">
+    
+    <section class="card tools w-full flex flex-row justify-end p-2 px-4 gap-2 h-12">
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-word-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-excel-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-ghost-neutral' size="5" icon_name="icon-pdf-regular" x_params='rounded-md' %}
+      {% include "components/buttons.html#icon_button" with func_type='button' type='btn-icon-primary' size="4" icon_name="icon-plus-fill" x_params='p-2 rounded-md aspect-square ' action='openModal' target='modal-create' hx_get=create_url hx_target="#modal-create-content" hx_swap="innerHTML" %}
     </section>
+  
+    {# Vista responsive - una sola estructura activa en el DOM #}
+    <div
+      id="tabla-prov-container"
+      class="flex flex-col flex-1 overflow-y-auto"
+      data-responsive-table="proveedores"
+      data-source-url="{% url 'proveedores' %}"
+    >
+      {% include "partials/skeletons.html#skeleton_table" %}
+    </div>
+
+    {# Modales #}
+    {% include "components/modals.html#modal" with modal_id='modal-create' title='Crear Proveedor' size='modal-lg' show_footer=False %}
+    {% include "components/modals.html#modal" with modal_id='modal-edit' title='Editar Proveedor' size='modal-lg' show_footer=False %}
+    {% include "components/modals.html#modal" with modal_id='modal-delete' title='Eliminar Proveedor' size='modal-md' show_footer=False %}
+    {% include "components/modals.html#modal" with modal_id='modal-detail' title='Detalle del Proveedor' size='modal-md' show_footer=False %}
+    
+    <div id="skeleton-template" class="hidden w-full h-full max-h-full">
+      {% include "partials/skeletons.html#skeleton_default" %}
+    </div>
+    <!-- Contenedor de Alertas -->
+    <div id="alerts-container" class="fixed bottom-4 right-4 z-20 flex flex-col gap-2 w-auto"></div>
   </section>
 {% endblock %}

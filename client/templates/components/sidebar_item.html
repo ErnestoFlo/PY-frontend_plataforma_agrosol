@@ -1,0 +1,32 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef sidebar_item %}  
+  {% with link_class=is_active|yesno:"sidebar-item bg-primary-theme/15 ,sidebar-item"  text_class=is_active|yesno:"text-fg,text-fg-body" icon_params=is_active|yesno:"text-fg,text-fg-body" %}
+    <a id='{{ id }}' href="{% url url %}" class="{{ link_class }}">      
+      {% include "components/buttons.html#icon_button" with x_params=icon_params type='btn-icon-ghost-neutral' size='5' icon_name=icon_name %}
+      <div class="{{ text_class }} align-start font-medium font-sans whitespace-nowrap">
+        {{ label }}
+      </div>
+    </a>
+  {% endwith %}
+
+{% endpartialdef %}
+
+{% partialdef sidebar_accordion_item %}
+  <details name="sidebar-group" class="sidebar-accordion w-full h-auto overflow-hidden gap-1 group">
+    <summary class="sidebar-item cursor-pointer list-none">
+      {% include "components/buttons.html#icon_button" with x_params='pointer-events-none group-hover:hidden' type='btn-icon-ghost-neutral' size='5' icon_name=icon_name %}
+      {% include "components/buttons.html#icon_button" with x_params='pointer-events-none accordion-arrow transition-transform hidden group-hover:inline group-open:rotate-90' type='btn-icon-ghost-neutral' size='5' icon_name='icon-caret-right-fill' %}
+      <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap flex-1">
+        {{ label }}
+      </div>
+    </summary>
+
+    <div class="ml-7 mt-2 flex flex-col gap-1">
+      {% for group_item in item.group %}
+        {% include "components/sidebar_item.html#sidebar_item" with label=group_item.label url=group_item.url icon_name=group_item.icon is_active=group_item.is_active %}
+      {% endfor %}
+    </div>
+  </details>
+{% endpartialdef %}

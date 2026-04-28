@@ -1,0 +1,71 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef modal %}
+  <div id="{{ modal_id }}"
+    class="modal-overlay hidden"
+    data-action="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="{{ modal_id }}-title">
+    <div class="modal-container card {{ size|default:'modal-md' }}">
+      <div class="modal-header">
+        <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
+          {{ title }}
+        </h2>
+        {% include "components/buttons.html#input_icon_button" with func_type='button' type='btn-icon-ghost-neutral' x_params='p-1 shrink-0' size='5' icon_name='icon-xmark-fill' action='closeModal' target=modal_id %}
+      </div>
+
+      <div id="{{ modal_id }}-content" class="modal-body"
+          hx-target="this"
+          hx-swap="innerHTML">
+        <!-- HTMX Inyecta aquí -->
+      </div>
+
+      {% if show_footer %}
+      <div class="modal-footer">
+        <button type="button"
+          class="btn btn-ghost text-sm"
+          data-action="closeModal"
+          data-target="{{ modal_id }}">
+          Cancelar
+        </button>
+        {% if confirm_url %}
+          <button type="button"
+            class="btn btn-primary text-sm"
+            hx-post="{{ confirm_url }}"
+            hx-target="#{{ modal_id }}-content"
+            hx-swap="innerHTML">
+            {{ confirm_text|default:'Confirmar' }}
+          </button>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+{% endpartialdef %}
+
+{% partialdef item_detail_modal %}
+  <div class="modal-detail-content flex flex-col gap-4">
+    {# Información del registro #}
+    <div class="flex flex-col gap-3 pb-4 border-b border-surface-3">
+      <div class="flex flex-col gap-1">
+        <p class="text-fg font-semibold text-base">{{ id_col }}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        {% for key, value in row.items %}
+        <div class="flex flex-col gap-1">
+          <label class="text-xs uppercase tracking-wide text-fg-muted font-semibold">{{ key }}</label>
+          <p class="text-fg">{{ value }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {# Botones de acciones #}
+    <div class="flex gap-2 pt-2">
+      {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='button' icon_size='4' icon_name='icon-pencil-fill' text='Editar' action='openModal' target='modal-edit' hx_get=edit_url hx_target="#modal-edit-content" hx_swap="innerHTML" %}
+      {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu-danger' role='button' icon_size='4' icon_name='icon-trash-fill' text='Eliminar' action='openModal' target='modal-delete' hx_get=delete_url hx_target="#modal-delete-content" hx_swap="innerHTML" %}
+    </div>
+  </div>
+{% endpartialdef %}

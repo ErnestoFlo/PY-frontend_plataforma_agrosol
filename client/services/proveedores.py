@@ -13,10 +13,12 @@ def get_by_id(id):
     return requests.get(f"{API_BASE_URL}/{id}", verify=VERIFY_SSL).json()
 
 def create(data):
-    return requests.post(API_BASE_URL, json=data, verify=VERIFY_SSL)
+    response = requests.post(API_BASE_URL, json=data, verify=VERIFY_SSL)
+    return response.json() if response.status_code in [200, 201] else {}
 
 def update(id, data):
-    return requests.put(f"{API_BASE_URL}/{id}", json=data, verify=VERIFY_SSL)
+    response = requests.put(f"{API_BASE_URL}/{id}", json=data, verify=VERIFY_SSL)
+    return response.json() if response.status_code in [200, 204] else {}
 
 def delete(id):
     return requests.delete(f"{API_BASE_URL}/{id}", verify=VERIFY_SSL)
