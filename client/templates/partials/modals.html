@@ -69,3 +69,40 @@
     </div>
   </div>
 {% endpartialdef %}
+
+{% partialdef inactivity_modal %}
+  <div id="{{ modal_id }}"
+    class="modal-overlay hidden"
+    data-action="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="{{ modal_id }}-title">
+    <div class="modal-container card {{ size|default:'modal-md' }}">
+      <div class="modal-header">
+        <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
+          {{ title }}
+        </h2>
+        <svg class="text-fg-body w-4 h-4">
+          <use href="{% static 'sprite.svg' %}#icon-timer-regular"></use>
+        </svg>
+      </div>
+      <div id="{{ modal_id }}-content" class="modal-body">
+        <section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+          <div class="mt-2 col-span-12 h-2">
+            <div id="barra-progreso" class="progress-bar"></div>
+          </div>
+          <div class=" mt-2 col-span-12">
+            <p class="text-fg-body">
+              Tu sesión se cerrará automáticamente por inactividad en:<br>
+              <span class="text-primary-500 m-0 p-0 text-3xl" id="contador">60</span> segundos
+            </p>
+          </div>
+          <div class="flex justify-end gap-2 mt-2 col-span-12">
+            {% include "components/buttons.html#icon_text_button" with func_type='submit' type='btn-icon-text-danger' icon_name='icon-logout-fill' icon_size='4' text='Cerrar Sesión' action='cerrarSesionAhora' target='modal-delete' %}
+            {% include 'components/buttons.html#button' with func_type='button' type='btn-ghost' text='¡Sigo aquí!' action='continuarSesion' %} 
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+{% endpartialdef %}

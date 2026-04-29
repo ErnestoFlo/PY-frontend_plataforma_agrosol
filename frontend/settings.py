@@ -145,7 +145,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
 ############ Variables de configuración para login ###########
-LOGIN_REDIRECT_URL = '/agrosol/perfil' # A dónde va el usuario DESPUÉS de hacer login exitoso
+LOGIN_REDIRECT_URL = '/agrosol/dashboard' # A dónde va el usuario DESPUÉS de hacer login exitoso
 LOGIN_URL = '/auth/login/' # A dónde redirige si intenta acceder a una página protegida sin login
 LOGOUT_REDIRECT_URL = '/auth/login' # A dónde va después de hacer logout
 

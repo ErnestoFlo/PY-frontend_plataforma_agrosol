@@ -21,11 +21,11 @@
     </div>
 
     {# Modales #}
-    {% include "components/modals.html#modal" with modal_id='modal-create' title='Crear Proveedor' size='modal-lg' show_footer=False %}
-    {% include "components/modals.html#modal" with modal_id='modal-edit' title='Editar Proveedor' size='modal-lg' show_footer=False %}
-    {% include "components/modals.html#modal" with modal_id='modal-delete' title='Eliminar Proveedor' size='modal-md' show_footer=False %}
-    {% include "components/modals.html#modal" with modal_id='modal-detail' title='Detalle del Proveedor' size='modal-md' show_footer=False %}
-    
+    {% include "partials/modals.html#modal" with modal_id='modal-create' title='Crear Proveedor' size='modal-lg' show_footer=False %}
+    {% include "partials/modals.html#modal" with modal_id='modal-edit' title='Editar Proveedor' size='modal-lg' show_footer=False %}
+    {% include "partials/modals.html#modal" with modal_id='modal-delete' title='Eliminar Proveedor' size='modal-md' show_footer=False %}
+    {% include "partials/modals.html#modal" with modal_id='modal-detail' title='Detalle del Proveedor' size='modal-lg' show_footer=False %}
+        
     <div id="skeleton-template" class="hidden w-full h-full max-h-full">
       {% include "partials/skeletons.html#skeleton_default" %}
     </div>

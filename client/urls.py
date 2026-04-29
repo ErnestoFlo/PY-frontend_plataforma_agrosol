@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     ### BIENVENIDA
     path("landing_login/", views.landing_login, name="landing"),
+    path("dashboard/", views.view1, name="dashboard"),
     ### URLS DE PROVEEDORES
     path("proveedores/", views.list_proveedores, name="proveedores"),
     path("proveedores/crear/", views.create_or_edit_proveedor, name="proveedores_crear"),
@@ -16,13 +17,9 @@ urlpatterns = [
 
     ### URLS DE DISEÑO
     path("design/test_components/", views.tests_components, name="tests_page"),
-    path("design/dashboard/", views.view1, name="dashboard"),
     
     ### URLS DE ENDPOINTS DINÁMICOS (HTMX)
     path("api/proveedores/opciones/", views.get_options, name="get_proveedores_options"),
-    
-    ### URLS DE LOGIN ###
-    path("principio/", views.principio, name="principio"),
 
     ### URLS DE USUARIOS ###
     path("usuarios/", views.lista_usuarios, name="lista_usuarios"),

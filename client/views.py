@@ -445,12 +445,6 @@ def delete_proveedor(request, id):
 # El decorador SIEMPRE va DESPUÉS de @login_required
 # para garantizar que request.user está disponible.
 
-
-### Vista de prueba para login ###
-@login_required
-def principio (request):
-    return render(request, "usuarios/principio.html")
-
 ########## USUARIOS ##########
 # @login_required
 # def perfil(request):

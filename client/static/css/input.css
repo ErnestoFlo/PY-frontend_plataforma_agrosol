@@ -500,6 +500,15 @@
     focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
     disabled:bg-none disabled:text-neutral-400 disabled:border-neutral-300 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
   }
+  .btn-icon-text-danger {
+    @apply
+    inline-flex items-center px-2 gap-2 font-semibold rounded-lg transition-colors
+    bg-none border border-danger-500 text-danger-500	/* normal state */
+		hover:bg-danger-400 hover:text-danger-800 hover:border-danger-800 /* hover state */
+		active:bg-danger-200 active:text-danger-500 active:border-danger-500 /* active state */
+		focus:outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 /* focus state */
+		disabled:bg-none disabled:text-neutral-400 disabled:cursor-not-allowed disabled:pointer-events-none /* disabled state */;
+  }
   .btn-icon-text-ghost-neutral {
     @apply
     inline-flex items-center font-semibold rounded-lg transition-colors
@@ -1022,4 +1031,16 @@
 }
 .bottombar-more-popover[data-open="true"] {
   @apply visible opacity-100 scale-100;
-}}
+}
+
+/*
+####### PROGRESS BAR ##########
+*/
+.progress-bar {
+  @apply relative w-full h-full rounded-full;
+  background: linear-gradient(90deg, var(--color-primary-theme), var(--color-primary-500));
+  transition: width 1s linear;
+}
+
+
+}

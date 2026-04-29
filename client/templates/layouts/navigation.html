@@ -24,4 +24,6 @@
       <div class="bg-primary-theme/10 w-1/2 h-1/4 absolute -bottom-1/6 left-1/2 -translate-x-1/2 blur-3xl"></div>
     </div>
   </div>
+  {% include "partials/modals.html#inactivity_modal" with modal_id='modal-inactivity' title='¿Sigue ahí?' size='modal-md' show_footer=False %}
+  <form id="form-logout" method="POST" action="{% url 'logout' %}" class="hidden;">{% csrf_token %}</form>
 {% endblock %}

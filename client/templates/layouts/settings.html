@@ -1,0 +1,15 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+
+  {% include 'componentes/navbar.html#navbar_settings' %}
+
+  {% block view %}
+  {% endblock %}
+
+  <footer>Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
+  {% include "partials/modals.html#inactivity_modal" with modal_id='modal-inactivity' title='¿Sigue ahí?' size='modal-md' show_footer=False %}
+  <form id="form-logout" method="POST" action="{% url 'logout' %}" class="hidden">{% csrf_token %}</form>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
