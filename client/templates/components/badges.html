@@ -7,3 +7,12 @@
     {{ text }}
   </span>
 {% endpartialdef %}
+
+{% partialdef badge_icon %}
+  <span class="badge badge-{{ variant }} {{ x_params }}">
+    <svg class="badge-icon">
+      <use href="{% static 'sprite.svg' %}#{{ icon }}" />
+    </svg>
+    {{ text }}
+  </span>
+{% endpartialdef %}

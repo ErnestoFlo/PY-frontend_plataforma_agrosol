@@ -13,5 +13,11 @@
 {% endpartialdef %}
 
 {% partialdef navbar_settings %}
-  
+  <nav class="flex-1 w-1/2 h-auto p-0 hidden md:block">
+    <ul class="flex w-full h-auto py-2 px-1 gap-1 justify-center items-center">
+      <li class="px-3 text-fg-body transition-all duration-200 hover:text-fg active:text-fg-body active:-scale-0.9"><a href="{% url 'lista_usuarios' %}">Usuarios</a></li>
+      <li class="px-3 text-fg-body transition-all duration-200 hover:text-fg active:text-fg-body active:-scale-0.9"><a href="{% url 'panel_permisos' %}">Permisos</a></li>
+      <li class="px-3 text-fg-body transition-all duration-200 hover:text-fg active:text-fg-body active:-scale-0.9"><a href="{% url 'prueba_tecnica' %}">Pruebas</a></li>
+    </ul>
+  </nav>
 {% endpartialdef %}

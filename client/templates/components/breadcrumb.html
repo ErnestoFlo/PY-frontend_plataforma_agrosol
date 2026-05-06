@@ -1,0 +1,12 @@
+{% load static %}
+{% load partials %}
+
+{% partialdef breadcrumb %}
+
+  <div class="breadcrumb-custom fade-up">
+    <a href="{% url 'lista_usuarios' %}">Usuarios</a>
+    <span class="sep">›</span>
+    <span class="current">Editar — {{ usuario.username }}</span>
+  </div>
+
+{% endpartialdef %}

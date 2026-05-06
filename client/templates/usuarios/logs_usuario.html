@@ -226,41 +226,7 @@
   <footer>Agrosol · Logs de Actividad · Solo Superusuarios</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    let filtroActual = 'todos';
+  <script src="{% static 'js/logs.js' %}"></script>
 
-    function filtrarLogs(tipo) {
-      filtroActual = tipo;
-      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('filtro-activo'));
-      document.getElementById('f-' + tipo)?.classList.add('filtro-activo');
-      aplicarFiltros();
-    }
-
-    function buscarLogs(q) {
-      aplicarFiltros(q.toLowerCase());
-    }
-
-    function aplicarFiltros(q = '') {
-      if (!q) q = document.getElementById('search-logs').value.toLowerCase();
-      let visibles = 0;
-      document.querySelectorAll('.log-row').forEach(row => {
-        const tipoOk  = filtroActual === 'todos' || row.dataset.tipo === filtroActual;
-        const textoOk = !q || row.dataset.texto.includes(q) || row.textContent.toLowerCase().includes(q);
-        if (tipoOk && textoOk) {
-          row.classList.remove('oculto');
-          visibles++;
-        } else {
-          row.classList.add('oculto');
-        }
-      });
-      const info = document.getElementById('logs-info');
-      if (info) {
-        const total = document.querySelectorAll('.log-row').length;
-        info.textContent = visibles === total
-          ? `${total} registro${total !== 1 ? 's' : ''}`
-          : `${visibles} de ${total} registros`;
-      }
-    }
-  </script>
 </body>
 </html>

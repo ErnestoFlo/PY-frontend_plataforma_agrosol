@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // *********************************************************
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
+  // Inicialización de módulos que lo requieran
   if (window.ProveedoresUI) {window.ProveedoresUI.initResponsiveTable('[data-responsive-table="proveedores"]')} // Inicializa tablas responsivas del módulo de proveedores
   if (window.Login) {window.Login.init()} // Inicializa el módulo de login (inactividad)
   flatpickr("#fecha_hora", {
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="handleBack"]').forEach(btn => {btn.addEventListener('click', (e) => handleBack())})
   document.querySelectorAll('[data-action="cerrarSesionAhora"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.cerrarSesionAhora())})
   document.querySelectorAll('[data-action="continuarSesion"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.continuarSesion())})
+
   // **** COMBOBOXES ****
   document.querySelectorAll('[data-action="comboboxToggle"]').forEach(trigger => {trigger.addEventListener('click', (e) => comboboxToggle(e.currentTarget))})
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
@@ -172,15 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateThemeAssets(theme) {
     const btn = document.querySelector('[data-action="toggleTheme"]')
     const main_logo = document.querySelector('#main-logo')
-    if (!btn) return
-    const icon = btn.querySelector('use')
-    const sprite = btn.dataset.sprite;
-    icon.setAttribute(
-      'href',
-      theme === 'dark'
-        ? `${sprite}#icon-sun-regular`
-        : `${sprite}#icon-moon-regular`
-    )
+    if (btn) {
+      const icon = btn.querySelector('use')
+      const sprite = btn.dataset.sprite;
+      icon.setAttribute(
+        'href',
+        theme === 'dark'
+          ? `${sprite}#icon-sun-regular`
+          : `${sprite}#icon-moon-regular`
+      )
+    }
     main_logo.setAttribute(
       'src',
       theme === 'dark'
@@ -560,8 +563,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!popover) return
     popover.setAttribute('data-open', 'false')
   }
-
   window.closePopover = closePopover
+
+  // ==================================
+  // LOGS
+  // ==================================
+
+  // ── Filtros ──
+    function filtrarLogs(tipo) {
+      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('filtro-activo'));
+      document.getElementById('f-' + tipo)?.classList.add('filtro-activo');
+      document.querySelectorAll('.log-row').forEach(row => {
+        row.classList.toggle('hidden', tipo !== 'todos' && row.dataset.tipo !== tipo);
+      });
+    }
 })
 
   // Cerrar el modal cuando hay un clic en el botón cerrar

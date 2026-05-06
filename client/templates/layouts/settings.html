@@ -2,14 +2,53 @@
 {% load static %}
 
 {% block content %}
-
-  {% include 'componentes/navbar.html#navbar_settings' %}
-
-  {% block view %}
-  {% endblock %}
-
-  <footer>Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
-  {% include "partials/modals.html#inactivity_modal" with modal_id='modal-inactivity' title='¿Sigue ahí?' size='modal-md' show_footer=False %}
-  <form id="form-logout" method="POST" action="{% url 'logout' %}" class="hidden">{% csrf_token %}</form>
+  <div class="grid grid-rows-[auto_1fr] grid-cols-1 h-dvh w-dvw p-3 pt-0 pl-4 pb-safe relative overflow-hidden">
+    <header class="card topbar flex justify-between items-center w-full h-auto my-3 px-4 md:px-8 py-2 z-50">
+      <div class="flex-1">
+        <a href="/agrosol/dashboard" class="topbar-logo" aria-label="Ir al inicio">
+          <img src="{% static 'images/logo letras blancas icono color@4x-8.png' %}" alt="Agrosol" id="main-logo" class="h-7 w-auto">
+        </a>
+      </div>
+    {% if request.user.is_authenticated %}
+      {% if request.user.is_superuser %}
+        {% include "../components/navbar.html#navbar_settings" %}
+      {% endif %}
+      <div class="flex-1 flex gap-0 items-center justify-end">
+        <a href="{% url 'perfil' %}" class="topbar-avatar-btn rounded-full p-1">
+          {% if request.user.profile.avatar.name %}
+            {% include "components/avatars.html#avatar" with size='w-8 h-8' user_img=request.user.profile.avatar.url %}
+          {% else %}
+            {% with initials=request.user.first_name|first|upper|add:request.user.last_name|first|upper %}
+              {% include "components/avatars.html#avatar" with size='w-8 h-8' initials=initials %}
+            {% endwith %}
+          {% endif %}
+          <p class="text-fg-body">@{{ request.user.username }}</p>
+        </a>
+        <div class="hidden md:block">{% include 'components/buttons.html#icon_button' with func_type='button' type='btn-icon-ghost-neutral' size='4' icon_name='icon-moon-regular' action='toggleTheme' %}</div>
+        <div class="md:hidden relative">
+          {% include 'components/buttons.html#icon_button' with func_type='button' x_params='p-1 relative' type='icon-ghost-neutral' icon_name='icon-elipsis-vertical-fill' size='4' action='togglePopover' target='nav-menu' attrs="aria-haspopup='true' aria-expanded='false'" %}
+          {% include 'components/popovers.html#nav_menu' %}
+        </div>
+        <form method="POST" action="{% url 'logout' %}" class="hidden md:block">
+            {% csrf_token %}
+            {% include 'components/buttons.html#icon_button' with funct_type='submit' type='btn-icon-ghost-danger' icon_name='icon-logout-fill' size='4' %}
+        </form>
+      </div>
+    {% endif %}
+    </header>
+    <main class="overflow-y-auto p-2 pb-20 md:pb-0 w-full h-full flex justify-center">
+      {% block view %}
+      {% endblock %}
+    </main>
+    {% include "partials/modals.html#inactivity_modal" with modal_id='modal-inactivity' title='¿Sigue ahí?' size='modal-md' show_footer=False %}
+    <form id="form-logout" method="POST" action="{% url 'logout' %}" class="hidden">{% csrf_token %}</form>
+  </div>
+  <div class="fixed h-dvh w-dvw -z-50">
+    <div class="w-full h-full relative -z-50">
+      <div class="bg-primary-theme/10 w-1/2 h-1/2 absolute -top-1/6 -left-1/3 blur-3xl"></div>
+      <div class="bg-accent-theme/10 w-1/2 h-1/2 absolute -top-1/6 -right-1/3 blur-3xl"></div>
+      <div class="bg-primary-theme/10 w-1/2 h-1/4 absolute -bottom-1/6 left-1/2 -translate-x-1/2 blur-3xl"></div>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

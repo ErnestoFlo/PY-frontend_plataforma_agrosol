@@ -614,30 +614,30 @@ class ActivityLog(models.Model):
     @property
     def icono(self):
         iconos = {
-            'login':           'bi-box-arrow-in-right',
-            'logout':          'bi-box-arrow-right',
-            'modulo':          'bi-collection',
-            'elemento':        'bi-cursor-fill',
-            'crear':           'bi-plus-circle-fill',
-            'editar':          'bi-pencil-fill',
-            'eliminar':        'bi-trash3-fill',
-            'buscar':          'bi-search',
-            'acceso_denegado': 'bi-shield-x',
+            'login':           'icon-login-regular',
+            'logout':          'icon-logout-fill',
+            'modulo':          'icon-module-regular',
+            'elemento':        'icon-cursor-regular',
+            'crear':           'icon-plus-circle-regular',
+            'editar':          'icon-pencil-regular',
+            'eliminar':        'icon-trash-fill',
+            'buscar':          'icon-magnifyng-glass-fill',
+            'acceso_denegado': 'icon-denied-access-regular',
         }
         return iconos.get(self.tipo_evento, 'bi-circle')
  
     @property
     def color(self):
         colores = {
-            'login':           'verde',
-            'logout':          'rojo',
-            'modulo':          'azul',
-            'elemento':        'naranja',
-            'crear':           'verde',
-            'editar':          'azul',
-            'eliminar':        'rojo',
-            'buscar':          'muted',
-            'acceso_denegado': 'rojo',
+            'login':           'green',
+            'logout':          'danger',
+            'modulo':          'cyan',
+            'elemento':        'orange',
+            'crear':           'green',
+            'editar':          'blue',
+            'eliminar':        'danger',
+            'buscar':          'neutral',
+            'acceso_denegado': 'danger',
         }
         return colores.get(self.tipo_evento, 'muted')
     

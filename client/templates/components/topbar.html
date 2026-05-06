@@ -4,14 +4,14 @@
 {% partialdef topbar %}
 <header class="card topbar h-full p-1 px-3">
   <!-- Logo -->
-  <a href="/agrosol/design/dashboard" class="topbar-logo" aria-label="Ir al inicio">
+  <a href="/agrosol/dashboard" class="topbar-logo" aria-label="Ir al inicio">
     <img src="{% static 'images/logo letras blancas icono color@4x-8.png' %}" alt="Agrosol" id="main-logo" class="h-7 w-auto">
   </a>
 
   <div class="nav-section flex align-center gap-2  h-8">
     {% include 'components/buttons.html#icon_button' with x_params='hidden md:block' action='handleBack' func_type='button' type='btn-icon-ghost-neutral' size='4' icon_name='icon-arrow-left-fill' %}
     <!-- Búsqueda -->
-    {% include 'components/inputs.html#input_search' with field=search_form.query x_params='max-w-80 h-full bg-surface-2 hover:bg-surface-3 border-none hidden md:flex' type='search' id='general_search' icon='icon-magnifyng-glass-fill' %}
+    {% include 'components/inputs.html#input_search' with field=search_form.query x_params='max-w-80 h-full bg-surface-2 hover:bg-surface-3 border-none hidden md:flex' type='search' id='general_search' icon='icon-magnifyng-glass-fill' placeholder='Búsqueda' %}
   </div>
 
   <!-- Acciones -->
@@ -29,12 +29,18 @@
         data-target="user-menu"
         aria-haspopup="true"
         aria-expanded="false">
-        {% include "components/avatars.html#avatar" with size='8' initials='A' user_img='cat_avatar.jpg' %}
+        {% if request.user.profile.avatar.name %}
+          {% include "components/avatars.html#avatar" with size='w-8 h-8' user_img=request.user.profile.avatar.url %}
+        {% else %}
+          {% with initials=request.user.first_name|first|upper|add:request.user.last_name|first|upper %}
+            {% include "components/avatars.html#avatar" with size='w-8 h-8' initials=initials %}
+          {% endwith %}
+        {% endif %}
         <svg class="w-3 h-3 text-fg-muted" aria-hidden="true">
           <use href="{% static 'sprite.svg' %}#icon-chevron-down-fill"/>
         </svg>
       </button>
-      {% include "components/popovers.html#user_menu" with popover_id='user-menu' username='SuperGato3000' role='Administrador' initials='A'  user_img='cat_avatar.jpg' %}
+      {% include "components/popovers.html#user_menu" with popover_id='user-menu' %}
     </div>
   </nav>
 

@@ -2,67 +2,48 @@
 {% load static %}
 
 {% block view %}
-  <main class="container py-4" style="max-width:1200px;">
-
-    <!-- ══ HEADER ══ -->
-    <div class="page-header fade-up">
-      <p class="page-subtitle"><i class="bi bi-cpu me-1"></i>Módulo de Prueba Técnica</p>
-      <h1 class="page-title">Biblioteca de Componentes</h1>
-      <p style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);margin-top:.5rem;">
-        Accesible para todos los usuarios · Prueba visual de acciones, componentes y datos
-      </p>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-        SECCIÓN 1 — ACCIONES
-    ══════════════════════════════════════════ -->
-    <p class="section-title fade-up d1">
-      <span class="cat-label cat-accion"><i class="bi bi-lightning-fill"></i>Acciones</span>
-    </p>
+  <div class="flex flex-col gap-3 w-full h-full py-1 max-w-6xl">
+    {% if request.user.is_authenticated %}
+    <!-- HERO -->
+    <p class="body text-muted">Módulo de Prueba Técnica</p>
+    <h1 class="heading-1">Biblioteca de Componentes</h1>
+    
+    <!-- ACCIONES -->
+    <p class="heading-2 mb-4">Acciones</p>
 
     {% if not permisos or permisos.seccion_acciones.ver %}
-    <div class="panel-card accion-card fade-up d1" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones"{% if permisos and not permisos.seccion_acciones.usar %} style="pointer-events:none;opacity:.5;"{% endif %}>
-      <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accion-color);margin-bottom:1.25rem;">
+    <div class="card accion-card {% if permisos and not permisos.seccion_acciones.usar %}pointer-events-none opacity-50{% endif %}" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones">
+      <p class="mono text-accent-500 mb-3">
         Botones de CRUD + acciones auxiliares — disparan peticiones al servidor
       </p>
 
       <!-- CRUD principal -->
       <div class="mb-4">
-        <p class="field-label" style="margin-bottom:.75rem;">CRUD Principal</p>
-        <div class="d-flex gap-2 flex-wrap">
+        <p class="mono uppercase mb-3">CRUD Principal</p>
+        <div class="flex gap-3 flex-wrap">
           {% if not permisos or permisos.btn_crear.ver %}
-          <button class="btn-crear{% if permisos and not permisos.btn_crear.usar %} perm-disabled{% endif %}" data-permiso="btn_crear" data-tipo="accion" data-label="Botón Crear" {% if not permisos or permisos.btn_crear.usar %}onclick="accionToast('Crear', 'success')"{% endif %}>
-            <i class="bi bi-plus-lg"></i>Crear
-          </button>
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-primary' text='Crear' icon_name='icon-plus-fill' icon_size='w-4 h-4' on_click="AlertManager.success('Accion ejecutada: Crear')"  attrs="data-permiso='btn_crear' data-label='Botón Crear'" is_disabled=True %}
           {% endif %}
           {% if not permisos or permisos.btn_editar.ver %}
-          <button class="btn-editar-a{% if permisos and not permisos.btn_editar.usar %} perm-disabled{% endif %}" data-permiso="btn_editar" data-tipo="accion" data-label="Botón Editar" {% if not permisos or permisos.btn_editar.usar %}onclick="accionToast('Editar', 'info')"{% endif %}>
-            <i class="bi bi-pencil"></i>Editar
-          </button>
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-secondary' text='Editar' icon_name='icon-pencil-regular' icon_size='w-4 h-4' on_click="AlertManager.info('Accion ejecutada: Editar')"  attrs="data-permiso='btn_editar' data-tipo='accion' data-label='Botón Editar'" %}
           {% endif %}
           {% if not permisos or permisos.btn_eliminar.ver %}
-          <button class="btn-eliminar-a{% if permisos and not permisos.btn_eliminar.usar %} perm-disabled{% endif %}" data-permiso="btn_eliminar" data-tipo="accion" data-label="Botón Eliminar" {% if not permisos or permisos.btn_eliminar.usar %}onclick="accionToast('Eliminar', 'error')"{% endif %}>
-            <i class="bi bi-trash3"></i>Eliminar
-          </button>
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-danger' text='Eliminar' icon_name='icon-trash-fill' icon_size='w-4 h-4' on_click="AlertManager.danger('Accion ejecutada: Eliminar')"  attrs="data-permiso='btn_eliminar' data-tipo='accion' data-label='Botón Eliminar'" %}
           {% endif %}
           {% if not permisos or permisos.btn_ver.ver %}
-          <button class="btn-ver-a{% if permisos and not permisos.btn_ver.usar %} perm-disabled{% endif %}" data-permiso="btn_ver" data-tipo="accion" data-label="Botón Ver" {% if not permisos or permisos.btn_ver.usar %}onclick="accionToast('Ver detalle', 'warning')"{% endif %}>
-            <i class="bi bi-eye"></i>Ver
-          </button>
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-secondary' text='Ver' icon_name='icon-open-eye-regular' icon_size='w-4 h-4' on_click="AlertManager.info('Accion ejecutada: Ver')"  attrs="data-permiso='btn_ver' data-tipo='accion' data-label='Botón Ver'" %}
           {% endif %}
           {% if not permisos or permisos.btn_cancelar.ver %}
-          <button class="btn-cancelar-a{% if permisos and not permisos.btn_cancelar.usar %} perm-disabled{% endif %}" data-permiso="btn_cancelar" data-tipo="accion" data-label="Botón Cancelar" {% if not permisos or permisos.btn_cancelar.usar %}onclick="accionToast('Cancelado', 'info')"{% endif %}>
-            <i class="bi bi-x-lg"></i>Cancelar
-          </button>
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-ghost-neutral' text='Cancelar' icon_name='icon-xmark-fill' icon_size='w-4 h-4' on_click="AlertManager.info('Accion ejecutada: Cancelar')"  attrs="data-permiso='btn_cancelar' data-tipo='accion' data-label='Botón Cancelar'" %}
           {% endif %}
         </div>
       </div>
 
       <!-- Icon buttons inline -->
       <div>
-        <p class="field-label" style="margin-bottom:.75rem;">Icon Buttons (acciones inline en tabla)</p>
+        <p class="mono uppercase mb-3">Icon Buttons (acciones inline en tabla)</p>
         {% if not permisos or permisos.btn_iconos.ver %}
-        <div class="d-flex gap-2 align-items-center flex-wrap{% if permisos and not permisos.btn_iconos.usar %} perm-card-disabled{% endif %}" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline">
+        <div class="flex gap-2 items-center flex-wrap{% if permisos and not permisos.btn_iconos.usar %} perm-card-disabled{% endif %}" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline">
           <button class="icon-btn edit" title="Editar" onclick="accionToast('Editar registro', 'info')">
             <i class="bi bi-pencil"></i>
           </button>
@@ -422,16 +403,13 @@
       </div>
     </div>
     {% endif %}
-
-  </main>
-
-  <!-- TOAST -->
-  <div id="toast" class="toast-custom">
-    <i class="toast-icon bi" id="toast-icon"></i>
-    <span id="toast-msg"></span>
+    <footer class="flex w-full justify-center h-auto text-fg-muted text-sm p-0 m-0">Agrosol · Prueba Técnica de Componentes · {{ request.user.username }}</footer>
+    {% endif %}
   </div>
 
-  <footer>Agrosol · Prueba Técnica de Componentes · Acceso general</footer>
+
+
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script>

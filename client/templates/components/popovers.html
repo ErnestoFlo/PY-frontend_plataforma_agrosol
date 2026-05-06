@@ -9,22 +9,28 @@
     aria-label="Menú de usuario">
     <!-- Header con avatar, nombre y rol -->
     <div class="popover-header">
-      {% include "components/avatars.html#avatar" with size='12' initials=initials user_img=user_img %}
-      <span class="popover-username">{{ username|default:'UserName' }}</span>
-      <span class="popover-role">{{ role|default:'User Roll' }}</span>
+      {% if request.user.profile.avatar.name %}
+        {% include "components/avatars.html#avatar" with size='w-18 h-18' user_img=request.user.profile.avatar.url %}
+      {% else %}
+        {% with initials=request.user.first_name|first|upper|add:request.user.last_name|first|upper %}
+          {% include "components/avatars.html#avatar" with size='w-18 h-18' initials=initials %}
+        {% endwith %}
+      {% endif %}
+      <span class="popover-username">{{ request.user.get_full_name|default:request.user.username }}</span>
+      <span class="popover-role">@{{ request.user.username }}</span>
     </div>
 
     <!-- Opciones -->
     <nav role="none">
       <a href="{% url 'perfil' %}">
-        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-settings-fill' text='Configuración' %}
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-settings-fill' text='Configuración' %}
       </a>
 
-      {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-moon-regular' action='toggleTheme' text='Cambiar Tema' %}
-
-      <a href="{% url 'landing' %}">
-        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu-danger' role='menuitem' icon_size='4' icon_name='icon-logout-fill' text='Cerrar Sesión' %}
-      </a>
+      {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-moon-regular' action='toggleTheme' text='Cambiar Tema' %}
+      <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        {% include 'components/buttons.html#icon_text_button' with func_type='submit' type='btn-icon-text-menu-danger' role='menuitem' icon_size='w-4 h-4' icon_name='icon-logout-fill' text='Cerrar Sesión' %}
+      </form>
     </nav>
   </div>
 {% endpartialdef %}
@@ -38,6 +44,33 @@
       <nav role="none">
         {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='4' icon_name='icon-pencil-fill' text='Editar'  action='openModal' target='modal-edit' hx_get=edit_url hx_target="#modal-edit-content" hx_swap="innerHTML" %}
         {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu-danger' role='menuitem' icon_size='4' icon_name='icon-trash-fill' text='Eliminar'  action='openModal' target='modal-delete' hx_get=delete_url hx_target="#modal-delete-content" hx_swap="innerHTML" %}
+      </nav>
+  </div>
+{% endpartialdef %}
+
+{% partialdef nav_menu %}
+  <div id="nav-menu"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {% if request.user.is_superuser %}
+          <a href="{% url 'lista_usuarios' %}">
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-users-group-regular' text='Usuarios' %}
+          </a>
+          <a href="{% url 'panel_permisos' %}">
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-shield-regular' text='Permisos' %}
+          </a>
+          <a href="{% url 'prueba_tecnica' %}">
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-module-regular' text='Pruebas' %}
+          </a>
+        {% endif %}
+        {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-menu' role='menuitem' icon_size='w-4 h-4' icon_name='icon-moon-regular' action='toggleTheme' text='Cambiar Tema' %}
+        <form method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          {% include 'components/buttons.html#icon_text_button' with func_type='submit' type='btn-icon-text-menu-danger' role='menuitem' icon_size='w-4 h-4' icon_name='icon-logout-fill' text='Cerrar Sesión' %}
+        </form>
       </nav>
   </div>
 {% endpartialdef %}

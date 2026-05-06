@@ -2,18 +2,23 @@
 {% load partials %}
   
 {% partialdef button %}
-  <button type="{{ func_type }}" class="btn {{ type }} {{ x_params }}"
+  <button type="{{ func_type }}" class="btn body {{ type }} {{ x_params }}"
+  data-tipo='accion'
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
   {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  {% if on_click %}onclick="{{ on_click }}"{% endif %}
+  {% if attrs %}{{ attrs|safe }}{% endif %}
   >{{ text }}</button>
 {% endpartialdef %}
 
 {% partialdef icon_button %}
-  <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}"
+  <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}"
+  data-tipo='accion'
+  data-sprite="{% static 'sprite.svg' %}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -30,7 +35,9 @@
 {% endpartialdef %}
 
 {% partialdef icon_text_button %}
-  <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}"
+  <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}"
+  data-tipo='accion'
+  data-sprite="{% static 'sprite.svg' %}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -38,8 +45,10 @@
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
-  {% if attrs %}{{ attrs|safe }}{% endif %}>
-    <svg class="w-{{ icon_size }} h-{{ icon_size }} shrink-0" aria-hidden="true">
+  {% if on_click %}onclick="{{ on_click }}"{% endif %}
+  {% if attrs %}{{ attrs|safe }}{% endif %}
+  {% if is_disabled %}disabled{% endif %}>
+    <svg class="{{ icon_size }} shrink-0" aria-hidden="true">
       <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
     </svg>
       {{ text }}
@@ -47,13 +56,15 @@
 {% endpartialdef %}
 
 {% partialdef input_icon_button %}
-  <button type="{{ func_type }}" class="{{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
+  <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}" data-sprite="{% static 'sprite.svg' %}" 
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
   {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  {% if on_click %}onclick="{{ on_click }}"{% endif %}
+  {% if attrs %}{{ attrs|safe }}{% endif %}
   >
     <svg class="w-5 h-5 {{ x_icon_params }}">
       <use href="{% static 'sprite.svg' %}#{{ icon_name }}"/>
@@ -64,6 +75,7 @@
 {% partialdef toggle_button %}
   <button type="button"
   class="toggle-btn {{ x_params }}"
+  data-tipo='accion'
   data-action="toggle"
   data-checked="{{ checked|default:'false' }}"
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -72,6 +84,7 @@
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  {% if attrs %}{{ attrs|safe }}{% endif %}
   >
     <span class="toggle-thumb"></span>
   </button>

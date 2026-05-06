@@ -17,7 +17,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ########## VISTA DE BIENVENIDA #########
 def landing_login(request):
     login_form = LoginForm()
-    return render(request, "layouts/landing_login.html", {
+    return render(request, "registration/login.html", {
         "pagename": "Bienvenida",
         'menu_sidebar_items': build_menu_sidebar_items('Bienvenida'),
         'menu_mobilebar_items': build_menu_mobilebar_items('Bienvenida'),
@@ -25,6 +25,7 @@ def landing_login(request):
     })
 
 ########## VISTAS POR DISEÑO ###########
+@login_required
 def view1(request):
     search_form = SearchForm()
     return render(request, "design/view1.html", {
@@ -35,6 +36,7 @@ def view1(request):
         "search_form": search_form
     })
 
+@login_required
 def tests_components(request):
     page = int(request.GET.get('page', 1))
     per_page = 6
@@ -595,18 +597,19 @@ def editar_usuario(request, id):
         return redirect('lista_usuarios')
 
     if request.method == "POST":
+        # Actualizar perfil PRIMERO (antes de guardar el usuario)
+        usuario.profile.cargo = request.POST.get('cargo', '')
+        usuario.profile.area = request.POST.get('area', '')
+        usuario.profile.telefono = request.POST.get('telefono', '')
+        usuario.profile.save()
+        
+        # Luego actualizar el usuario
         usuario.first_name = request.POST.get('first_name', '')
         usuario.last_name  = request.POST.get('last_name', '')
         usuario.email = request.POST.get('email', '')
         usuario.is_staff = 'is_staff'      in request.POST
         usuario.is_superuser = 'is_superuser'  in request.POST
         usuario.save()
-
-        # Datos del perfil extendido
-        usuario.profile.cargo = request.POST.get('cargo', '')
-        usuario.profile.area = request.POST.get('area', '')
-        usuario.profile.telefono = request.POST.get('telefono', '')
-        usuario.profile.save()
 
         return redirect('lista_usuarios')
 
@@ -1131,10 +1134,7 @@ def registro_elemento(request):
 @login_required
 def perfil(request):
     if request.method == "POST":
-        request.user.first_name = request.POST.get('first_name', '')
-        request.user.last_name  = request.POST.get('last_name', '')
-        request.user.email      = request.POST.get('email', '')
-        request.user.save()
+        # Actualizar perfil PRIMERO (antes de guardar el usuario)
         p = request.user.profile
         p.cargo    = request.POST.get('cargo', '')
         p.area     = request.POST.get('area', '')
@@ -1142,6 +1142,12 @@ def perfil(request):
         if 'avatar' in request.FILES:
             p.avatar = request.FILES['avatar']
         p.save()
+        
+        # Luego actualizar el usuario
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name  = request.POST.get('last_name', '')
+        request.user.email      = request.POST.get('email', '')
+        request.user.save()
         return redirect('perfil')
  
     from .models import ActivityLog

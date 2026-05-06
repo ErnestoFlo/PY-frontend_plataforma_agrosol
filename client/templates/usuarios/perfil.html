@@ -2,285 +2,294 @@
 {% load static %}
 
 {% block view %}
-  <main class="container py-5" style="max-width:960px;">
+  <div class="flex flex-col gap-3 lg:grid lg:grid-rows-1 lg:grid-cols-[1fr_auto] w-full h-full py-1">
     {% if request.user.is_authenticated %}
 
-    <!-- HERO -->
-    <div class="profile-hero fade-up">
-      <div class="d-flex align-items-center gap-4 flex-wrap">
-        <div class="avatar-wrapper">
-          <div class="avatar-ring" onclick="new bootstrap.Modal(document.getElementById('modal-editar')).show()">
-            {% if request.user.profile.avatar.name %}
-              <img src="{{ request.user.profile.avatar.url }}" alt="Avatar de {{ request.user.username }}">
-            {% else %}
-              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-            {% endif %}
-          </div>
-          <div class="avatar-edit-btn" data-bs-toggle="modal" data-bs-target="#modal-editar">
-            <i class="bi bi-pencil-fill"></i>
-          </div>
-        </div>
-        <div class="flex-grow-1">
-          <h1 class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</h1>
-          <p class="profile-username mb-1">@{{ request.user.username }}</p>
-          {% if request.user.profile.cargo %}
-          <p style="color:var(--muted);font-size:.85rem;margin-bottom:.6rem;">
-            <i class="bi bi-briefcase me-1"></i>{{ request.user.profile.cargo }}
-            {% if request.user.profile.area %}· <span style="color:var(--acento);">{{ request.user.profile.area }}</span>{% endif %}
-          </p>
-          {% endif %}
-          <div class="d-flex gap-2 flex-wrap">
-            {% if request.user.is_superuser %}<span class="role-badge badge-superuser"><i class="bi bi-shield-fill me-1"></i>Super Admin</span>
-            {% elif request.user.is_staff %}<span class="role-badge badge-staff"><i class="bi bi-star-fill me-1"></i>Staff</span>
-            {% else %}<span class="role-badge badge-user"><i class="bi bi-person-fill me-1"></i>Usuario</span>{% endif %}
-            {% if request.user.is_active %}<span class="role-badge badge-active"><i class="bi bi-check-circle-fill me-1"></i>Activo</span>
-            {% else %}<span class="role-badge badge-inactive"><i class="bi bi-x-circle-fill me-1"></i>Inactivo</span>{% endif %}
-          </div>
-        </div>
-        <div class="ms-auto">
-          <button class="btn-save" data-bs-toggle="modal" data-bs-target="#modal-editar">
-            <i class="bi bi-pencil-square me-1"></i>Editar Perfil
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider">
-
-    <!-- INFORMACIÓN PERSONAL -->
-    <p class="section-title fade-up delay-1">Información Personal</p>
-    <div class="row g-3 mb-4 fade-up delay-1">
-      <div class="col-md-4 col-sm-6">
-        <div class="info-card">
-          <div class="card-icon"><i class="bi bi-person"></i></div>
-          <p class="card-label">Username</p>
-          <p class="card-value" style="font-family:'DM Mono',monospace;">{{ request.user.username }}</p>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6">
-        <div class="info-card">
-          <div class="card-icon"><i class="bi bi-type"></i></div>
-          <p class="card-label">Nombre</p>
-          <p class="card-value">{{ request.user.first_name|default:"—" }}</p>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6">
-        <div class="info-card">
-          <div class="card-icon"><i class="bi bi-type-bold"></i></div>
-          <p class="card-label">Apellido</p>
-          <p class="card-value">{{ request.user.last_name|default:"—" }}</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-sm-6">
-        <div class="info-card">
-          <div class="card-icon"><i class="bi bi-envelope"></i></div>
-          <p class="card-label">Email</p>
-          <p class="card-value">{{ request.user.email|default:"Sin email registrado" }}</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-sm-6">
-        <div class="info-card">
-          <div class="card-icon"><i class="bi bi-person-badge"></i></div>
-          <p class="card-label">Nombre Completo</p>
-          <p class="card-value">{{ request.user.get_full_name|default:"Sin nombre completo" }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- INFORMACIÓN DEL PERFIL -->
-    <p class="section-title fade-up delay-2">Información del Perfil</p>
-    <div class="row g-3 mb-4 fade-up delay-2">
-      <div class="col-md-6">
-        <div class="info-card">
-          <div class="profile-extra-field">
-            <i class="bi bi-briefcase profile-extra-icon"></i>
-            <span class="profile-extra-label">Cargo</span>
-            <span class="profile-extra-value">{{ request.user.profile.cargo|default:"—" }}</span>
-          </div>
-          <div class="profile-extra-field">
-            <i class="bi bi-building profile-extra-icon"></i>
-            <span class="profile-extra-label">Área</span>
-            <span class="profile-extra-value">{{ request.user.profile.area|default:"—" }}</span>
-          </div>
-          <div class="profile-extra-field">
-            <i class="bi bi-telephone profile-extra-icon"></i>
-            <span class="profile-extra-label">Teléfono</span>
-            <span class="profile-extra-value">{{ request.user.profile.telefono|default:"—" }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="info-card d-flex flex-column align-items-center justify-content-center text-center" style="gap:1rem;">
+    <div class="h-auto lg:overflow-y-auto lg:mr-1 lg:px-2" style="scrollbar-width: none;">
+      <!-- HERO -->
+      <div class="card mb-5 md:py-8">
+        <div class="flex items-center gap-4 flex-wrap">
           {% if request.user.profile.avatar.name %}
-            <img src="{{ request.user.profile.avatar.url }}" alt="Avatar"
-                 style="width:80px;height:80px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px var(--fondo),0 0 0 5px var(--verde-dim);">
-            <p class="card-label" style="margin:0;">Foto de perfil actual</p>
+            {% include "components/avatars.html#avatar" with size='w-20 h-20' user_img=request.user.profile.avatar.url action='openModal' target='modal-edit' hx_get=edit_url hx_target='#modal-edit-content' hx_swap='innerHTML' action_icon='icon-pencil-fill' %}
           {% else %}
-            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#16a34a);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#0a0f0a;">
-              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-            </div>
-            <p class="card-label" style="margin:0;">Sin foto de perfil</p>
+            {% with initials=request.user.first_name|first|upper|add:request.user.last_name|first|upper %}
+              {% include "components/avatars.html#avatar" with size='w-20 h-20' action='openModal' target='modal-edit' hx_get=edit_url hx_target='#modal-edit-content' hx_swap='innerHTML' initials=initials action_icon='icon-pencil-fill' %}
+            {% endwith %}
           {% endif %}
-          <button class="btn-cancel" style="font-size:.75rem;" data-bs-toggle="modal" data-bs-target="#modal-editar">
-            <i class="bi bi-camera me-1"></i>Cambiar foto
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTIVIDAD (fechas) -->
-    <p class="section-title fade-up delay-3">Actividad</p>
-    <div class="row g-3 mb-4 fade-up delay-3">
-      <div class="col-md-6">
-        <div class="date-card">
-          <i class="bi bi-calendar-plus date-icon"></i>
-          <div>
-            <p class="card-label">Miembro desde</p>
-            <p class="card-value">{{ request.user.date_joined|date:"d \d\e F \d\e Y" }}</p>
-            <p class="card-label mt-1" style="margin-bottom:0;">{{ request.user.date_joined|date:"H:i" }} hs</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="date-card">
-          <i class="bi bi-clock-history date-icon"></i>
-          <div>
-            <p class="card-label">Último acceso</p>
-            <p class="card-value">{{ request.user.last_login|date:"d \d\e F \d\e Y"|default:"Nunca" }}</p>
-            <p class="card-label mt-1" style="margin-bottom:0;">{{ request.user.last_login|date:"H:i" }} hs</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ESTADO Y ROLES -->
-    <p class="section-title fade-up delay-3">Estado y Roles</p>
-    <div class="row g-3 mb-4 fade-up delay-3">
-      <div class="col-md-3 col-6">
-        <div class="info-card text-center">
-          <div style="font-size:1.5rem;margin-bottom:.5rem;">
-            {% if request.user.is_authenticated %}<i class="bi bi-check-circle-fill" style="color:var(--verde);"></i>
-            {% else %}<i class="bi bi-x-circle-fill" style="color:var(--muted);"></i>{% endif %}
-          </div>
-          <p class="card-label">is_authenticated</p>
-          <p class="card-value" style="font-family:'DM Mono',monospace;font-size:.85rem;">
-            {% if request.user.is_authenticated %}True{% else %}False{% endif %}
-          </p>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="info-card text-center">
-          <div style="font-size:1.5rem;margin-bottom:.5rem;">
-            {% if request.user.is_active %}<i class="bi bi-check-circle-fill" style="color:var(--verde);"></i>
-            {% else %}<i class="bi bi-x-circle-fill" style="color:var(--muted);"></i>{% endif %}
-          </div>
-          <p class="card-label">is_active</p>
-          <p class="card-value" style="font-family:'DM Mono',monospace;font-size:.85rem;">
-            {% if request.user.is_active %}True{% else %}False{% endif %}
-          </p>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="info-card text-center">
-          <div style="font-size:1.5rem;margin-bottom:.5rem;">
-            {% if request.user.is_staff %}<i class="bi bi-check-circle-fill" style="color:var(--verde);"></i>
-            {% else %}<i class="bi bi-x-circle-fill" style="color:var(--muted);"></i>{% endif %}
-          </div>
-          <p class="card-label">is_staff</p>
-          <p class="card-value" style="font-family:'DM Mono',monospace;font-size:.85rem;">
-            {% if request.user.is_staff %}True{% else %}False{% endif %}
-          </p>
-        </div>
-      </div>
-      <div class="col-md-3 col-6">
-        <div class="info-card text-center">
-          <div style="font-size:1.5rem;margin-bottom:.5rem;">
-            {% if request.user.is_superuser %}<i class="bi bi-check-circle-fill" style="color:var(--verde);"></i>
-            {% else %}<i class="bi bi-x-circle-fill" style="color:var(--muted);"></i>{% endif %}
-          </div>
-          <p class="card-label">is_superuser</p>
-          <p class="card-value" style="font-family:'DM Mono',monospace;font-size:.85rem;">
-            {% if request.user.is_superuser %}True{% else %}False{% endif %}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- GRUPOS -->
-    <p class="section-title fade-up delay-4">Grupos / Roles Asignados</p>
-    <div class="info-card mb-4 fade-up delay-4">
-      {% if request.user.groups.all %}
-        {% for group in request.user.groups.all %}
-          <span class="group-pill"><i class="bi bi-people-fill"></i>{{ group.name }}</span>
-        {% endfor %}
-      {% else %}
-        <p style="color:var(--muted);font-size:.9rem;margin:0;">
-          <i class="bi bi-info-circle me-2"></i>Este usuario no pertenece a ningún grupo todavía.
-        </p>
-      {% endif %}
-    </div>
-
-    <!-- MI ACTIVIDAD RECIENTE -->
-    <p class="section-title fade-up delay-5">
-      <i class="bi bi-activity me-2" style="color:var(--verde);"></i>Mi Actividad Reciente
-    </p>
-    <div class="fade-up delay-5" style="margin-bottom:2rem;">
-      {% if logs %}
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;">
-        <button onclick="filtrarLogs('todos')"    id="f-todos"    class="filtro-btn filtro-activo">Todos</button>
-        <button onclick="filtrarLogs('login')"    id="f-login"    class="filtro-btn">Login</button>
-        <button onclick="filtrarLogs('logout')"   id="f-logout"   class="filtro-btn">Logout</button>
-        <button onclick="filtrarLogs('modulo')"   id="f-modulo"   class="filtro-btn">Módulos</button>
-        <button onclick="filtrarLogs('elemento')" id="f-elemento" class="filtro-btn">Elementos</button>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--borde);border-radius:14px;overflow:hidden;">
-        {% for log in logs %}
-        <div class="log-row" data-tipo="{{ log.tipo_evento }}">
-          <div class="log-icon log-icon-{{ log.color }}">
-            <i class="bi {{ log.icono }}"></i>
-          </div>
-          <div style="flex:1;min-width:0;">
-            <p style="font-weight:600;font-size:.88rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              {{ log.descripcion|default:log.tipo_evento }}
+          <div class="flex-grow-1">
+            <h1 class="heading-1">{{ request.user.get_full_name|default:request.user.username }}</h1>
+            <p class="body text-primary-theme mb-1">@{{ request.user.username }}</p>
+            {% if request.user.profile.cargo %}
+            <p style="color:var(--muted);font-size:.85rem;margin-bottom:.6rem;">
+              <i class="bi bi-briefcase me-1"></i>{{ request.user.profile.cargo }}
+              {% if request.user.profile.area %}· <span style="color:var(--acento);">{{ request.user.profile.area }}</span>{% endif %}
             </p>
-            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
-              {% if log.modulo %}{{ log.modulo.nombre }} · {% endif %}
-              {{ log.ip|default:"IP desconocida" }} · {{ log.dispositivo|default:"" }}
-            </p>
+            {% endif %}
+            <div class="d-flex gap-2 flex-wrap">
+              {% if request.user.is_superuser %}
+                {% include 'components/badges.html#badge_icon' with variant='danger' icon='icon-shield-regular' text='Super Admin' %}
+              {% elif request.user.is_staff %}
+                {% include 'components/badges.html#badge_icon' with variant='accent' icon='icon-star-sheriff-regular' text='Staff' %}
+              {% else %}
+                {% include 'components/badges.html#badge_icon' with variant='primary' icon='icon-user-regular' text='Usuario' %}
+              {% endif %}
+              {% if request.user.is_active %}
+                {% include 'components/badges.html#badge_icon' with variant='success' icon='icon-check-circle-fill' text='Activo' %}
+              {% else %}
+                {% include 'components/badges.html#badge_icon' with variant='danger' icon='icon-xmark-circle-fill' text='Inactivo' %}
+              {% endif %}
+            </div>
           </div>
-          <div style="text-align:right;flex-shrink:0;">
-            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin:0;">{{ log.fecha|date:"d/m/Y" }}</p>
-            <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">{{ log.fecha|date:"H:i" }}</p>
+          <div class="w-full flex justify-center md:w-auto md:ms-auto">
+            {% include 'components/buttons.html#button' with func_type='button' type='btn-secondary' x_params='btn' text='Editar Perfil' action='openModal' target='modal-edit' hx_get=edit_url hx_target='#modal-edit-content' hx_swap='innerHTML' %}
           </div>
         </div>
-        {% endfor %}
       </div>
-      <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);text-align:right;margin-top:.5rem;">
-        Mostrando últimos {{ logs|length }} eventos
-      </p>
+
+      <!-- INFORMACIÓN PERSONAL -->
+      <p class="heading-2 mb-4">Información Personal</p>
+      <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-4 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{% static 'sprite.svg' %}#icon-user-regular" />
+            </svg>
+            <p class="mono">Username</p>
+            <p class="body-lg">@{{ request.user.username }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-4 col-span-6">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{% static 'sprite.svg' %}#icon-letters-regular" />
+            </svg>
+            <p class="mono">Nombre</p>
+            <p class="body-lg">{{ request.user.first_name|default:"—" }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-4 col-span-6">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{% static 'sprite.svg' %}#icon-letter-b-regular" />
+            </svg>
+            <p class="mono">Apellido</p>
+            <p class="body-lg">{{ request.user.last_name|default:"—" }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-6 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{% static 'sprite.svg' %}#icon-mail-regular" />
+            </svg>
+            <p class="mono">Email</p>
+            <p class="body-lg">{{ request.user.email|default:"Sin email registrado" }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-6 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{% static 'sprite.svg' %}#icon-person-badge-regular" />
+            </svg>
+            <p class="mono">Nombre Completo</p>
+            <p class="body-lg">{{ request.user.get_full_name|default:"Sin nombre completo" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN DEL PERFIL -->
+      <p class="heading-2 mb-4">Información Del Perfil</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card">
+            <div class="flex items-center gap-3 py-3 border-b border-fg-muted/50">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-suitcase-regular" />
+            </svg>
+              <span class="mono min-w-20">Cargo</span>
+              <span class="body ">{{ request.user.profile.cargo|default:"—" }}</span>
+            </div>
+            <div class="flex items-center gap-3 py-3 border-b border-fg-muted/50">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-building-regular" />
+            </svg>
+              <span class="mono min-w-20">Área</span>
+              <span class="body">{{ request.user.profile.area|default:"—" }}</span>
+            </div>
+            <div class="flex items-center gap-3 py-3">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-phone-regular" />
+            </svg>
+              <span class="mono min-w-20">Teléfono</span>
+              <span class="body">{{ request.user.profile.telefono|default:"—" }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex flex-col items-center justify-center text-center gap-4">
+            {% if request.user.profile.avatar.name %}
+              {% include "components/avatars.html#avatar" with size='w-18 h-18' user_img=request.user.profile.avatar.url %}
+              <p class="mono m-0">Foto de perfil actual</p>
+            {% else %}
+              {% with initials=request.user.first_name|first|upper|add:request.user.last_name|first|upper %}
+                {% include "components/avatars.html#avatar" with size='w-18 h-18' initials=initials %}
+              {% endwith %}
+              <p class="body-lg">Sin foto de perfil</p>
+            {% endif %}
+            {% include 'components/buttons.html#icon_text_button' with func_type='button' type='btn-icon-text-secondary' text='Cambiar foto' icon_name='icon-camera-regular' icon_size='w-5 h-5' action='openmodal' target='modal-edit' hx_get=edit_url hx_target='#modal-edit-content' hx_swap='innerHTML' %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD (fechas) -->
+      <p class="heading-2 mb-4">Actividad</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex items-center gap-4">
+            <svg class="h-8 w-8 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-date-regular" />
+            </svg>
+            <div>
+              <p class="mono">Miembro desde</p>
+              <p class="body-lg">{{ request.user.date_joined|date:"d \d\e F \d\e Y" }}</p>
+              <p class="mono mt-2" style="margin-bottom:0;">{{ request.user.date_joined|date:"H:i" }} hs</p>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex items-center gap-4">
+            <svg class="h-8 w-8 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-timer-regular" />
+            </svg>
+            <div>
+              <p class="mono">Último acceso</p>
+              <p class="body-lg">{{ request.user.last_login|date:"d \d\e F \d\e Y"|default:"Nunca" }}</p>
+              <p class="mono mt-2" style="margin-bottom:0;">{{ request.user.last_login|date:"H:i" }} hs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO Y ROLES -->
+      <p class="heading-2 mb-4">Estado y Roles</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_authenticated %} <use class="text-primary-500" href="{% static 'sprite.svg' %}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{% static 'sprite.svg' %}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_authenticated</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_authenticated %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_active %} <use class="text-primary-500" href="{% static 'sprite.svg' %}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{% static 'sprite.svg' %}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_active</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_active %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_staff %} <use class="text-primary-500" href="{% static 'sprite.svg' %}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{% static 'sprite.svg' %}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_staff</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_staff %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_superuser %} <use class="text-primary-500" href="{% static 'sprite.svg' %}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{% static 'sprite.svg' %}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_superuser</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_superuser %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRUPOS -->
+      <p class="heading-2 mb-4">Grupos / Roles Asignados</p>
+      <div class="card mb-4">
+        {% if request.user.groups.all %}
+          {% for group in request.user.groups.all %}
+            {% include 'components/badges.html#badge_icon' with text=group.name variant='success' icon='icon-users-group-regular' x_params='p-3 px-4' %}
+          {% endfor %}
+        {% else %}
+          <p class="body flex gap-3 items-center">
+            <svg class="h-6 w-6 text-primary-500">
+              <use href="{% static 'sprite.svg' %}#icon-info-circle-fill" />
+            </svg>
+            Este usuario no pertenece a ningún grupo todavía.
+          </p>
+        {% endif %}
+      </div>
+
+      <footer class="hidden lg:flex w-full justify-center h-auto text-fg-muted text-sm p-0 m-0">Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
+    </div>
+
+
+    <div class="lg:overflow-hidden lg:h-full w-full lg:w-96 grid grid-rows-[auto_1fr]">
+      <!-- MI ACTIVIDAD RECIENTE -->
+      <p class="h-full w-full heading-1 mb-4">Mi Actividad Reciente</p>
+      <div class="h-full w-full min-h-0 mb-4 grid grid-rows-[auto_1fr] grid-cols-1 relative">
+        {% if logs %}
+          {% include '../partials/logs.html#user_logs' %}
+        {% else %}
+        <div class="row-span-2" style="background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:2.5rem;text-align:center;color:var(--muted);">
+          <i class="bi bi-activity" style="font-size:1.8rem;display:block;margin-bottom:.5rem;"></i>
+          <p style="font-weight:700;margin:0;">Sin actividad registrada todavía</p>
+          <p style="font-size:.83rem;margin:.3rem 0 0;">Los eventos aparecerán aquí cuando uses el sistema</p>
+        </div>
+        {% endif %}
+      </div>
+
       {% else %}
-      <div style="background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:2.5rem;text-align:center;color:var(--muted);">
-        <i class="bi bi-activity" style="font-size:1.8rem;display:block;margin-bottom:.5rem;"></i>
-        <p style="font-weight:700;margin:0;">Sin actividad registrada todavía</p>
-        <p style="font-size:.83rem;margin:.3rem 0 0;">Los eventos aparecerán aquí cuando uses el sistema</p>
+      <div class="text-center py-5">
+        <i class="bi bi-lock" style="font-size:3rem;color:var(--muted);"></i>
+        <h2 class="mt-3" style="font-weight:800;">Acceso Restringido</h2>
+        <p style="color:var(--muted);">Debes iniciar sesión para ver esta página.</p>
+        <a href="{% url 'login' %}" class="btn btn-outline-success mt-2">Ir al Login</a>
       </div>
       {% endif %}
+      <footer class="lg:hidden flex w-full justify-center h-auto text-fg-muted text-sm pt-2">Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
     </div>
+  </div>
 
-    {% else %}
-    <div class="text-center py-5">
-      <i class="bi bi-lock" style="font-size:3rem;color:var(--muted);"></i>
-      <h2 class="mt-3" style="font-weight:800;">Acceso Restringido</h2>
-      <p style="color:var(--muted);">Debes iniciar sesión para ver esta página.</p>
-      <a href="{% url 'login' %}" class="btn btn-outline-success mt-2">Ir al Login</a>
-    </div>
-    {% endif %}
-  </main>
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
 
 
-  <!-- MODAL EDITAR PERFIL -->
+<!-- MODAL EDITAR PERFIL -->
   {% if request.user.is_authenticated %}
-  <div class="modal fade modal-custom" id="modal-editar" tabindex="-1" aria-hidden="true">
+  <div class="modal fade modal-custom hidden" id="modal-editar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -344,10 +353,8 @@
       </div>
     </div>
   </div>
-  <style>
-    @keyframes popIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:none}}
-    @keyframes pulse-orange{0%,100%{box-shadow:0 0 0 0 rgba(251,146,60,.3)}50%{box-shadow:0 0 0 10px rgba(251,146,60,0)}}
-  </style>
   {% endif %}
+
+  <script src="{% static 'js/logs.js' %}"></script>
 
   {% endblock %}
