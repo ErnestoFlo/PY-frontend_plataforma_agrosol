@@ -1,0 +1,155 @@
+{% import "components/popovers.html" as popovers %}
+{% import "components/buttons.html" as buttons %}
+
+{# Contrato base:
+  - table_id debe existir como "<table_id>-container" en la vista que incluye este partial.
+  - fragment controla qué versión pedir por HTMX: table (desktop) o table_mobile.
+#}
+{% macro table() %}
+  <div class="table-container card {{ x_params }} px-4 py-2 flex flex-col h-full">
+    <div class="overflow-x-auto rounded-xl flex-1 flex flex-col h-full">
+      <div class="overflow-y-auto rounded-xl flex-auto">
+        <table class="data-table rounded-t-xl">
+          <thead class="card rounded-none rounded-t-xl sticky top-0 z-10 border-bottom p-0 bg-surface-1">
+            <tr class="p-0 bg-transparent rounded-t-xl">
+              <th class="rounded-ss-xl table-th w-8 border-none">#</th>
+              {% for col in columns %}
+                <th class="table-th border-none leading-5">{{ col }}</th>
+              {% endfor %}
+              {% if with_actions %}
+                <th class="table-th w-auto border-transparent rounded-se-xl">Acción</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody id="{{ table_id }}-body" class="w-full">
+            {{ tables.table_rows(rows, with_actions=with_actions) }}
+          </tbody>
+        </table>
+      </div>
+      {{ tables.table_pagination(page_items=page_items, table_id=table_id, current_page=current_page, total_pages=total_pages, fragment=fragment) }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro table_rows(rows, with_actions=none) %}
+  {# Este partial se usa para reemplazo granular (ej. editar una fila por outerHTML). #}
+  {% for row in rows %}
+    <tr class="table-tr" id="row-{{ row.id }}">
+      <td class="table-td-num border-none">{{ row.id }}</td>
+      {% if row.avatar %}
+        <td class="table-td">
+          <div class="w-8 h-8 rounded-full bg-surface-3 flex items-center justify-center text-xs font-semibold text-fg shrink-0">
+            {{ row.initials }}
+          </div>
+        </td>
+      {% endif %}
+      {% for cell in row.cells.values() %}
+        <td class="table-td w-auto max-w-10" title="{{ cell }}">{{ cell }}</td>
+      {% endfor %}
+      {% if with_actions %}
+        <td class="table-td overflow-visible w-auto flex justify-center gap-2 relative" data-action="popoverContainer">
+          {{ buttons.icon_button(func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-horizontal-fill', size='4', action='togglePopover', target=row.actions_id, attrs="aria-haspopup='true' aria-expanded='false'") }}
+          {{ popovers.row_actions(row) }}
+        </td>
+      {% endif %}
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="99" class="table-td text-center text-fg-muted py-8">
+        Sin registros
+      </td>
+    </tr>
+  {% endfor %}
+{% endmacro %}
+
+{% macro table_mobile() %}
+  {# Variante mobile basada en cards; comparte paginación con desktop. #}
+  <div class="mobile-table-container flex-1 overflow-y-auto px-2 py-1 md:py-4">
+    <div class="overflow-x-auto rounded-xl flex-1 flex flex-col h-full">
+      <div class="overflow-y-auto rounded-xl flex-auto mb-2">
+        <div id="{{ table_id }}-mobile-body" class="flex flex-col gap-3">
+          {{ tables.table_mobile_rows(rows) }}
+        </div>
+      </div>
+      {{ tables.table_pagination(page_items=page_items, table_id=table_id, current_page=current_page, total_pages=total_pages, fragment=fragment) }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro table_mobile_rows(rows) %}
+  {# Contrato esperado por cada row: id_col, prior_cols y detail_url. #}
+  {% for row in rows %}
+    <div class="card p-4 flex flex-col gap-3">
+      <div class="flex justify-between items-start gap-2">
+        <div class="flex-1">
+          <h3 class="font-semibold text-fg text-base truncate">
+            {{ row.id_col }}
+          </h3>
+        </div>
+        {{ buttons.icon_button(
+          func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0 rounded-md w-6 h-6', 
+          icon_size='4', icon_name='icon-elipsis-horizontal-fill', text='Editar', action='openModal', 
+          target='modal-detail', hx_get=row.detail_url, hx_target="#modal-detail-content", hx_swap="innerHTML"
+        ) }}
+      </div>
+      {# Campos principales - Prioridad Alta #}
+      <div class="grid grid-cols-[auto_1fr] gap-2 text-sm">
+        {% for key, value in row.prior_cols.items() %}
+          <span class="text-fg-muted min-w-max capitalize">{{ key }}</span>
+          <span class="text-fg font-medium truncate">{{ value }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-8 text-fg-muted">
+      <p>Sin registros</p>
+    </div>
+  {% endfor %}
+{% endmacro %}
+
+{% macro table_pagination(page_items, table_id, current_page, total_pages, fragment) %}
+  {# Todas las acciones de paginación apuntan al contenedor completo para mantener header/body/paginador sincronizados. #}
+  <div class="table-pagination card h-16 flex-auto py-2 md:py-2">
+    <button class="page-btn"
+      {% if current_page > 1 %}
+        hx-get="?page={{ current_page - 1 }}&fragment={{ fragment }}"
+        hx-target="#{{ table_id }}-container"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+      {% else %}
+        disabled
+      {% endif %}>
+      <svg class="w-4 h-4">
+        <use href="{{ static('sprite.svg') }}#icon-chevron-left-fill"/>
+      </svg>
+    </button>
+
+    {% for page in page_items %}
+      {% if page == 'ellipsis' %}
+        <span class="page-btn pointer-events-none opacity-70">...</span>
+      {% else %}
+        <button class="page-btn {% if page == current_page %}page-btn-active{% endif %}"
+          hx-get="?page={{ page }}&fragment={{ fragment }}"
+          hx-target="#{{ table_id }}-container"
+          hx-swap="innerHTML"
+          hx-push-url="true">
+          {{ page }}
+        </button>
+      {% endif %}
+    {% endfor %}
+
+    <button class="page-btn"
+      {% if current_page < total_pages %}
+        hx-get="?page={{ current_page - 1 }}&fragment={{ fragment }}"
+        hx-target="#{{ table_id }}-container"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+      {% else %}
+        disabled
+      {% endif %}>
+      <svg class="w-4 h-4">
+        <use href="{{ static('sprite.svg') }}#icon-chevron-right-fill"/>
+      </svg>
+    </button>
+  </div>
+{% endmacro %}

@@ -1,0 +1,195 @@
+{% from 'partials/options_lists.html' import combobox_dropdown %}
+{% from 'components/buttons.html' import input_icon_button %}
+
+{% macro input(label, name, field=none, type="text", x_params="", x_input_params="", x_label_bg="") %}
+  <fieldset class="input-container {{ x_params }}" data-tipo='componente'>
+    {% if field is not none %}
+      {{ render_field(field, type=type, id=name, class="input input-" ~ type ~ " " ~ x_input_params ~ " peer", placeholder=" ") }}
+    {% else %}
+      <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} {{ x_input_params }} peer" placeholder=" ">
+    {% endif %}
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_search(icon_name, name, field=none, placeholder="Búsqueda", x_params="", x_input_params="", x_icon_params="", action=none) %}
+  <fieldset class="input-container gap-1 {{ x_params }}" data-tipo='componente'>
+    {% if field is not none %}
+      {{ render_field(field, type='text', id=name, class="input input-text peer", placeholder=placeholder, data_action=action) }}
+    {% else %}
+        <input type="text" id="{{ name }}" class="input input-text {{ x_input_params }} peer" placeholder='{{ placeholder }}' data-action='{{ action }}'>
+    {% endif %}
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}">
+      <use href="{{ static('sprite.svg') }}#{{ icon_name }}" />
+    </svg>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_icon(label, icon_name, name, field=none, type="text", x_params="", x_input_params="", x_icon_params="") %}
+  <fieldset class="input-container {{ x_params }}" data-tipo='componente'>
+
+    {% if field is not none %}
+      {{ render_field(field, type=type, id=name, class="input input-" ~ type ~ " " ~ x_input_params ~ " peer", placeholder=" ") }}
+    {% else %}
+      <input type="{{ type }}" id="{{ name }}" class="input input-{{ type }} {{ x_input_params }} peer" placeholder=" ">
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs"> {{ label }} </label>
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}">
+      <use href="{{ static('sprite.svg') }}#{{ icon_name }}" />
+    </svg>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_password(label, name, icon_name, field=none, x_params="", x_input_params="", x_icon_params="", x_label_bg="") %}
+  <fieldset class="input-container {{ x_params }}" data-tipo='componente'>
+
+    {% if field is not none %}
+      {{ render_field(field, type='password', id=name, class="input " ~ x_input_params ~ " peer", placeholder=" ") }}
+    {% else %}
+      <input type="password" id="{{ name }}" class="input {{ x_input_params }} peer" placeholder=" ">
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
+      {{ label }}
+    </label>
+    {{ input_icon_button(func_type="button", type='btn-icon-ghost-neutral', x_params='p-0 shrink-0', icon_name=icon_name, action='togglePassword', target=name) }}
+    </button>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_combobox(label, name, url, field=none, type="text", x_params="", x_input_params="", x_icon_params="") %}
+  <fieldset class="input-container {{ x_params }}" data-tipo='componente' data-action="combobox"
+        hx-get="{{ url }}"
+        hx-trigger="click once"
+        hx-target="#{{ name }}-options"
+        hx-swap="innerHTML">    
+    <!-- Input visible que muestra la selección -->
+    {% if field is not none %}
+      {{ render_field(field, id=name, name=name, class="input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name) }}
+    {% else %}
+      <input type="{{ type }}" id="{{ name }}" name="{{ name }}" class="input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly data-action="comboboxToggle" data-target="{{ name }}">
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs">
+      {{ label }}
+    </label>
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}" data-action="combobox-Toggle" data-target="{{ name }}">
+      <use href="{{ static('sprite.svg') }}#icon-chevron-down-fill" />
+    </svg>
+    <!-- Combobox dropdown -->
+    {{ combobox_dropdown(name) }}
+  </fieldset>
+{% endmacro %}
+
+{% macro input_range(label, name, field=none, type="text", x_params="", x_input_params="") %}
+  <div class="range-container {{ x_params }}" data-tipo='componente'>
+    
+    <fieldset class="range-track-container">
+      <legend class="input-legend">{{ label }}</legend>
+      <label for="{{ name }}" class="input-label-static">{{ label }}</label>
+
+      <div class="range-wrapper" data-action="range" data-target="{{ name }}">
+        <!-- Track visual -->
+        <div class="range-track">
+          <div class="range-fill" id="{{ name }}-fill"></div>
+          <div class="range-thumb" id="{{ name }}-thumb"></div>
+        </div>
+        <!-- Input real invisible encima -->
+        <input 
+          type="range"
+          id="{{ name }}"
+          name="{{ name }}"
+          class="range-input-hidden"
+          min="{{ min|default(0) }}"
+          max="{{ max|default(100) }}"
+          value="{{ value|default(50) }}"
+          step="{{ step|default(1) }}"
+        >
+      </div>
+
+    </fieldset>
+
+    <!-- Labels inferiores -->
+    <div class="range-labels">
+      <span class="range-label-bounds">{{ min|default(0) }}</span>
+      <output id="{{ name }}-value" class="range-label-value">{{ value|default(50) }}</output>
+      <span class="range-label-bounds">{{ max|default(100) }}</span>
+    </div>
+
+  </div>
+{% endmacro %}
+
+{% macro input_checkbox(label, name, field=none, size="4", x_params="", x_icon_params="") %}
+
+  <div class=" group flex justify-end items-center {{ x_params }} relative gap-2">
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>
+    {% if field is not none %}
+      {{ render_field(field, type='checkbox', id=name, class="opacity-0 absolute top-0 left-0 w-full h-full z-10") }}
+    {% else %}
+      <input type="checkbox" class="opacity-0 absolute top-0 left-0 w-full h-full z-10" id="remember-me">
+    {% endif %}
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-1">
+      <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }} opacity-0 group-has-checked:opacity-100 text-neutral-50 z-10">
+        <use href="{{ static('sprite.svg') }}#icon-check-fill"/>
+      </svg>
+    </div>
+  </div>
+  
+{% endmacro %}
+
+{% macro input_radiobutton(label, name, field=none, size="4", x_params="", x_icon_params="") %}
+  
+  <div class=" group flex justify-end items-center {{ x_params }} relative gap-2">
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>
+    {% if field is not none %}
+      {{ render_field(field, type='radio', id=name, class="opacity-0 absolute w-full h-full") }}
+    {% else %}
+      <input type="radio" class="opacity-0 absolute w-full h-full" id="remember-me">
+    {% endif %}
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded-full border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-0.5">
+    </div>
+  </div>  
+
+{% endmacro %}
+
+{% macro input_color() %}
+  
+  <input type="color" name="" id="">
+
+{% endmacro %}
+
+{% macro input_file(name, field=none, accept=none, multiple=none, x_params="", x_icon_params="") %}
+  <div class="file-picker {{ x_params }}" data-tipo='componente' data-action="filePicker" data-target="{{ name }}">
+    {% if field is not none %}
+      {{ render_field(field, type='file', id=name, name=name, class="hidden", multiple=multiple, accept=accept) }}
+    {% else %}
+      <input type="file" id="{{ name }}" name="{{ name }}" class="hidden"
+        {% if multiple %}multiple{% endif %}
+        {% if accept %}accept="{{ accept }}"{% endif %}>
+    {% endif %}
+    <div class="file-picker-zone" data-action="filePickerZone" data-target="{{ name }}">
+      <svg class="w-8 h-8 text-fg-muted {{ x_icon_params }}">
+        <use href="{{ static('sprite.svg') }}#icon-file-regular"/>
+      </svg>
+      <p class="text-sm text-fg-muted text-center">
+        Arrastra archivos aquí o
+        <span class="text-fg-success font-semibold">selecciona</span>
+      </p>
+      {% if accept %}
+        <p class="text-xs text-fg-muted">{{ accept }}</p>
+      {% endif %}
+    </div>
+    <ul id="{{ name }}-files" class="file-list"></ul>
+  </div>
+{% endmacro %}

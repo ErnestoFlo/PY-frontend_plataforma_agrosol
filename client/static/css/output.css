@@ -336,9 +336,6 @@
   .right-0\.5 {
     right: calc(var(--spacing) * 0.5);
   }
-  .right-1 {
-    right: var(--spacing-1);
-  }
   .right-2\/3 {
     right: calc(2 / 3 * 100%);
   }
@@ -356,9 +353,6 @@
   }
   .bottom-0\.5 {
     bottom: calc(var(--spacing) * 0.5);
-  }
-  .bottom-1 {
-    bottom: var(--spacing-1);
   }
   .bottom-1\/2 {
     bottom: calc(1 / 2 * 100%);
@@ -603,9 +597,6 @@
   .w-6\/7 {
     width: calc(6 / 7 * 100%);
   }
-  .w-6\/10 {
-    width: calc(6 / 10 * 100%);
-  }
   .w-8 {
     width: var(--spacing-8);
   }
@@ -694,21 +685,9 @@
     --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
-  .translate-x-2\/19 {
-    --tw-translate-x: calc(2 / 19 * 100%);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-  }
-  .translate-y-2\/19 {
-    --tw-translate-y: calc(2 / 19 * 100%);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-  }
   .translate-y-5 {
     --tw-translate-y: var(--spacing-5);
     translate: var(--tw-translate-x) var(--tw-translate-y);
-  }
-  .-scale-x-100 {
-    --tw-scale-x: calc(100% * -1);
-    scale: var(--tw-scale-x) var(--tw-scale-y);
   }
   .-rotate-90 {
     rotate: calc(90deg * -1);
@@ -1230,10 +1209,6 @@
   }
   .brightness-65 {
     --tw-brightness: brightness(65%);
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
-  }
-  .brightness-90 {
-    --tw-brightness: brightness(90%);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .filter {
@@ -3960,21 +3935,6 @@
   inherits: false;
   initial-value: 0;
 }
-@property --tw-scale-x {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
-@property --tw-scale-y {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
-@property --tw-scale-z {
-  syntax: "*";
-  inherits: false;
-  initial-value: 1;
-}
 @property --tw-rotate-x {
   syntax: "*";
   inherits: false;
@@ -4204,6 +4164,21 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-scale-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
 @keyframes pulse {
   50% {
     opacity: 0.5;
@@ -4215,9 +4190,6 @@
       --tw-translate-x: 0;
       --tw-translate-y: 0;
       --tw-translate-z: 0;
-      --tw-scale-x: 1;
-      --tw-scale-y: 1;
-      --tw-scale-z: 1;
       --tw-rotate-x: initial;
       --tw-rotate-y: initial;
       --tw-rotate-z: initial;
@@ -4272,6 +4244,9 @@
       --tw-backdrop-sepia: initial;
       --tw-duration: initial;
       --tw-ease: initial;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-scale-z: 1;
     }
   }
 }

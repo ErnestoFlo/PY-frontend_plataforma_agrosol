@@ -184,12 +184,14 @@ document.addEventListener('DOMContentLoaded', () => {
           : `${sprite}#icon-moon-regular`
       )
     }
-    main_logo.setAttribute(
-      'src',
-      theme === 'dark'
-        ? '/static/images/logo letras blancas icono color@4x-8.png'
-        : '/static/images/Logo princiapal@4x-8.png'
-    )
+    if(main_logo){
+      main_logo.setAttribute(
+        'src',
+        theme === 'dark'
+          ? '/static/images/logo letras blancas icono color@4x-8.png'
+          : '/static/images/Logo princiapal@4x-8.png'
+      )
+    }
   }
 
   // OBSERVAR CAMBIOS EN ATRIBUTOS DE CUALQUIER ELEMENTO
