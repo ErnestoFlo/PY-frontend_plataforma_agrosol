@@ -3,7 +3,7 @@
 {% macro user_logs(logs) %}
   <div class="bar-filter w-full">
 
-    {{ input_search(x_params='w-44 h-8 bg-surface-1 hover:bg-surface-2 border-none hidden md:flex', icon_name='icon-magnifyng-glass-fill', placeholder='Buscar en logs...', action='buscarLogs') }}
+    {{ input_search(permiso='input_buscar_logs', label_log='Buscar en logs', x_params='w-44 h-8 bg-surface-1 hover:bg-surface-2 border-none hidden md:flex', placeholder='Buscar en logs...', action='buscarLogs') }}
     <button data-action="filtrarLogs" data-type="todos"    id="f-todos"    class="btn-filter filtro-activo">Todos</button>
     <button data-action="filtrarLogs" data-type="login"    id="f-login"    class="btn-filter">Login</button>
     <button data-action="filtrarLogs" data-type="logout"   id="f-logout"   class="btn-filter">Logout</button>

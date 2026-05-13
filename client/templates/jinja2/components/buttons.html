@@ -1,6 +1,8 @@
-{% macro button(text, func_type="button", type="btn-primary", x_params="", action=none, target=none, role=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none) %}
+{% macro button(permiso, label_log, text, func_type="button", type="btn-primary", x_params="", action=none, target=none, role=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, disabled=false) %}
   <button type="{{ func_type }}" class="btn body {{ type }} {{ x_params }}"
   data-tipo='accion'
+  data-permiso="{{ permiso }}"
+  data-label="{{ label_log }}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -10,13 +12,16 @@
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
   {% if on_click %}onclick="{{ on_click }}"{% endif %}
   {% if attrs %}{{ attrs|safe }}{% endif %}
+  {% if disabled %} disabled {% endif %}
   >{{ text }}</button>
 {% endmacro %}
 
-{% macro icon_button(icon_name, func_type="button", type="btn-icon-ghost-neutral", size="6", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none) %}
+{% macro icon_button(permiso, label_log, icon_name, func_type="button", type="btn-icon-ghost-neutral", size="6", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, disabled=false) %}
   <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}"
-  data-tipo='accion'
   data-sprite="{{ static('sprite.svg') }}"
+  data-tipo="accion"
+  data-permiso="{{ permiso }}"
+  data-label="{{ label_log }}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -24,7 +29,9 @@
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  {% if on_click %}onclick="{{ on_click }}"{% endif %}
   {% if attrs %}{{ attrs|safe }}{% endif %}
+  {% if disabled %} disabled {% endif %}
   >
     <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }}">
       <use href="{{ static('sprite.svg') }}#{{ icon_name }}"/>
@@ -32,9 +39,11 @@
   </button>
 {% endmacro %}
 
-{% macro icon_text_button(text, icon_name, func_type="button", type="btn-icon-text-primary", icon_size="6", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, is_disabled=none) %}
+{% macro icon_text_button(permiso, label_log, text, icon_name, func_type="button", type="btn-icon-text-primary", icon_size="6", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, disabled=false) %}
   <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}"
   data-tipo='accion'
+  data-permiso="{{ permiso }}"
+  data-label="{{ label_log }}"
   data-sprite="{{ static('sprite.svg') }}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
@@ -45,7 +54,7 @@
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
   {% if on_click %}onclick="{{ on_click }}"{% endif %}
   {% if attrs %}{{ attrs|safe }}{% endif %}
-  {% if is_disabled %}disabled{% endif %}>
+  {% if disabled %}disabled{% endif %}>
     <svg class="w-{{ icon_size }} h-{{ icon_size }} {{ x_icon_params }} shrink-0" aria-hidden="true">
       <use href="{{ static('sprite.svg') }}#{{ icon_name }}"/>
     </svg>
@@ -53,8 +62,11 @@
   </button>
 {% endmacro %}
 
-{% macro input_icon_button(icon_name, func_type="button", type="btn-icon-text-primary", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, is_disabled=true) %}
+{% macro input_icon_button(permiso, label_log, icon_name, func_type="button", type="btn-icon-text-primary", role=none, x_params="", x_icon_params="", action=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, disabled=disabled) %}
   <button type="{{ func_type }}" class="body {{ type }} {{ x_params }}" data-sprite="{{ static('sprite.svg') }}" 
+  data-tipo="accion"
+  data-permiso="{{ permiso }}"
+  data-label="{{ label_log }}"
   {% if role %}role="{{ role }}"{% endif %}
   {% if action %}data-action="{{ action }}"{% endif %}
   {% if target %}data-target="{{ target }}"{% endif %}
@@ -64,6 +76,7 @@
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
   {% if on_click %}onclick="{{ on_click }}"{% endif %}
   {% if attrs %}{{ attrs|safe }}{% endif %}
+  {% if disabled %} disabled {% endif %}
   >
     <svg class="w-5 h-5 {{ x_icon_params }}">
       <use href="{{ static('sprite.svg') }}#{{ icon_name }}"/>
@@ -71,7 +84,7 @@
   </button>
 {% endmacro %}
 
-{% macro toggle_button(icon_name, x_params="", action=none, target=none, role=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, is_disabled=true) %}
+{% macro toggle_button(permiso, label_log, x_params="", action=none, target=none, role=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none, on_click=none, attrs=none, disabled=true) %}
   <button type="button"
   class="toggle-btn {{ x_params }}"
   data-tipo='accion'
@@ -84,7 +97,9 @@
   {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
   {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
   {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
+  {% if on_click %}onclick="{{ on_click }}"{% endif %}
   {% if attrs %}{{ attrs|safe }}{% endif %}
+  {% if disabled %} disabled {% endif %}
   >
     <span class="toggle-thumb"></span>
   </button>

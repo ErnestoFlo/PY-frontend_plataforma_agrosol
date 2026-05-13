@@ -17,31 +17,30 @@
       {# — Sección: Datos generales — #}
       <div role="group" aria-labelledby="seccion-datos-generales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
         <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Datos generales</p>
-        {{ inputs.input }}
-        {% include "components/inputs.html#input" with field=form.proveedor x_params="col-span-12" name='proveedor' label='Nombre de Proveedor' type='text' %}
-        {% include "components/inputs.html#input" with field=form.direccion x_params="col-span-12" name='direccion' label='Dirección' type='text' %}
-        {% include "components/inputs.html#input" with field=form.contacto x_params="col-span-12" name='contacto' label='Contacto' type='text' %}
-        {% include "components/inputs.html#input" with field=form.cargo x_params="col-span-12" name='cargo' label='Cargo' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_nombre' label_log='Nombre de Proveedor' field=form.proveedor x_params="col-span-12" name='proveedor' label='Nombre de Proveedor' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_direccion' label_log='Dirección proveedor' field=form.direccion x_params="col-span-12" name='direccion' label='Dirección' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_contacto' label_log='Contacto proveedor' field=form.contacto x_params="col-span-12" name='contacto' label='Contacto' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_cargo' label_log='Cargo contacto' field=form.cargo x_params="col-span-12" name='cargo' label='Cargo' type='text' %}
       </div>
 
       {# — Sección: Contacto — #}
       <div role="group" aria-labelledby="seccion-contacto" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
         <p id="seccion-contacto" class="col-span-12 text-sm font-medium text-neutral-500">Contacto</p>
-        {% include "components/inputs.html#input" with field=form.telefono x_params="col-span-12" name='telefono' label='Teléfono' type='text' %}
-        {% include "components/inputs.html#input" with field=form.celular x_params="col-span-12" name='celular' label='Celular' type='text' %}
-        {% include "components/inputs.html#input" with field=form.email x_params="col-span-12" name='email' label='Email' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_telefono' label_log='Teléfono proveedor' field=form.telefono x_params="col-span-12" name='telefono' label='Teléfono' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_celular' label_log='Celular proveedor' field=form.celular x_params="col-span-12" name='celular' label='Celular' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_email' label_log='Email proveedor' field=form.email x_params="col-span-12" name='email' label='Email' type='text' %}
       </div>
 
       {# — Sección: Otros — #}
       <div role="group" aria-labelledby="seccion-otros" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
         <p id="seccion-otros" class="col-span-12 text-sm font-medium text-neutral-500">Otros</p>
-        {% include "components/inputs.html#input" with field=form.terminos_de_pago x_params="col-span-12" name='terminos-de-pago' label='Términos de Pago' type='text' %}
+        {% include "components/inputs.html#input" with permiso='proveedor_terminos' label_log='Términos de pago' field=form.terminos_de_pago x_params="col-span-12" name='terminos-de-pago' label='Términos de Pago' type='text' %}
       </div>
       
       {# — Botones de acción — #}
       <div class="flex justify-end gap-2 mt-2 col-span-12">
-        {% include "components/buttons.html#button" with func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target=modal_name %}
-        {% include 'components/buttons.html#button' with func_type='submit' type='btn-primary' text=submit_text %}      
+        {% include "components/buttons.html#button" with permiso='btn_cancelar' label_log='Cancelar' func_type='button' type='btn-ghost' text='Cancelar' action='closeModal' target=modal_name %}
+        {% include 'components/buttons.html#button' with permiso='btn_guardar_proveedor' label_log='Guardar proveedor' func_type='submit' type='btn-primary' text=submit_text %}      
       </div>
   </form>
 {% endmacro %}

@@ -26,8 +26,8 @@
         hx-on::after-request="if(event.detail.successful) { closeModal('modal-delete'); AlertManager.danger('Proveedor eliminado exitosamente'); }"
         >
     {{ render_csrf_token(request)|safe }}
-    {{ button(func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target='modal-delete') }}
-    {{ button(func_type='submit', type='btn-danger', text='Eliminar') }}
+    {{ button(permiso='btn_cancelar', label_log='Cancelar eliminación', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target='modal-delete') }}
+    {{ button(permiso='btn_eliminar_proveedor', label_log='Eliminar proveedor', func_type='submit', type='btn-danger', text='Eliminar') }}
   </form>
 </section>
 

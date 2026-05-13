@@ -2,10 +2,37 @@
 (function () {
   console.log('Inicializando modulo de logs (filtros y otras utilidades)');
 
-  document.querySelectorAll('[data-action="filtrarLogs"]').forEach(btn => {btn.addEventListener('click', (e) => window.Logs.filtrarLogs(btn.dataset.type))})
-  document.querySelectorAll('[data-action="buscarLogs"]').forEach(input => {
+  document.querySelectorAll('[data-action="filtrarLogs"]')?.forEach(btn => {btn.addEventListener('click', (e) => window.Logs.filtrarLogs(btn.dataset.type))})
+  document.querySelectorAll('[data-action="buscarLogs"]')?.forEach(input => {
     input.addEventListener('input', (e) => window.Logs.buscarLogs(e.currentTarget.value))
   })
+  // Adjuntar listeners automáticamente a TODOS los elementos con data-permiso
+  // Se ejecuta una sola vez al cargar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-permiso]').forEach(el => {
+      const clave = el.dataset.permiso;
+      const label = el.dataset.label || clave;
+      const tipo  = el.dataset.tipo  || 'componente';
+
+      // Para acciones: escuchar click
+      if (tipo === 'accion') {
+        el.addEventListener('click', () => window.registrarLog(clave, label), { passive: true });
+      }
+
+      // Para componentes: escuchar cambio/interacción
+      if (tipo === 'componente') {
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'select' || tag === 'textarea') {
+          el.addEventListener('change', () => window.registrarLog(clave, label), { passive: true });
+        } else {
+          // Wrapper div/section — escuchar cualquier interacción interna
+          el.addEventListener('click',  () => window.registrarLog(clave, label), { passive: true });
+          el.addEventListener('change', () => window.registrarLog(clave, label), { passive: true });
+        }
+      }
+    });
+  });
+
 
   // Variables privadas
   let filtroActual = 'todos';

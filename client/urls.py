@@ -20,7 +20,7 @@ urlpatterns = [
     path("design/test_components/", views.tests_components, name="tests_page"),
     
     ### URLS DE ENDPOINTS DINÁMICOS (HTMX)
-    path("api/proveedores/opciones/", views.get_options, name="get_proveedores_options"),
+    path("api/opciones/", views.get_options, name="get_proveedores_options"),
 
     ### URLS DE USUARIOS ###
     path("usuarios/", views.lista_usuarios, name="lista_usuarios"),

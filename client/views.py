@@ -76,7 +76,7 @@ def get_options(request):
         {'id': 4, 'nombre': 'Opcion 4'},
         {'id': 5, 'nombre': 'Opcion 5'}
     ]
-    return render(request, 'partials/options_lists.html#combobox_options', {
+    return render(request, 'partials/combobox_options.html', {
         'options': [{'value': o['id'], 'label': o['nombre']} for o in options]
     })
 

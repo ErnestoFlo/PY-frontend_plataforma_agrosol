@@ -11,17 +11,17 @@
   </a>
 
   <div class="nav-section flex align-center gap-2  h-8">
-    {{ icon_button(x_params='hidden md:block', action='handleBack', func_type='button', type='btn-icon-ghost-neutral', size='4', icon_name='icon-arrow-left-fill') }}
+    {{ icon_button(permiso='btn_volver', label_log='Botón volver', x_params='hidden md:block', action='handleBack', func_type='button', type='btn-icon-ghost-neutral', size='4', icon_name='icon-arrow-left-fill') }}
     <!-- Búsqueda -->
-    {{ input_search(field=search_form.query, x_params='max-w-80 h-full bg-surface-2 hover:bg-surface-3 border-none hidden md:flex', name='general_search', icon_name='icon-magnifyng-glass-fill') }}
+    {{ input_search(permiso='input_busqueda_general', label_log='Buscar general', field=search_form.query, x_params='max-w-80 h-full bg-surface-2 hover:bg-surface-3 border-none hidden md:flex', name='general_search') }}
   </div>
 
   <!-- Acciones -->
   <nav class="topbar-actions" aria-label="Acciones de usuario">
 
     <!-- Notificaciones -->
-    {{ icon_button(x_params='md:hidden', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-magnifyng-glass-fill', action='openSearchMode') }}
-    {{ icon_button(func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-bell-regular', action='toggleNotifications') }}
+    {{ icon_button(permiso='btn_buscar_mobile', label_log='Abrir búsqueda móvil', x_params='md:hidden', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-magnifyng-glass-fill', action='openSearchMode') }}
+    {{ icon_button(permiso='btn_notificaciones', label_log='Abrir notificaciones', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-bell-regular', action='toggleNotifications') }}
 
     <!-- Avatar con dropdown -->
     <div class="relative rounded-full p-1" data-action="popoverContainer" style="z-index: 999;">

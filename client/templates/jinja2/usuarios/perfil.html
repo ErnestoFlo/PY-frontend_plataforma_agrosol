@@ -39,7 +39,7 @@
             </div>
           </div>
           <div class="w-full flex justify-center md:w-auto md:ms-auto">
-            {{ buttons.button(func_type='button', type='btn-secondary', x_params='btn', text='Editar Perfil', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
+            {{ buttons.button(permiso='btn_editar_perfil', label_log='Editar Perfil', func_type='button', type='btn-secondary', x_params='btn', text='Editar Perfil', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
           </div>
         </div>
       </div>
@@ -124,8 +124,13 @@
         </div>
         <div class="lg:col-span-6 col-span-12">
           <div class="card flex flex-col items-center justify-center text-center gap-4">
-            {{ avatar(size='18', user=request.user) }}
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-secondary', text='Cambiar foto', icon_name='icon-camera-regular', icon_size='5', action='openmodal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
+            <div class="w-full flex justify-center">{{ avatar(size='16', user=request.user) }}</div>
+              {% if request.user.profile.avatar.name %}
+                <p class="mono uppercase m-o">Foto de perfil actual</p>
+              {% else %}
+                <p class="mono uppercase m-0">Sin foto de perfil</p>
+              {% endif %}
+            {{ buttons.icon_text_button(permiso='btn_cambiar_foto', label_log='Cambiar foto de perfil', func_type='button', type='btn-icon-text-secondary', text='Cambiar foto', icon_name='icon-camera-regular', icon_size='5', action='openmodal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
           </div>
         </div>
       </div>
@@ -268,6 +273,4 @@
     </div>
   </div>
   
-  <script src="{{ static('js/logs.js') }}"></script>
-
   {% endblock %}

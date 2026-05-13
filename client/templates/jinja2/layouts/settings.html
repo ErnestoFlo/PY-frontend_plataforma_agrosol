@@ -22,14 +22,14 @@
           {{ avatar(size='8', user=request.user) }}
           <p class="text-fg-body">@{{ request.user.username }}</p>
         </a>
-        <div class="hidden md:block"> {{ buttons.icon_button(func_type='button', type='btn-icon-ghost-neutral', size='4', icon_name='icon-moon-regular', action='toggleTheme') }} </div>
+        <div class="hidden md:block"> {{ buttons.icon_button(permiso='btn_tema', label_log='Botón cambiar tema', func_type='button', type='btn-icon-ghost-neutral', size='4', icon_name='icon-moon-regular', action='toggleTheme') }} </div>
         <div class="md:hidden relative">
-          {{ buttons.icon_button(func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-vertical-fill', size='4', action='togglePopover', target='nav-menu', attrs="aria-haspopup='true' aria-expanded='false'") }}
+          {{ buttons.icon_button(permiso='btn_menu', label_log='Abrir menú', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-vertical-fill', size='4', action='togglePopover', target='nav-menu', attrs="aria-haspopup='true' aria-expanded='false'") }}
           {{ popovers.nav_menu(user=request.user, request=request) }}
         </div>
         <form method="POST" action="{{ url('logout') }}" class="hidden md:block">
           {{ render_csrf_token(request)|safe }}
-          {{ buttons.icon_button(func_type='submit', type='btn-icon-ghost-danger', icon_name='icon-logout-fill', size='4') }}
+          {{ buttons.icon_button(permiso='btn_cerrar_sesion', label_log='Cerrar sesión', func_type='submit', type='btn-icon-ghost-danger', icon_name='icon-logout-fill', size='4') }}
         </form>
       </div>
     {% endif %}

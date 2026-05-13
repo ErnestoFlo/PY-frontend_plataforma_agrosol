@@ -53,11 +53,13 @@ def environment(**options):
         "url": reverse,
         "render_field": render_field,
         "date_format": date_format,
+        "csrf_token_only": lambda request: get_token(request),
     })
 
     env.globals["render_csrf_token"] = lambda request: (
-    f'<input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">'
+    f"<input type='hidden' name='csrfmiddlewaretoken' value='{get_token(request)}'>"
     )
+
 
     env.filters.update({
         "safe": mark_safe,

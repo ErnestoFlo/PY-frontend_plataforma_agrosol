@@ -22,6 +22,12 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Perfil de {self.user.username}"
     
+    @property
+    def initials(self):
+        first = (self.user.first_name or "")[:1].upper()
+        last = (self.user.last_name or "")[:1].upper()
+        return first + last
+    
 # Cada vez que se crea un User, crear su perfil automáticamente
 @receiver(post_save, sender=User)
 def crear_perfil(sender, instance, created, **kwargs):

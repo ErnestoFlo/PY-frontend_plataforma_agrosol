@@ -1,5 +1,7 @@
 {% extends 'layouts/settings.html' %}
 {% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+{% import 'components/inputs.html' as inputs %}
 
 {% block view %}
   <div class="flex flex-col gap-3 w-full h-full py-1 max-w-6xl">
@@ -9,7 +11,7 @@
     <h1 class="heading-1">Biblioteca de Componentes</h1>
     
     <!-- ACCIONES -->
-    <p class="heading-2 mb-4">Acciones</p>
+    <p class="heading-2 my-4">Acciones</p>
 
     {% if not permisos or permisos.seccion_acciones.ver %}
     <div class="card accion-card {% if permisos and not permisos.seccion_acciones.usar %}pointer-events-none opacity-50{% endif %}" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones">
@@ -22,19 +24,19 @@
         <p class="mono uppercase mb-3">CRUD Principal</p>
         <div class="flex gap-3 flex-wrap">
           {% if not permisos or permisos.btn_crear.ver %}
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-primary', text='Crear', icon_name='icon-plus-fill', icon_size='w-4 h-4', on_click="AlertManager.success('Accion ejecutada: Crear')", attrs="data-permiso='btn_crear' data-label='Botón Crear'", is_disabled=True) }}
+            {{ buttons.icon_text_button(permiso='btn_crear', label_log='Botón Crear', func_type='button', type='btn-icon-text-primary', text='Crear', icon_name='icon-plus-fill', icon_size='4', on_click="AlertManager.success('Accion ejecutada: Crear')") }}
           {% endif %}
           {% if not permisos or permisos.btn_editar.ver %}
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-secondary', text='Editar', icon_name='icon-pencil-regular', icon_size='w-4 h-4', on_click="AlertManager.info('Accion ejecutada: Editar')",  attrs="data-permiso='btn_editar' data-tipo='accion' data-label='Botón Editar'") }}
+            {{ buttons.icon_text_button(permiso='btn_editar', label_log='Botón Editar', func_type='button', type='btn-icon-text-secondary', text='Editar', icon_name='icon-pencil-regular', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Editar')") }}
           {% endif %}
           {% if not permisos or permisos.btn_eliminar.ver %}
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-danger', text='Eliminar', icon_name='icon-trash-fill', icon_size='w-4 h-4', on_click="AlertManager.danger('Accion ejecutada: Eliminar')",  attrs="data-permiso='btn_eliminar' data-tipo='accion' data-label='Botón Eliminar'") }}
+            {{ buttons.icon_text_button(permiso='btn_eliminar', label_log='Botón Eliminar', func_type='button', type='btn-icon-text-danger', text='Eliminar', icon_name='icon-trash-fill', icon_size='4', on_click="AlertManager.danger('Accion ejecutada: Eliminar')") }}
           {% endif %}
           {% if not permisos or permisos.btn_ver.ver %}
-            {{ buttons.icon_text_button(func_type='button' type='btn-icon-text-secondary' text='Ver' icon_name='icon-open-eye-regular' icon_size='w-4 h-4' on_click="AlertManager.info('Accion ejecutada: Ver')"  attrs="data-permiso='btn_ver' data-tipo='accion' data-label='Botón Ver'") }}
+            {{ buttons.icon_text_button(permiso='btn_ver', label_log='Botón Ver', func_type='button', type='btn-icon-text-secondary', text='Ver', icon_name='icon-open-eye-regular', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Ver')") }}
           {% endif %}
           {% if not permisos or permisos.btn_cancelar.ver %}
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-ghost-neutral', text='Cancelar', icon_name='icon-xmark-fill', icon_size='w-4 h-4', on_click="AlertManager.info('Accion ejecutada: Cancelar')",  attrs="data-permiso='btn_cancelar' data-tipo='accion' data-label='Botón Cancelar'") }}
+            {{ buttons.icon_text_button(permiso='btn_cancelar', label_log='Botón Cancelar', func_type='button', type='btn-icon-text-ghost-neutral', text='Cancelar', icon_name='icon-xmark-fill', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Cancelar')") }}
           {% endif %}
         </div>
       </div>
@@ -43,29 +45,14 @@
       <div>
         <p class="mono uppercase mb-3">Icon Buttons (acciones inline en tabla)</p>
         {% if not permisos or permisos.btn_iconos.ver %}
-        <div class="flex gap-2 items-center flex-wrap{% if permisos and not permisos.btn_iconos.usar %} perm-card-disabled{% endif %}" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline">
-          <button class="icon-btn edit" title="Editar" onclick="accionToast('Editar registro', 'info')">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="icon-btn del" title="Eliminar" onclick="accionToast('Eliminar registro', 'error')">
-            <i class="bi bi-trash3"></i>
-          </button>
-          <button class="icon-btn view" title="Ver" onclick="accionToast('Ver detalle', 'warning')">
-            <i class="bi bi-eye"></i>
-          </button>
-          <button class="icon-btn" style="color:var(--verde);" title="Aprobar"
-                  onclick="accionToast('Aprobado ✓', 'success')" onmouseover="this.style.color='var(--verde)';this.style.borderColor='var(--verde)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--borde)'">
-            <i class="bi bi-check2"></i>
-          </button>
-          <button class="icon-btn" title="Exportar"
-                  onclick="accionToast('Exportando...', 'info')">
-            <i class="bi bi-download"></i>
-          </button>
-          <button class="icon-btn" title="Duplicar"
-                  onclick="accionToast('Registro duplicado', 'success')">
-            <i class="bi bi-copy"></i>
-          </button>
-          <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-left:.5rem;">
+        <div class="flex gap-2 items-center flex-wrap" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline" {% if permisos and not permisos.c_textbox.usar %} aria-disabled='true'{% endif %}>
+          {{ buttons.icon_button(permiso='btn_editar_inline', label_log='Editar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-pencil-regular', on_click="AlertManager.info('Editar registro')") }}
+          {{ buttons.icon_button(permiso='btn_eliminar_inline', label_log='Eliminar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-trash-fill', on_click="AlertManager.danger('Eliminar registro')") }}
+          {{ buttons.icon_button(permiso='btn_ver_inline', label_log='Ver detalle', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-open-eye-regular', on_click="AlertManager.warning('Ver detalle')") }}
+          {{ buttons.icon_button(permiso='btn_aprobar_inline', label_log='Aprobar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-check-circle-fill', on_click="AlertManager.success('Aprobado')") }}
+          {{ buttons.icon_button(permiso='btn_exportar_inline', label_log='Exportar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-download-regular', on_click="AlertManager.info('Exportando...')") }}
+          {{ buttons.icon_button(permiso='btn_duplicar_inline', label_log='Duplicar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-file-regular', on_click="AlertManager.success('Registro duplicado')") }}
+          <span class="mono ml-2">
             ← Hover para ver estados
           </span>
         </div>
@@ -77,581 +64,140 @@
     <!-- ══════════════════════════════════════════
          SECCIÓN 2 — COMPONENTES
     ══════════════════════════════════════════ -->
-    <p class="section-title fade-up d2 mt-4">
-      <span class="cat-label cat-componente"><i class="bi bi-puzzle"></i>Componentes</span>
-    </p>
+    <p class="heading-2 my-4">Componentes</p>
 
-    <div class="row g-3">
+    <div class="grid grid-cols-12 grid-rows-[auto_auto]">
 
-      <!-- COL 1 -->
-      <div class="col-lg-6">
+      <div class="col-span-12 grid grid-cols-12 gap-3  mb-4">
+        <!-- COL 1 -->
+        <div class="col-span-12 md:col-span-6">
 
-        <!-- Textbox -->
-        {% if not permisos or permisos.c_textbox.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_textbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_textbox" data-tipo="componente" data-label="Textbox">
-            <p class="field-label">Textbox <span class="tipo-chip">texto</span></p>
-            <input type="text" class="field-input" id="c-textbox"
-                  placeholder="Escribe aquí..." oninput="actualizarTabla()">
-            <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
-              Input de texto libre · máx. 255 caracteres
-            </p>
-          </div>
-        {% endif %}
-
-        <!-- Password -->
-        {% if not permisos or permisos.c_password.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_password.usar %} perm-card-disabled{% endif %}" data-permiso="c_password" data-tipo="componente" data-label="Password Textbox">
-            <p class="field-label">Password Textbox <span class="tipo-chip">password</span></p>
-            <div class="input-group-custom">
-              <input type="password" class="field-input" id="c-password" placeholder="••••••••">
-              <button class="input-toggle-eye" onclick="togglePassword()" tabindex="-1">
-                <i class="bi bi-eye" id="eye-icon"></i>
-              </button>
+          <!-- Textbox -->
+          {% if not permisos or permisos.c_textbox.ver %}
+            <div class="card mb-4 componente-card" >
+              <p class="mono uppercase mb-3">Textbox {{ badges.badge('Texto', 'info') }}</p>
+              {{ inputs.input(permiso='c_textbox', label_log='Textbox', label='Escribe aquí', name="c-textbox", type='text') }}
+              <p class="mono mt-2">
+                Input de texto libre · máx. 255 caracteres
+              </p>
             </div>
-          </div>
-        {% endif %}
+          {% endif %}
 
-        <!-- Combobox -->
-        {% if not permisos or permisos.c_combobox.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_combobox.usar %} perm-card-disabled{% endif %}" data-permiso="c_combobox" data-tipo="componente" data-label="Combobox / Select">
-            <p class="field-label">Combobox / Select <span class="tipo-chip">select</span></p>
-            <select class="field-input" id="c-combobox" onchange="actualizarTabla()">
-              <option value="">Seleccionar categoría...</option>
-              <option value="Electrónica">Electrónica</option>
-              <option value="Ropa">Ropa</option>
-              <option value="Alimentos">Alimentos</option>
-              <option value="Herramientas">Herramientas</option>
-              <option value="Software">Software</option>
-            </select>
-          </div>
-        {% endif %}
-
-        <!-- Datepicker -->
-        {% if not permisos or permisos.c_datepicker.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_datepicker.usar %} perm-card-disabled{% endif %}" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker">
-            <p class="field-label">Datepicker <span class="tipo-chip">fecha</span></p>
-            <input type="date" class="field-input" id="c-datepicker" onchange="actualizarTabla()">
-          </div>
-        {% endif %}
-
-        <!-- Rangebox / Slider -->
-        {% if not permisos or permisos.c_range.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_range.usar %} perm-card-disabled{% endif %}" data-permiso="c_range" data-tipo="componente" data-label="Rangebox / Slider">
-            <p class="field-label">Rangebox / Slider <span class="tipo-chip">rango</span></p>
-            <div class="d-flex align-items-center gap-3">
-              <input type="range" class="range-custom flex-grow-1" id="c-range"
-                    min="0" max="100" value="45"
-                    oninput="document.getElementById('range-val').textContent=this.value; actualizarTabla()">
-              <span class="range-value" id="range-val">45</span>
+          <!-- Password -->
+          {% if not permisos or permisos.c_password.ver %}
+            <div class="card mb-4 componente-card" {% if permisos and not permisos.c_password.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Password Textbox {{ badges.badge('Password', 'info') }}</p>
+              {{ inputs.input_password(permiso='c_password', label_log='Password textbox', label='Escribe aquí', name="c-password") }}
             </div>
-            <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
-              Rango 0–100 · valor actual: <span id="range-val-2" style="color:var(--verde);">45</span>
-            </p>
-          </div>
-        {% endif %}
+          {% endif %}
 
+          <!-- Combobox -->
+          {% if not permisos or permisos.c_combobox.ver %}
+            <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_combobox.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Combobox / Select {{ badges.badge('Select', 'info') }}</p>
+              {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", url='/agrosol/api/opciones/') }}
+            </div>
+          {% endif %}
+
+          <!-- Datepicker -->
+          {% if not permisos or permisos.c_datepicker.ver %}
+            <div class="card mb-4 componente-card"  {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Date / Hour picker {{ badges.badge('Fecha y Hora', 'info') }}</p>
+              {{ inputs.input_icon(permiso='c_date_hourpicker', label_log='Fecha y hora', label='Fecha y Hora', name="c-date-hourpicker", icon_name='icon-date-fill') }}
+            </div>
+          {% endif %}
+
+          <!-- Datepicker -->
+          {% if not permisos or permisos.c_datepicker.ver %}
+            <div class="card mb-4 componente-card" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker" {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Datepicker {{ badges.badge('Fecha', 'info') }}</p>
+              {{ inputs.input_icon(permiso='c_datepicker', label_log='Datepicker', label='Fecha', name="c-datepicker", icon_name='icon-date-fill') }}
+            </div>
+          {% endif %}
+
+          <!-- Rangebox / Slider -->
+          {% if not permisos or permisos.c_range.ver %}
+            <div class="card mb-4 componente-card" {% if permisos and not permisos.c_range.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Rangebox / Slider {{ badges.badge('Rango', 'info') }}</p>
+              {{ inputs.input_range(permiso='c_range', label_log='Range control', min='0', max='100', def_value='50', x_params="", x_input_params="") }}
+            </div>
+          {% endif %}
+
+        </div>
+
+        <!-- COL 2 -->
+        <div class="col-span-12 md:col-span-6">
+
+          <!-- Searcher -->
+          {% if not permisos or permisos.c_searcher.ver %}
+            <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_searcher.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Searcher {{ badges.badge('Búsqueda', 'info') }}</p>
+              {{ inputs.input_search(permiso='input_c_searcher', label_log='Buscar producto', name="c-searcher", placeholder="Buscar producto...", action='filtrarSugerencias') }}
+              <p class="mono mt-2">
+                Búsqueda con sugerencias dinámicas
+              </p>
+            </div>
+          {% endif %}
+
+          <!-- Checkboxes -->
+          {% if not permisos or permisos.c_checkbox.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_checkbox.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Checkboxes {{ badges.badge('Múltiple', 'info') }}</p>
+              {% call inputs.input_wrapper(permiso='c_checkbox', label_log='Wrapper Disponibilidad', label='Disponibilidad') %}
+                {{ inputs.input_checkbox(label='Opción A — Disponible', name='c-check1', checked=true) }}
+                {{ inputs.input_checkbox(label='Opción B — En revisión', name='c-check2') }}
+                {{ inputs.input_checkbox(label='Opción C — Pendiente', name='c-check3') }}
+              {% endcall %}
+            </div>
+          {% endif %}
+
+          <!-- Radiobuttons -->
+          {% if not permisos or permisos.c_radio.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_radio.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Radiobutton {{ badges.badge('Único', 'info') }}</p>
+                {% call inputs.input_wrapper(permiso='c_radiobutton', label_log='Wrapper Prioridad', label='Prioridad') %}
+                  {{ inputs.input_radiobutton(label='Alta', name='c-radio', checked=true, value='Alto') }}
+                  {{ inputs.input_radiobutton(label='Media', name='c-radio', value='Medio') }}
+                  {{ inputs.input_radiobutton(label='Baja', name='c-radio', value='Bajo') }}
+                {% endcall %}
+            </div>
+          {% endif %}
+
+          <!-- Toggle / Switch -->
+          {% if not permisos or permisos.c_toggle.ver %}
+          <div class="card componente-card">
+            {% call inputs.input_wrapper(permiso='c_toggle', label_log='Toggle / Switch', label='Preferencias') %}
+              {{ inputs.input_toggle(label='Notificaciones', description='Recibir alertas del sistema', name='c-toggle1',  checked=true) }}
+              {{ inputs.input_toggle(label='Modo público', description='Visible para otros usuarios', name='c-toggle2') }}
+            {% endcall %}
+          </div>
+          {% endif %}
+        </div>
       </div>
 
-      <!-- COL 2 -->
-      <div class="col-lg-6">
-
-        <!-- Searcher -->
-        {% if not permisos or permisos.c_searcher.ver %}
-          <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_searcher.usar %} perm-card-disabled{% endif %}" data-permiso="c_searcher" data-tipo="componente" data-label="Searcher">
-            <p class="field-label">Searcher <span class="tipo-chip">búsqueda</span></p>
-            <div class="search-wrapper">
-              <i class="bi bi-search search-icon"></i>
-              <input type="text" class="field-input search-input" id="c-searcher"
-                    placeholder="Buscar producto..." autocomplete="off"
-                    oninput="filtrarSugerencias(this.value)">
-              <div class="search-results" id="search-results"></div>
+      <!-- Color picker + File upload en row -->
+      <div class="grid grid-cols-12 col-span-12 gap-3">
+        <div class="col-span-12 md:col-span-6">
+          {% if not permisos or permisos.c_color.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_color.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Color Picker {{ badges.badge('Color', 'info') }}</p>
+              {{ inputs.input_color(permiso='c_color', label_log='Selector de color', name='c-color') }}
             </div>
-            <p style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:.4rem;">
-              Búsqueda con sugerencias dinámicas
-            </p>
-          </div>
-        {% endif %}
-
-        <!-- Checkboxes -->
-        {% if not permisos or permisos.c_checkbox.ver %}
-        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_checkbox.usar %} perm-card-disabled{% endif %}" data-permiso="c_checkbox" data-tipo="componente" data-label="Checkboxes">
-          <p class="field-label">Checkboxes <span class="tipo-chip">múltiple</span></p>
-          <label class="check-custom">
-            <input type="checkbox" id="c-check1" checked onchange="actualizarTabla()">
-            <span class="check-box"></span>
-            <span class="check-text">Opción A — Disponible</span>
-          </label>
-          <label class="check-custom">
-            <input type="checkbox" id="c-check2" onchange="actualizarTabla()">
-            <span class="check-box"></span>
-            <span class="check-text">Opción B — En revisión</span>
-          </label>
-          <label class="check-custom">
-            <input type="checkbox" id="c-check3" onchange="actualizarTabla()">
-            <span class="check-box"></span>
-            <span class="check-text">Opción C — Pendiente</span>
-          </label>
+          {% endif %}
         </div>
-                {% endif %}
-
-        <!-- Radiobuttons -->
-        {% if not permisos or permisos.c_radio.ver %}
-        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_radio.usar %} perm-card-disabled{% endif %}" data-permiso="c_radio" data-tipo="componente" data-label="Radiobutton">
-          <p class="field-label">Radiobutton <span class="tipo-chip">único</span></p>
-          <label class="radio-custom">
-            <input type="radio" name="c-radio" value="Alto" checked onchange="actualizarTabla()">
-            <span class="radio-circle"></span>
-            <span class="check-text">Prioridad Alta</span>
-          </label>
-          <label class="radio-custom">
-            <input type="radio" name="c-radio" value="Medio" onchange="actualizarTabla()">
-            <span class="radio-circle"></span>
-            <span class="check-text">Prioridad Media</span>
-          </label>
-          <label class="radio-custom">
-            <input type="radio" name="c-radio" value="Bajo" onchange="actualizarTabla()">
-            <span class="radio-circle"></span>
-            <span class="check-text">Prioridad Baja</span>
-          </label>
+        <div class="col-span-12 md:col-span-6">
+          {% if not permisos or permisos.c_file.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_file.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">File / Image Upload {{ badges.badge('Archivo', 'info') }}</p>
+              {{ inputs.input_file(permiso='c_file', label_log='Subir archivo', name='c-file', accept='image/*' ) }}
+            </div>
+          {% endif %}
         </div>
-                {% endif %}
-
-        <!-- Toggle / Switch -->
-        {% if not permisos or permisos.c_toggle.ver %}
-        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_toggle.usar %} perm-card-disabled{% endif %}" data-permiso="c_toggle" data-tipo="componente" data-label="Toggle / Switch">
-          <p class="field-label">Toggle / Switch <span class="tipo-chip">booleano</span></p>
-          <div class="toggle-row">
-            <div>
-              <p style="font-size:.88rem;font-weight:600;margin:0;">Notificaciones</p>
-              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">Recibir alertas del sistema</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="c-toggle1" checked onchange="actualizarTabla()">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-row">
-            <div>
-              <p style="font-size:.88rem;font-weight:600;margin:0;">Modo público</p>
-              <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">Visible para otros usuarios</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="c-toggle2" onchange="actualizarTabla()">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-                {% endif %}
-
-        <!-- Color picker + File upload en row -->
-        <div class="row g-3">
-          <div class="col-6">
-            {% if not permisos or permisos.c_color.ver %}
-        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_color.usar %} perm-card-disabled{% endif %}" data-permiso="c_color" data-tipo="componente" data-label="Color Picker">
-              <p class="field-label">Color Picker <span class="tipo-chip">color</span></p>
-              <div class="color-input-wrap">
-                <input type="color" class="color-picker" id="c-color" value="#4ade80"
-                       oninput="actualizarColor(this.value)">
-                <input type="text" class="color-hex" id="color-hex-val"
-                       value="#4ade80" maxlength="7"
-                       oninput="sincronizarColor(this.value)">
-              </div>
-            </div>
-                    {% endif %}
-          </div>
-          <div class="col-6">
-            {% if not permisos or permisos.c_file.ver %}
-        <div class="panel-card componente-card fade-up d2{% if permisos and not permisos.c_file.usar %} perm-card-disabled{% endif %}" data-permiso="c_file" data-tipo="componente" data-label="File / Image Upload">
-              <p class="field-label">File / Image <span class="tipo-chip">archivo</span></p>
-              <div class="upload-zone" id="upload-zone"
-                   ondragover="event.preventDefault();this.classList.add('dragover')"
-                   ondragleave="this.classList.remove('dragover')"
-                   ondrop="handleDrop(event)"
-                   onclick="document.getElementById('c-file').click()">
-                <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
-                <p class="upload-text"><strong>Click</strong> o arrastra aquí</p>
-                <div class="upload-preview" id="upload-preview">
-                  <img id="upload-img" src="" alt="">
-                </div>
-              </div>
-              <input type="file" id="c-file" accept="image/*" style="display:none"
-                     onchange="previewFile(this)">
-            </div>
-                    {% endif %}
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════
-         SECCIÓN 3 — DATOS
-    ══════════════════════════════════════════ -->
-    <p class="section-title fade-up d3 mt-4">
-      <span class="cat-label cat-dato"><i class="bi bi-table"></i>Datos</span>
-    </p>
-
-    <!-- Barra de herramientas de la tabla -->
-    {% if not permisos or permisos.barra_tabla.ver %}
-    <div class="d-flex align-items-center justify-content-between mb-3 gap-3 flex-wrap fade-up d3{% if permisos and not permisos.barra_tabla.usar %} perm-disabled{% endif %}" data-permiso="barra_tabla" data-tipo="accion" data-label="Barra de Herramientas Tabla">
-      <div class="search-wrapper" style="max-width:280px;flex:1;">
-        <i class="bi bi-search search-icon"></i>
-        <input type="text" class="field-input search-input" id="tabla-search"
-               placeholder="Filtrar tabla..." oninput="filtrarTabla(this.value)">
-      </div>
-      <div class="d-flex gap-2">
-        <button class="btn-cancelar-a" onclick="resetearTabla()" style="font-size:.78rem;padding:.4rem .9rem;">
-          <i class="bi bi-arrow-clockwise"></i>Reset
-        </button>
-        {% if not permisos or permisos.btn_agregar_fila.ver %}
-        <button class="btn-crear{% if permisos and not permisos.btn_agregar_fila.usar %} perm-disabled{% endif %}" data-permiso="btn_agregar_fila" data-tipo="accion" data-label="Botón Agregar Fila" {% if not permisos or permisos.btn_agregar_fila.usar %}onclick="agregarRegistro()"{% endif %} style="font-size:.78rem;padding:.4rem .9rem;">
-          <i class="bi bi-plus-lg"></i>Agregar fila
-        </button>
-        {% endif %}
-      </div>
-    </div>
-    {% endif %}
-
-    {% if not permisos or permisos.tabla_datos.ver %}
-    <div class="table-card fade-up d3" data-permiso="tabla_datos" data-tipo="dato" data-label="Tabla de Datos">
-      <table class="table table-custom" id="tabla-datos">
-        <thead>
-          <tr>
-            <th>#</th>
-            {% if not permisos or permisos.col_nombre.ver %}<th data-permiso="col_nombre" data-tipo="dato" data-label="Columna Nombre">Nombre</th>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<th data-permiso="col_categoria" data-tipo="dato" data-label="Columna Categoría">Categoría</th>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<th data-permiso="col_fecha" data-tipo="dato" data-label="Columna Fecha">Fecha</th>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<th data-permiso="col_valor" data-tipo="dato" data-label="Columna Valor">Valor</th>{% endif %}
-            <th>Color</th>
-            {% if not permisos or permisos.col_prioridad.ver %}<th data-permiso="col_prioridad" data-tipo="dato" data-label="Columna Prioridad">Prioridad</th>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<th data-permiso="col_estado" data-tipo="dato" data-label="Columna Estado">Estado</th>{% endif %}
-            <th>Notif.</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody-datos">
-          <!-- Datos ficticios iniciales -->
-          <tr class="fila-dato">
-            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#001</td>
-            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Proyecto Alpha</td>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Software</span></td>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">12/01/2026</td>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">78</td>{% endif %}
-            <td><span class="color-dot" style="background:#4ade80;"></span></td>
-            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
-            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
-            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #001','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
-          </tr>
-          <tr class="fila-dato">
-            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#002</td>
-            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Stock Herramientas</td>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Herramientas</span></td>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">05/02/2026</td>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">32</td>{% endif %}
-            <td><span class="color-dot" style="background:#f87171;"></span></td>
-            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-pendiente">Medio</span></td>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-pendiente">Pendiente</span></td>{% endif %}
-            <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
-            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #002','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
-          </tr>
-          <tr class="fila-dato">
-            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#003</td>
-            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Lote Alimentos Q1</td>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Alimentos</span></td>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">20/03/2026</td>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">91</td>{% endif %}
-            <td><span class="color-dot" style="background:#fbbf24;"></span></td>
-            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-activo">Alto</span></td>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-activo">Activo</span></td>{% endif %}
-            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
-            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #003','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
-          </tr>
-          <tr class="fila-dato">
-            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#004</td>
-            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Colección Ropa Verano</td>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Ropa</span></td>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">01/04/2026</td>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">55</td>{% endif %}
-            <td><span class="color-dot" style="background:#a78bfa;"></span></td>
-            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);">Bajo</span></td>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-inactivo">Inactivo</span></td>{% endif %}
-            <td><i class="bi bi-x-circle-fill" style="color:var(--muted);font-size:.85rem;"></i></td>
-            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #004','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
-          </tr>
-          <tr class="fila-dato">
-            <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#005</td>
-            {% if not permisos or permisos.col_nombre.ver %}<td style="font-weight:600;">Dispositivos Electrónicos</td>{% endif %}
-            {% if not permisos or permisos.col_categoria.ver %}<td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">Electrónica</span></td>{% endif %}
-            {% if not permisos or permisos.col_fecha.ver %}<td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">14/03/2026</td>{% endif %}
-            {% if not permisos or permisos.col_valor.ver %}<td style="font-family:'DM Mono',monospace;font-size:.78rem;">67</td>{% endif %}
-            <td><span class="color-dot" style="background:#60a5fa;"></span></td>
-            {% if not permisos or permisos.col_prioridad.ver %}<td><span class="status-badge s-revision">Alto</span></td>{% endif %}
-            {% if not permisos or permisos.col_estado.ver %}<td><span class="status-badge s-revision">Revisión</span></td>{% endif %}
-            <td><i class="bi bi-check-circle-fill" style="color:var(--verde);font-size:.85rem;"></i></td>
-            <td><div class="d-flex gap-1"><button class="icon-btn edit" onclick="accionToast('Editando fila #005','info')"><i class="bi bi-pencil"></i></button><button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button></div></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="table-footer">
-        <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);" id="tabla-info">
-          5 registros · datos ficticios en memoria
-        </span>
-        <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);">
-          Los cambios de los componentes se reflejan aquí
-        </span>
-      </div>
-    </div>
-    {% endif %}
     <footer class="flex w-full justify-center h-auto text-fg-muted text-sm p-0 m-0">Agrosol · Prueba Técnica de Componentes · {{ request.user.username }}</footer>
     {% endif %}
   </div>
 
-
-
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // ══════════════════════════════════════════
-    //  TOAST
-    // ══════════════════════════════════════════
-    let toastTimer;
-    function mostrarToast(msg, tipo = 'success') {
-      const toast  = document.getElementById('toast');
-      const icon   = document.getElementById('toast-icon');
-      const msgEl  = document.getElementById('toast-msg');
-      const iconos = { success:'bi-check-circle-fill', error:'bi-x-circle-fill', info:'bi-info-circle-fill', warning:'bi-exclamation-triangle-fill' };
-      clearTimeout(toastTimer);
-      toast.className   = `toast-custom ${tipo}`;
-      icon.className    = `toast-icon bi ${iconos[tipo]}`;
-      msgEl.textContent = msg;
-      toast.classList.add('show');
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    function accionToast(accion, tipo) {
-      mostrarToast(`Acción ejecutada: ${accion}`, tipo);
-    }
-
-    // ══════════════════════════════════════════
-    //  REGISTRO DE ACTIVIDAD — Logs automáticos
-    //  Envía un log al servidor cuando el usuario
-    //  interactúa con un elemento data-permiso
-    // ══════════════════════════════════════════
-    const CSRF_LOG    = "{{ csrf_token }}";
-    const MODULO_URL  = "prueba_tecnica";
-    const LOG_URL     = "{% url 'registro_elemento' %}";
-
-    function registrarLog(clave, label) {
-      // No loguear si el usuario es superusuario (opcional)
-      // Falla silenciosamente — nunca interrumpe la UX
-      try {
-        const fd = new FormData();
-        fd.append('csrfmiddlewaretoken', CSRF_LOG);
-        fd.append('elemento_clave',     clave);
-        fd.append('elemento_label',     label);
-        fd.append('modulo_url',         MODULO_URL);
-        fetch(LOG_URL, { method: 'POST', body: fd }).catch(() => {});
-      } catch(e) {}
-    }
-
-    // Adjuntar listeners automáticamente a TODOS los elementos con data-permiso
-    // Se ejecuta una sola vez al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('[data-permiso]').forEach(el => {
-        const clave = el.dataset.permiso;
-        const label = el.dataset.label || clave;
-        const tipo  = el.dataset.tipo  || 'componente';
-
-        // Para acciones: escuchar click
-        if (tipo === 'accion') {
-          el.addEventListener('click', () => registrarLog(clave, label), { passive: true });
-        }
-
-        // Para componentes: escuchar cambio/interacción
-        if (tipo === 'componente') {
-          const tag = el.tagName.toLowerCase();
-          if (tag === 'input' || tag === 'select' || tag === 'textarea') {
-            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
-          } else {
-            // Wrapper div/section — escuchar cualquier interacción interna
-            el.addEventListener('click',  () => registrarLog(clave, label), { passive: true });
-            el.addEventListener('change', () => registrarLog(clave, label), { passive: true });
-          }
-        }
-      });
-    });
-
-    // ══════════════════════════════════════════
-    //  PASSWORD TOGGLE
-    // ══════════════════════════════════════════
-    function togglePassword() {
-      const input = document.getElementById('c-password');
-      const icon  = document.getElementById('eye-icon');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'bi bi-eye-slash';
-      } else {
-        input.type = 'password';
-        icon.className = 'bi bi-eye';
-      }
-    }
-
-    // ══════════════════════════════════════════
-    //  COLOR PICKER SYNC
-    // ══════════════════════════════════════════
-    function actualizarColor(val) {
-      document.getElementById('color-hex-val').value = val;
-    }
-    function sincronizarColor(val) {
-      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-        document.getElementById('c-color').value = val;
-      }
-    }
-
-    // ══════════════════════════════════════════
-    //  FILE UPLOAD PREVIEW
-    // ══════════════════════════════════════════
-    function previewFile(input) {
-      if (!input.files || !input.files[0]) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('upload-img').src = e.target.result;
-        document.getElementById('upload-preview').style.display = 'block';
-        mostrarToast(`Archivo cargado: ${input.files[0].name}`, 'success');
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-    function handleDrop(e) {
-      e.preventDefault();
-      document.getElementById('upload-zone').classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        document.getElementById('upload-img').src = ev.target.result;
-        document.getElementById('upload-preview').style.display = 'block';
-        mostrarToast(`Archivo arrastrado: ${file.name}`, 'success');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // ══════════════════════════════════════════
-    //  RANGE SYNC
-    // ══════════════════════════════════════════
-    document.getElementById('c-range').addEventListener('input', function() {
-      document.getElementById('range-val').textContent  = this.value;
-      document.getElementById('range-val-2').textContent = this.value;
-    });
-
-    // ══════════════════════════════════════════
-    //  SEARCHER CON SUGERENCIAS
-    // ══════════════════════════════════════════
-    const SUGERENCIAS = ['Proyecto Alpha','Stock Herramientas','Lote Alimentos Q1','Colección Ropa Verano','Dispositivos Electrónicos','Fertilizante NPK','Semillas Maíz','Abono Orgánico','Fungicida Mancozeb'];
-
-    function filtrarSugerencias(q) {
-      const results = document.getElementById('search-results');
-      if (!q.trim()) { results.classList.remove('show'); return; }
-      const matches = SUGERENCIAS.filter(s => s.toLowerCase().includes(q.toLowerCase()));
-      if (!matches.length) { results.classList.remove('show'); return; }
-      results.innerHTML = matches.map(m =>
-        `<div class="search-result-item" onclick="seleccionarSugerencia('${m}')">
-          <i class="bi bi-search"></i>${m}
-        </div>`
-      ).join('');
-      results.classList.add('show');
-    }
-
-    function seleccionarSugerencia(val) {
-      document.getElementById('c-searcher').value = val;
-      document.getElementById('search-results').classList.remove('show');
-      mostrarToast(`Seleccionado: ${val}`, 'info');
-    }
-
-    document.addEventListener('click', e => {
-      if (!e.target.closest('.search-wrapper')) {
-        document.getElementById('search-results').classList.remove('show');
-      }
-    });
-
-    // ══════════════════════════════════════════
-    //  AGREGAR FILA A LA TABLA (desde componentes)
-    // ══════════════════════════════════════════
-    let filaCount = 6;
-
-    function actualizarTabla() {
-      // Sincroniza range label
-      document.getElementById('range-val-2').textContent = document.getElementById('c-range').value;
-    }
-
-    function agregarRegistro() {
-      const nombre    = document.getElementById('c-textbox').value.trim()     || `Registro #00${filaCount}`;
-      const categoria = document.getElementById('c-combobox').value            || '—';
-      const fecha     = document.getElementById('c-datepicker').value          || new Date().toLocaleDateString('es-HN');
-      const valor     = document.getElementById('c-range').value               || '0';
-      const color     = document.getElementById('c-color').value               || '#4ade80';
-      const radio     = document.querySelector('input[name="c-radio"]:checked')?.value || 'Medio';
-      const notif     = document.getElementById('c-toggle1').checked;
-
-      const prioClass = { 'Alto':'s-revision','Medio':'s-pendiente','Bajo':'' }[radio] || '';
-      const prioStyle = radio === 'Bajo' ? 'style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);"' : '';
-
-      const id = String(filaCount).padStart(3, '0');
-      const tbody = document.getElementById('tbody-datos');
-
-      const fila = document.createElement('tr');
-      fila.className = 'fila-dato row-new';
-      fila.innerHTML = `
-        <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);">#${id}</td>
-        <td style="font-weight:600;">${nombre}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--azul);">${categoria}</span></td>
-        <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">${fecha}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${valor}</td>
-        <td><span class="color-dot" style="background:${color};"></span></td>
-        <td><span class="status-badge ${prioClass}" ${prioStyle}>${radio}</span></td>
-        <td><span class="status-badge s-activo">Activo</span></td>
-        <td><i class="bi bi-${notif ? 'check-circle-fill" style="color:var(--verde)' : 'x-circle-fill" style="color:var(--muted)'};font-size:.85rem;"></i></td>
-        <td>
-          <div class="d-flex gap-1">
-            <button class="icon-btn edit" onclick="accionToast('Editando fila #${id}','info')"><i class="bi bi-pencil"></i></button>
-            <button class="icon-btn del" onclick="eliminarFila(this)"><i class="bi bi-trash3"></i></button>
-          </div>
-        </td>`;
-
-      tbody.insertBefore(fila, tbody.firstChild);
-      filaCount++;
-      actualizarContador();
-      mostrarToast(`Registro #${id} agregado a la tabla.`, 'success');
-    }
-
-    function eliminarFila(btn) {
-      const fila = btn.closest('tr');
-      fila.style.transition = 'opacity .3s, transform .3s';
-      fila.style.opacity = '0';
-      fila.style.transform = 'translateX(20px)';
-      setTimeout(() => { fila.remove(); actualizarContador(); }, 300);
-      mostrarToast('Registro eliminado.', 'error');
-    }
-
-    function actualizarContador() {
-      const n = document.querySelectorAll('.fila-dato:not([style*="opacity: 0"])').length;
-      document.getElementById('tabla-info').textContent = `${n} registros · datos ficticios en memoria`;
-    }
-
-    // ══════════════════════════════════════════
-    //  FILTRAR TABLA
-    // ══════════════════════════════════════════
-    function filtrarTabla(q) {
-      document.querySelectorAll('.fila-dato').forEach(f => {
-        f.style.display = f.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
-      });
-    }
-
-    function resetearTabla() {
-      document.querySelectorAll('.fila-dato').forEach(f => f.style.display = '');
-      document.getElementById('tabla-search').value = '';
-      mostrarToast('Tabla reseteada.', 'info');
-    }
-  </script>
 {% endblock %}

@@ -9,7 +9,9 @@
     aria-label="Menú de usuario">
     <!-- Header con avatar, nombre y rol -->
     <div class="popover-header">
-      {{ avatars.avatar(size='18', user=user) }}
+      <div class="w-full flex justify-center">
+        {{ avatars.avatar(size='16', user=user) }}
+      </div>
       <span class="popover-username">{{ request.user.get_full_name() or request.user.username }}</span>
       <span class="popover-role">@{{ user.username }}</span>
     </div>
@@ -17,12 +19,12 @@
     <!-- Opciones -->
     <nav role="none">
       <a href="{{ url('perfil') }}">
-        {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-settings-fill', text='Configuración') }}
+        {{ buttons.icon_text_button(permiso='btn_perfil', label_log='Botón ver perfil', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-settings-fill', text='Configuración') }}
       </a>
-      {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
+      {{ buttons.icon_text_button(permiso='btn_tema', label_log='Botón cambiar tema de color', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
       <form method="POST" action="{{ url('logout') }}">
         {{ render_csrf_token(request)|safe }}
-        {{ buttons.icon_text_button(func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
+        {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Botón cerrar sesión', func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
       </form>
     </nav>
   </div>
@@ -36,12 +38,14 @@
     aria-label="Menú de usuario">
       <nav role="none">
         {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
           func_type='button', type='btn-icon-text-menu', role='menuitem', 
           icon_size='4', icon_name='icon-pencil-fill', text='Editar', 
           action='openModal', target='modal-edit', hx_get=row.edit_url, 
           hx_target="#modal-edit-content", hx_swap="innerHTML"
           ) }}
         {{ buttons.icon_text_button(
+          permiso='btn_eliminación', label_log='Botón abrir eliminación', 
           func_type='button', type='btn-icon-text-menu-danger', role='menuitem',
           icon_size='4', icon_name='icon-trash-fill', text='Eliminar',
           action='openModal', target='modal-delete', hx_get=row.delete_url, 
@@ -60,19 +64,19 @@
       <nav role="none">
         {% if user.is_superuser %}
           <a href="{{ url('lista_usuarios') }}">
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-users-group-regular', text='Usuarios') }}
+            {{ buttons.icon_text_button(permiso='btn_lista_usuarios', label_log='Botón abrir usuarios', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-users-group-regular', text='Usuarios') }}
           </a>
           <a href="{{ url('panel_permisos') }}">
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-shield-regular', text='Permisos') }}
+            {{ buttons.icon_text_button(permiso='btn_panel_permisos', label_log='Abrir panel de permisos', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-shield-regular', text='Permisos') }}
           </a>
           <a href="{{ url('prueba_tecnica') }}">
-            {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-module-regular', text='Pruebas') }}
+            {{ buttons.icon_text_button(permiso='btn_prueba_tecnica', label_log='Abrir prueba técnica', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-module-regular', text='Pruebas') }}
           </a>
         {% endif %}
-        {{ buttons.icon_text_button(func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
+        {{ buttons.icon_text_button(permiso='btn_tema', label_log='Botón cambiar tema', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
         <form method="POST" action="{{ url('logout') }}">
           {{ render_csrf_token(request)|safe }}
-          {{ buttons.icon_text_button(func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
+          {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Cerrar sesión', func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
         </form>
       </nav>
   </div>

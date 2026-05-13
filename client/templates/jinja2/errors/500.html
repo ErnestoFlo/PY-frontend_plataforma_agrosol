@@ -1,259 +1,162 @@
-<!DOCTYPE html>
-<html lang="es" data-bs-theme="dark">
+<!doctype html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>500 — Error del Servidor · Agrosol</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>500 · Error Interno del Servidor</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const theme = saved || (prefersDark ? 'dark' : 'light')
+      document.documentElement.setAttribute('data-theme', theme)
+    })()
+  </script>
   <style>
-    :root {
-      --verde:     #4ade80; --verde-dim: #166534;
-      --fondo:     #0a0f0a; --card:      #111a11;
-      --borde:     #1f2e1f; --texto:     #e2f0e2;
-      --muted:     #6b7c6b; --acento:    #86efac;
-      --color:     #fb923c; /* naranja para 500 */
-      --color-dim: rgba(251,146,60,.12);
+    @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+    :root{
+      --color-primary-600: hsl(148 88% 24%);
+      --color-accent-500: hsl(40 98% 30%);
+      --color-neutral-50:  hsl(40 5% 90%);
+      --color-neutral-100: hsl(40 5% 80%);
+      --color-neutral-300: hsl(40 5% 60%);
+      --color-neutral-700: hsl(40 5% 20%);
+      --color-neutral-900: hsl(40 5% 10%);
+
+      --color-surface-1: var(--color-neutral-50);
+      --color-surface-2: var(--color-neutral-50);
+      --color-bg: var(--color-neutral-100);
+
+      --color-fg: var(--color-neutral-900);
+      --color-fg-body: var(--color-neutral-700);
+      --color-fg-muted: var(--color-neutral-400, #6b7280);
+
+      --color-primary-theme: var(--color-primary-600);
+      --color-accent-theme: var(--color-accent-500);
+      --color-danger-200: hsl(0 70% 70%);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Syne', sans-serif;
-      background: var(--fondo);
-      background-image: radial-gradient(circle, #1a2e1a 1px, transparent 1px);
-      background-size: 28px 28px;
-      color: var(--texto); min-height: 100vh;
-      display: flex; flex-direction: column;
-      overflow-x: hidden;
+    [data-theme="dark"]{
+      --color-surface-1: var(--color-neutral-900);
+      --color-surface-2: var(--color-neutral-800);
+      --color-bg: var(--color-neutral-950);
+      --color-fg: var(--color-neutral-50);
+      --color-fg-body: var(--color-neutral-100);
+      --color-fg-muted: var(--color-neutral-500, #9ca3af);
+      --color-primary-theme: var(--color-primary-400, hsl(148 80% 58%));
     }
-    .navbar-custom {
-      background: rgba(10,15,10,.9); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--borde); padding: .75rem 2rem;
-    }
-    .navbar-brand {
-      font-size: 1.4rem; font-weight: 800; letter-spacing: -.03em;
-      color: var(--verde); text-decoration: none;
-    }
-    .error-wrapper {
-      flex: 1; display: flex; align-items: center;
-      justify-content: center; padding: 2rem 1rem;
-    }
-    .error-container { width: 100%; max-width: 600px; text-align: center; }
-    /* CÓDIGO GIGANTE */
-    .error-code {
-      font-size: clamp(7rem, 20vw, 11rem);
-      font-weight: 800; letter-spacing: -.06em; line-height: 1;
-      background: linear-gradient(135deg, var(--color), rgba(251,146,60,.35));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: glitch 5s ease-in-out infinite;
-      margin-bottom: .5rem;
-    }
-    @keyframes glitch {
-      0%, 90%, 100% { transform: none; filter: drop-shadow(0 0 20px rgba(251,146,60,.25)); }
-      91% { transform: skew(-1deg) translateX(-3px); filter: drop-shadow(3px 0 0 rgba(251,146,60,.8)); }
-      92% { transform: skew(1deg)  translateX(3px);  filter: drop-shadow(-3px 0 0 rgba(251,146,60,.8)); }
-      93% { transform: none; filter: drop-shadow(0 0 30px rgba(251,146,60,.6)); }
-    }
-    /* ICONO CON PULSO */
-    .error-icon-wrap {
-      position: relative; width: 80px; height: 80px; margin: 0 auto 1.5rem;
-    }
-    .icon-bg {
-      width: 80px; height: 80px; border-radius: 50%;
-      background: var(--color-dim); border: 1px solid rgba(251,146,60,.25);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: var(--color); position: relative; z-index: 1;
-    }
-    .icon-pulse {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 2px solid rgba(251,146,60,.3);
-      animation: expand 2s ease-out infinite;
-    }
-    .icon-pulse-2 {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 2px solid rgba(251,146,60,.15);
-      animation: expand 2s ease-out .6s infinite;
-    }
-    @keyframes expand {
-      0%   { transform: scale(1); opacity: .8; }
-      100% { transform: scale(1.7); opacity: 0; }
-    }
-    /* TEXTOS */
-    .error-tag {
-      font-family: 'DM Mono', monospace; font-size: .72rem;
-      background: var(--color-dim); color: var(--color);
-      border: 1px solid rgba(251,146,60,.2); border-radius: 6px;
-      padding: .2rem .6rem; display: inline-block; margin-bottom: 1rem;
-    }
-    .error-title {
-      font-size: 1.6rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: .75rem;
-    }
-    .error-desc {
-      font-family: 'DM Mono', monospace; font-size: .82rem;
-      color: var(--muted); line-height: 1.7; margin-bottom: 1.75rem;
-    }
-    /* TERMINAL DE ERROR */
-    .terminal {
-      background: #060d06; border: 1px solid var(--borde);
-      border-radius: 12px; overflow: hidden;
-      margin-bottom: 1.75rem; text-align: left;
-    }
-    .terminal-header {
-      background: var(--card); border-bottom: 1px solid var(--borde);
-      padding: .6rem 1rem; display: flex; align-items: center; gap: .5rem;
-    }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-r { background: #f87171; } .dot-y { background: #fbbf24; } .dot-g { background: var(--verde); }
-    .terminal-title {
-      font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted); margin-left: .4rem;
-    }
-    .terminal-body { padding: 1.1rem 1.3rem; }
-    .terminal-line {
-      font-family: 'DM Mono', monospace; font-size: .78rem;
-      line-height: 1.9; display: flex; gap: .75rem;
-    }
-    .t-prompt { color: var(--verde); flex-shrink: 0; }
-    .t-error  { color: var(--color); }
-    .t-muted  { color: var(--muted); }
-    .t-blink  {
-      display: inline-block; width: 8px; height: 14px;
-      background: var(--verde); vertical-align: middle; margin-left: 2px;
-      animation: blink .9s step-end infinite;
-    }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    /* ACCIONES */
-    .actions-card {
-      background: var(--card); border: 1px solid var(--borde);
-      border-radius: 12px; padding: 1.1rem 1.4rem;
-      margin-bottom: 1.75rem; text-align: left;
-    }
-    .action-label {
-      font-family: 'DM Mono', monospace; font-size: .65rem;
-      letter-spacing: .12em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: .75rem;
-    }
-    .action-item {
-      display: flex; align-items: center; gap: .75rem;
-      padding: .5rem 0; border-bottom: 1px solid var(--borde); font-size: .85rem;
-    }
-    .action-item:last-child { border-bottom: none; }
-    .action-item i { color: var(--color); width: 16px; text-align: center; }
-    /* BOTONES */
-    .btn-primary-custom {
-      background: var(--verde); color: #0a0f0a; border: none;
-      border-radius: 10px; font-weight: 700; font-size: .9rem;
-      padding: .7rem 1.8rem; text-decoration: none;
-      transition: opacity .2s; display: inline-block; cursor: pointer;
-    }
-    .btn-primary-custom:hover { opacity: .85; color: #0a0f0a; }
-    .btn-secondary-custom {
-      background: transparent; color: var(--muted);
-      border: 1px solid var(--borde); border-radius: 10px;
-      font-size: .9rem; padding: .7rem 1.6rem;
-      text-decoration: none; transition: all .2s; display: inline-block;
-    }
-    .btn-secondary-custom:hover { color: var(--texto); border-color: var(--muted); }
-    /* ANIMACIONES */
-    .fade-up { opacity: 0; transform: translateY(20px); animation: fu .5s ease forwards; }
-    @keyframes fu { to { opacity: 1; transform: none; } }
-    .d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; } .d3 { animation-delay: .3s; }
-    footer {
-      border-top: 1px solid var(--borde); padding: 1.25rem 0;
-      text-align: center; font-family: 'DM Mono', monospace;
-      font-size: .7rem; color: var(--muted);
-    }
+
+    .page-bg{ background: var(--color-bg); }
+    .font-display { font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+    .text-fg { color: var(--color-fg); }
+    .text-fg-body { color: var(--color-fg-body); }
+    .text-fg-muted { color: var(--color-fg-muted); }
+    .text-primary-theme { color: var(--color-primary-theme); }
+    .bg-surface-2 { background: var(--color-surface-2); }
+    .bg-surface-1 { background: var(--color-surface-1); }
+    .bg-surface-1-6 { background: color-mix(in srgb, var(--color-surface-1) 6%, transparent); }
+    .bg-primary-theme-10 { background: color-mix(in srgb, var(--color-primary-theme) 10%, transparent); }
+    .shadow-c-md { box-shadow: var(--shadow-c-md, 0 8px 24px rgba(2,6,23,.12)); }
+    .heading-2 { font-size: 1.25rem; font-weight:700; }
+    .body-lg { font-size: 1rem; }
+    .btn { padding:.5rem .9rem; border-radius:.5rem; }
+    .btn-ghost { background: transparent; border:1px solid color-mix(in srgb, var(--color-fg) 8%, transparent); }
+    .btn-primary { background: var(--color-primary-theme); color:var(--color-fg-inverted, #fff); border:none; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
   </style>
 </head>
-<body>
+<body class="page-bg">
+  <main class="w-full min-h-screen flex items-center justify-center px-6 py-16">
+    <div class="max-w-3xl w-full">
+      <header class="flex items-center justify-between mb-8">
+        <a href="/" class="font-display font-bold text-lg text-fg">Agrosol</a>
+        <span class="mono text-sm text-fg-muted">Sistema de Gestión</span>
+      </header>
 
-  <nav class="navbar-custom d-flex align-items-center justify-content-between">
-    <a href="/" class="navbar-brand">Agrosol</a>
-    <span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">
-      Sistema de Gestión
-    </span>
-  </nav>
+      <section class="flex flex-col items-center text-center gap-4 p-8 bg-surface-2 rounded-xl shadow-c-md">
+        <div class="text-6xl md:text-8xl font-display font-extrabold leading-none text-fg">500</div>
+        <div class="w-20 h-20 rounded-full bg-primary-theme-10 flex items-center justify-center text-primary-theme text-2xl relative">⚠️</div>
+        <span class="mono text-xs bg-primary-theme-10 text-primary-theme px-2 py-1 rounded inline-block">INTERNAL_SERVER_ERROR</span>
+        <h1 class="heading-2 mt-2">Error del Servidor</h1>
+        <p class="body-lg text-fg-body max-w-xl">Algo falló en el servidor al procesar tu solicitud. El equipo técnico ha sido notificado automáticamente.</p>
 
-  <div class="error-wrapper">
-    <div class="error-container">
-
-      <div class="fade-up">
-        <div class="error-code">500</div>
-      </div>
-
-      <div class="fade-up d1">
-        <div class="error-icon-wrap">
-          <div class="icon-pulse"></div>
-          <div class="icon-pulse-2"></div>
-          <div class="icon-bg"><i class="bi bi-cpu"></i></div>
-        </div>
-        <span class="error-tag">INTERNAL_SERVER_ERROR</span>
-        <h1 class="error-title">Error del Servidor</h1>
-        <p class="error-desc">
-          Algo falló en el servidor al procesar tu solicitud.<br>
-          El equipo técnico ha sido notificado automáticamente.
-        </p>
-      </div>
-
-      <!-- Terminal de error -->
-      <div class="terminal fade-up d2">
-        <div class="terminal-header">
-          <div class="dot dot-r"></div>
-          <div class="dot dot-y"></div>
-          <div class="dot dot-g"></div>
-          <span class="terminal-title">agrosol — server.log</span>
-        </div>
-        <div class="terminal-body">
-          <div class="terminal-line">
-            <span class="t-prompt">$</span>
-            <span class="t-muted">django · {{ request.path }}</span>
-          </div>
-          <div class="terminal-line">
-            <span class="t-prompt">!</span>
-            <span class="t-error">InternalServerError: 500</span>
-          </div>
-          <div class="terminal-line">
-            <span class="t-prompt">→</span>
-            <span class="t-muted">El servidor encontró una condición inesperada</span>
-          </div>
-          <div class="terminal-line">
-            <span class="t-prompt">$</span>
-            <span class="t-muted">esperando acción del usuario<span class="t-blink"></span></span>
+        <div class="w-full mt-4 p-4 rounded-lg bg-surface-1/6">
+          <p class="mono text-xs text-fg-muted mb-2">Registro (simulado)</p>
+          <div class="bg-surface-1 text-fg-inverted p-3 rounded font-mono text-sm" style="color:var(--color-fg-inverted, #fff)">
+            <div>$ django · /ruta/ejemplo</div>
+            <div>! InternalServerError: 500</div>
+            <div>→ El servidor encontró una condición inesperada</div>
           </div>
         </div>
-      </div>
 
-      <!-- Qué hacer -->
-      <div class="actions-card fade-up d2">
-        <p class="action-label">Qué puedes hacer</p>
-        <div class="action-item">
-          <i class="bi bi-arrow-clockwise"></i>
-          <span>Recarga la página — puede ser un error temporal</span>
+        <div class="flex gap-3 mt-6 justify-center">
+          <button onclick="location.reload()" class="body btn btn-ghost text-fg-muted">Reintentar</button>
+          <a href="/" class="btn btn-primary">Ir al inicio</a>
         </div>
-        <div class="action-item">
-          <i class="bi bi-clock"></i>
-          <span>Espera unos minutos e intenta nuevamente</span>
-        </div>
-        <div class="action-item">
-          <i class="bi bi-house"></i>
-          <span>Regresa al inicio y retoma tu trabajo desde allí</span>
-        </div>
-      </div>
+      </section>
 
-      <div class="d-flex gap-3 justify-content-center flex-wrap fade-up d3">
-        <button onclick="location.reload()" class="btn-secondary-custom">
-          <i class="bi bi-arrow-clockwise me-2"></i>Reintentar
-        </button>
-        <a href="{% url 'proveedores' %}" class="btn-primary-custom">
-          <i class="bi bi-house me-2"></i>Ir al inicio
-        </a>
-      </div>
-
+      <footer class="mt-8 mono text-xs text-fg-muted text-center">Agrosol · Error 500 · Error Interno del Servidor</footer>
     </div>
-  </div>
-
-  <footer>Agrosol · Error 500 · Error Interno del Servidor</footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </main>
 </body>
-</html>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const theme = saved || (prefersDark ? 'dark' : 'light')
+      document.documentElement.setAttribute('data-theme', theme)
+    })()
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+    :root{
+      --color-primary-500: hsl(148 98% 30%);
+      --color-primary-600: hsl(148 88% 24%);
+      --color-accent-500: hsl(40 98% 30%);
+      --color-neutral-50:  hsl(40 5% 90%);
+      --color-neutral-100: hsl(40 5% 80%);
+      --color-neutral-300: hsl(40 5% 60%);
+      --color-neutral-700: hsl(40 5% 20%);
+      --color-neutral-900: hsl(40 5% 10%);
+      --color-success-100: hsl(138 45% 80%);
+      --color-success-800: hsl(130 42% 20%);
+      --color-danger-200: hsl(0 70% 70%);
+      --color-danger-600: hsl(0 60% 40%);
+      --color-surface-1: var(--color-neutral-50);
+      --color-surface-2: var(--color-neutral-50);
+      --color-bg: var(--color-neutral-100);
+      --color-fg: var(--color-neutral-900);
+      --color-fg-body: var(--color-neutral-700);
+      --color-fg-muted: var(--color-neutral-400, #6b7280);
+      --color-primary-theme: var(--color-primary-600);
+      --color-accent-theme: var(--color-accent-500);
+      --color-fg-success: var(--color-success-800);
+      --color-fg-danger: var(--color-danger-600);
+    }
+    [data-theme="dark"]{
+      --color-surface-1: var(--color-neutral-900);
+      --color-surface-2: var(--color-neutral-800);
+      --color-bg: var(--color-neutral-950);
+      --color-fg: var(--color-neutral-50);
+      --color-fg-body: var(--color-neutral-100);
+      --color-fg-muted: var(--color-neutral-500, #9ca3af);
+      --color-primary-theme: var(--color-primary-400, hsl(148 80% 58%));
+    }
+    .font-display { font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+    .text-fg { color: var(--color-fg); }
+    .text-fg-muted { color: var(--color-fg-muted); }
+    .bg-surface-1 { background-color: var(--color-surface-1); }
+    .bg-surface-2\/5 { background-color: rgba(15,23,42,.05); }
+    .bg-surface-1\/6 { background-color: rgba(15,23,42,.06); }
+    .shadow-c-md { box-shadow: var(--shadow-c-md, 0 8px 24px rgba(2,6,23,.12)); }
+    .heading-2 { font-size: 1.25rem; font-weight:700; }
+    .body-lg { font-size: 1rem; }
+    .btn { padding:.5rem .9rem; border-radius:.5rem; }
+    .btn-ghost { background: transparent; border:1px solid rgba(15,23,42,.05); }
+    .btn-primary { background: var(--color-primary-theme); color:var(--color-fg-inverted, #fff); border:none; }
+    .link-card { display:flex; align-items:center; justify-content:space-between; padding:.75rem; border-radius:.5rem; }
+    .link-card:hover{ background: rgba(0,0,0,0.03); }
+    .bg-black\/80{ background: rgba(0,0,0,.8); }
+    .font-mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+  </style>

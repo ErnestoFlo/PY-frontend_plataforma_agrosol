@@ -48,7 +48,7 @@
       {% endfor %}
       {% if with_actions %}
         <td class="table-td overflow-visible w-auto flex justify-center gap-2 relative" data-action="popoverContainer">
-          {{ buttons.icon_button(func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-horizontal-fill', size='4', action='togglePopover', target=row.actions_id, attrs="aria-haspopup='true' aria-expanded='false'") }}
+          {{ buttons.icon_button(permiso='btn_row_actions', label_log='Abrir acciones fila', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-horizontal-fill', size='4', action='togglePopover', target=row.actions_id, attrs="aria-haspopup='true' aria-expanded='false'") }}
           {{ popovers.row_actions(row) }}
         </td>
       {% endif %}
@@ -86,7 +86,7 @@
             {{ row.id_col }}
           </h3>
         </div>
-        {{ buttons.icon_button(
+        {{ buttons.icon_button(permiso='btn_row_actions_mobile', label_log='Abrir acciones fila (mobile)',
           func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0 rounded-md w-6 h-6', 
           icon_size='4', icon_name='icon-elipsis-horizontal-fill', text='Editar', action='openModal', 
           target='modal-detail', hx_get=row.detail_url, hx_target="#modal-detail-content", hx_swap="innerHTML"

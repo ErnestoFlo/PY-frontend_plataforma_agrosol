@@ -28,7 +28,7 @@
           </div>
         </div>
         <a href="#login" class="flex-1 w-full md:w-30 flex flex-col justify-end md:justify-start py-20 md:py-10">
-          {{ buttons.button(type='btn-contrast', x_params='w-full', text='Ingresar') }}
+          {{ buttons.button(permiso='btn_ingresar', label_log='Ingresar', type='btn-contrast', x_params='w-full', text='Ingresar') }}
         </a>
       </div>
       <!-- <div class="highlight w-1/2 aspect-square bg-primary-200/40 blur-3xl bottom-1/2 left-2/3 -z-10"></div>
@@ -50,10 +50,10 @@
                       Usuario o contraseña incorrectos.
                     </div>
                   {% endif %}
-                  {{ inputs.input(field=form.username, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', type='text', name='username', label='Usuario') }}
-                  {{ inputs.input_password(field=form.password, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', name='password', label='Contraseña', icon_name='icon-open-eye-regular') }}
+                  {{ inputs.input(permiso='input_username', label_log='Usuario', field=form.username, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', type='text', name='username', label='Usuario') }}
+                  {{ inputs.input_password(permiso='input_password', label_log='Contraseña', field=form.password, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', name='password', label='Contraseña') }}
                 </div>
-                {{ buttons.button(func_type="submit", x_params="w-1/2", type='btn-primary', text='Ingresar') }}
+                {{ buttons.button(permiso='btn_ingresar', label_log='Ingresar', func_type="submit", x_params="w-1/2", type='btn-primary', text='Ingresar') }}
               </form>
             </div>
         </div>

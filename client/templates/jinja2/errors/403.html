@@ -1,236 +1,124 @@
-<!DOCTYPE html>
-<html lang="es" data-bs-theme="dark">
+<!doctype html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>403 — Acceso Prohibido · Agrosol</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>403 · Acceso Prohibido</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const theme = saved || (prefersDark ? 'dark' : 'light')
+      document.documentElement.setAttribute('data-theme', theme)
+    })()
+  </script>
   <style>
-    :root {
-      --verde:     #4ade80; --verde-dim: #166534;
-      --fondo:     #0a0f0a; --card:      #111a11;
-      --borde:     #1f2e1f; --texto:     #e2f0e2;
-      --muted:     #6b7c6b; --acento:    #86efac;
-      --color:     #f87171; /* rojo para 403 */
-      --color-dim: rgba(239,68,68,.12);
+    @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+    :root{
+      --color-primary-600: hsl(148 88% 24%);
+      --color-accent-500: hsl(40 98% 30%);
+      --color-neutral-50:  hsl(40 5% 90%);
+      --color-neutral-100: hsl(40 5% 80%);
+      --color-neutral-300: hsl(40 5% 60%);
+      --color-neutral-700: hsl(40 5% 20%);
+      --color-neutral-900: hsl(40 5% 10%);
+      --color-danger-200: hsl(0 70% 70%);
+      --color-danger-600: hsl(0 60% 40%);
+
+      --color-surface-1: var(--color-neutral-50);
+      --color-surface-2: var(--color-neutral-50);
+      --color-bg: var(--color-neutral-100);
+
+      --color-fg: var(--color-neutral-900);
+      --color-fg-body: var(--color-neutral-700);
+      --color-fg-muted: var(--color-neutral-400, #6b7280);
+
+      --color-primary-theme: var(--color-primary-600);
+      --color-accent-theme: var(--color-accent-500);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Syne', sans-serif;
-      background: var(--fondo);
-      background-image: radial-gradient(circle, #1a2e1a 1px, transparent 1px);
-      background-size: 28px 28px;
-      color: var(--texto); min-height: 100vh;
-      display: flex; flex-direction: column;
+    [data-theme="dark"]{
+      --color-surface-1: var(--color-neutral-900);
+      --color-surface-2: var(--color-neutral-800);
+      --color-bg: var(--color-neutral-950);
+      --color-fg: var(--color-neutral-50);
+      --color-fg-body: var(--color-neutral-100);
+      --color-fg-muted: var(--color-neutral-500, #9ca3af);
+      --color-primary-theme: var(--color-primary-400, hsl(148 80% 58%));
     }
-    .navbar-custom {
-      background: rgba(10,15,10,.9); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--borde); padding: .75rem 2rem;
-    }
-    .navbar-brand {
-      font-size: 1.4rem; font-weight: 800; letter-spacing: -.03em;
-      color: var(--verde); text-decoration: none;
-    }
-    .error-wrapper {
-      flex: 1; display: flex; align-items: center;
-      justify-content: center; padding: 2rem 1rem;
-    }
-    .error-container { width: 100%; max-width: 580px; text-align: center; }
-    /* CÓDIGO GIGANTE */
-    .error-code {
-      font-size: clamp(7rem, 20vw, 11rem);
-      font-weight: 800; letter-spacing: -.06em; line-height: 1;
-      background: linear-gradient(135deg, var(--color), rgba(239,68,68,.35));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: glow 3s ease-in-out infinite;
-      margin-bottom: .5rem;
-    }
-    @keyframes glow {
-      0%, 100% { filter: drop-shadow(0 0 20px rgba(239,68,68,.25)); }
-      50%       { filter: drop-shadow(0 0 45px rgba(239,68,68,.5)); }
-    }
-    /* CANDADO ANIMADO */
-    .lock-wrap {
-      position: relative; width: 80px; height: 80px;
-      margin: 0 auto 1.5rem;
-    }
-    .lock-icon {
-      width: 80px; height: 80px; border-radius: 50%;
-      background: var(--color-dim); border: 1px solid rgba(239,68,68,.25);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: var(--color);
-      animation: shake 4s ease-in-out infinite;
-    }
-    @keyframes shake {
-      0%, 85%, 100% { transform: rotate(0); }
-      88%  { transform: rotate(-8deg); }
-      91%  { transform: rotate(8deg); }
-      94%  { transform: rotate(-5deg); }
-      97%  { transform: rotate(5deg); }
-    }
-    .lock-ring {
-      position: absolute; inset: -6px; border-radius: 50%;
-      border: 2px solid rgba(239,68,68,.15);
-      animation: ring-pulse 3s ease-in-out infinite;
-    }
-    @keyframes ring-pulse {
-      0%, 100% { transform: scale(1); opacity: .6; }
-      50%       { transform: scale(1.08); opacity: .15; }
-    }
-    /* TEXTOS */
-    .error-tag {
-      font-family: 'DM Mono', monospace; font-size: .72rem;
-      background: var(--color-dim); color: var(--color);
-      border: 1px solid rgba(239,68,68,.2); border-radius: 6px;
-      padding: .2rem .6rem; display: inline-block; margin-bottom: 1rem;
-    }
-    .error-title {
-      font-size: 1.6rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: .75rem;
-    }
-    .error-desc {
-      font-family: 'DM Mono', monospace; font-size: .82rem;
-      color: var(--muted); line-height: 1.7; margin-bottom: 1.75rem;
-    }
-    /* USUARIO INFO */
-    .user-card {
-      background: var(--card); border: 1px solid var(--borde);
-      border-radius: 12px; padding: 1rem 1.4rem;
-      display: flex; align-items: center; gap: 1rem;
-      margin-bottom: 1.75rem; text-align: left;
-    }
-    .user-avatar {
-      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--verde), #16a34a);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; font-weight: 800; color: #0a0f0a; overflow: hidden;
-      box-shadow: 0 0 0 2px var(--card), 0 0 0 3px var(--verde-dim);
-    }
+
+    .page-bg{ background: var(--color-bg); }
+    .font-display { font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+    .text-fg { color: var(--color-fg); }
+    .text-fg-body { color: var(--color-fg-body); }
+    .text-fg-muted { color: var(--color-fg-muted); }
+    .text-primary-theme { color: var(--color-primary-theme); }
+    .text-accent-theme { color: var(--color-accent-theme); }
+    .text-danger { color: var(--color-danger-600); }
+    .bg-surface-2 { background: var(--color-surface-2); }
+    .bg-surface-1 { background: var(--color-surface-1); }
+    .bg-surface-1-6 { background: color-mix(in srgb, var(--color-surface-1) 6%, transparent); }
+    .bg-danger-10 { background: color-mix(in srgb, var(--color-danger-200) 10%, transparent); }
+    .bg-primary-theme-10 { background: color-mix(in srgb, var(--color-primary-theme) 10%, transparent); }
+    .shadow-c-md { box-shadow: var(--shadow-c-md, 0 8px 24px rgba(2,6,23,.12)); }
+    .heading-2 { font-size: 1.25rem; font-weight:700; }
+    .body-lg { font-size: 1rem; }
+    .btn { padding:.5rem .9rem; border-radius:.5rem; }
+    .btn-ghost { background: transparent; border:1px solid color-mix(in srgb, var(--color-fg) 8%, transparent); }
+    .btn-primary { background: var(--color-primary-theme); color:var(--color-fg-inverted, #fff); border:none; }
+    .link-card { display:flex; align-items:center; justify-content:space-between; padding:.75rem; border-radius:.5rem; }
+    .link-card:hover{ background: color-mix(in srgb, var(--color-fg) 4%, transparent); }
+    .user-avatar { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:800; color:var(--color-fg); background: linear-gradient(135deg, var(--color-primary-theme), color-mix(in srgb, var(--color-primary-theme) 70%, black)); box-shadow: 0 0 0 2px var(--color-surface-1); overflow:hidden; }
     .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    /* PERMISOS FALTANTES */
-    .perm-card {
-      background: var(--color-dim); border: 1px solid rgba(239,68,68,.2);
-      border-radius: 12px; padding: 1.1rem 1.4rem;
-      margin-bottom: 1.75rem; text-align: left;
-    }
-    .perm-label {
-      font-family: 'DM Mono', monospace; font-size: .65rem;
-      letter-spacing: .12em; text-transform: uppercase; color: var(--color);
-      margin-bottom: .6rem; display: flex; align-items: center; gap: .4rem;
-    }
-    .perm-row {
-      display: flex; align-items: center; gap: .6rem;
-      font-size: .83rem; color: var(--muted);
-    }
-    .perm-row i { color: var(--color); font-size: .75rem; }
-    /* BOTONES */
-    .btn-primary-custom {
-      background: var(--verde); color: #0a0f0a; border: none;
-      border-radius: 10px; font-weight: 700; font-size: .9rem;
-      padding: .7rem 1.8rem; text-decoration: none;
-      transition: opacity .2s; display: inline-block;
-    }
-    .btn-primary-custom:hover { opacity: .85; color: #0a0f0a; }
-    .btn-secondary-custom {
-      background: transparent; color: var(--muted);
-      border: 1px solid var(--borde); border-radius: 10px;
-      font-size: .9rem; padding: .7rem 1.6rem;
-      text-decoration: none; transition: all .2s; display: inline-block;
-    }
-    .btn-secondary-custom:hover { color: var(--texto); border-color: var(--muted); }
-    /* ANIMACIONES */
-    .fade-up { opacity: 0; transform: translateY(20px); animation: fu .5s ease forwards; }
-    @keyframes fu { to { opacity: 1; transform: none; } }
-    .d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; } .d3 { animation-delay: .3s; }
-    footer {
-      border-top: 1px solid var(--borde); padding: 1.25rem 0;
-      text-align: center; font-family: 'DM Mono', monospace;
-      font-size: .7rem; color: var(--muted);
-    }
   </style>
 </head>
-<body>
+<body class="page-bg">
+  <main class="w-full min-h-screen flex items-center justify-center px-6 py-16">
+    <div class="max-w-3xl w-full">
+      <header class="flex items-center justify-between mb-8">
+        <a href="/" class="font-display font-bold text-lg text-fg">Agrosol</a>
+        <span class="mono text-sm text-fg-muted">Sistema de Gestión</span>
+      </header>
 
-  <nav class="navbar-custom d-flex align-items-center justify-content-between">
-    <a href="/" class="navbar-brand">Agrosol</a>
-    <span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">
-      Sistema de Gestión
-    </span>
-  </nav>
-
-  <div class="error-wrapper">
-    <div class="error-container">
-
-      <div class="fade-up">
-        <div class="error-code">403</div>
-      </div>
-
-      <div class="fade-up d1">
-        <div class="lock-wrap">
-          <div class="lock-ring"></div>
-          <div class="lock-icon"><i class="bi bi-shield-lock"></i></div>
+      <section class="flex flex-col items-center text-center gap-4 p-8 bg-surface-2 rounded-xl shadow-c-md">
+        <div class="text-6xl md:text-8xl font-display font-extrabold leading-none text-fg">403</div>
+        <div class="w-20 h-20 rounded-full bg-danger-10 flex items-center justify-center text-danger text-2xl">
+          🔒
         </div>
-        <span class="error-tag">FORBIDDEN</span>
-        <h1 class="error-title">Acceso Prohibido</h1>
-        <p class="error-desc">
-          No tienes los permisos necesarios para acceder<br>
-          a este recurso con tu cuenta actual.
-        </p>
-      </div>
+        <span class="mono text-xs bg-danger-10 text-danger px-2 py-1 rounded inline-block">FORBIDDEN</span>
+        <h1 class="heading-2 mt-2">Acceso Prohibido</h1>
+        <p class="body-lg text-fg-body max-w-xl">No tienes los permisos necesarios para acceder a este recurso con tu cuenta actual.</p>
 
-      <!-- Info del usuario logueado -->
-      {% if request.user.is_authenticated %}
-      <div class="user-card fade-up d2">
-        <div class="user-avatar">
-          {% if request.user.profile.avatar.name %}
-            <img src="{{ request.user.profile.avatar.url }}" alt="">
-          {% else %}
-            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-          {% endif %}
-        </div>
-        <div>
-          <p style="font-weight:700;font-size:.88rem;margin:0;">
-            {{ request.user.get_full_name|default:request.user.username }}
-          </p>
-          <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin:.1rem 0 0;">
-            Conectado como <span style="color:var(--acento);">@{{ request.user.username }}</span>
-            ·
-            {% if request.user.is_superuser %}
-              <span style="color:var(--color);">Super Admin</span>
-            {% elif request.user.is_staff %}
-              <span style="color:var(--amarillo, #fbbf24);">Staff</span>
+          <div class="w-full flex items-center gap-4 mt-4 p-4 rounded-lg bg-surface-1-6">
+          <div class="user-avatar">
+            {% if request.user.profile.avatar.name %}
+              <img src="{{ request.user.profile.avatar.url }}" alt="">
             {% else %}
-              <span>Usuario</span>
+              {{ request.user.profile.initials }}
             {% endif %}
-          </p>
+          </div>          
+          <div class="text-left">
+            <p class="font-semibold">{{ request.user.get_full_name() or request.user.username }}</p>
+            <p class="mono text-xs text-fg-muted">Conectado como <span class="text-accent-theme">@{{ request.user.username }}</span> · 
+              {% if request.user.is_superuser %}
+              <span class="text-accent-theme">Super Admin</span>
+              {% elif request.user.is_staff %}
+                <span class="text-accent-theme">Staff</span>
+              {% else %}
+                <span class="text-accent-theme">Usuario</span>
+              {% endif %}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div class="perm-card fade-up d2">
-        <p class="perm-label"><i class="bi bi-x-circle"></i> Acceso requerido</p>
-        <p class="perm-row">
-          <i class="bi bi-dot"></i>
-          Esta sección está restringida a usuarios con permisos especiales
-        </p>
-      </div>
-      {% endif %}
+        <div class="flex gap-3 mt-6 justify-center">
+          <a href="javascript:history.back()" class="body btn btn-ghost text-fg-muted">Volver atrás</a>
+          <a href="/" class="btn btn-primary">Ir al inicio</a>
+        </div>
+      </section>
 
-      <div class="d-flex gap-3 justify-content-center flex-wrap fade-up d3">
-        <a href="javascript:history.back()" class="btn-secondary-custom">
-          <i class="bi bi-arrow-left me-2"></i>Volver atrás
-        </a>
-        <a href="{% url 'proveedores' %}" class="btn-primary-custom">
-          <i class="bi bi-house me-2"></i>Ir al inicio
-        </a>
-      </div>
-
+      <footer class="mt-8 mono text-xs text-fg-muted text-center">Agrosol · Error 403 · Acceso Prohibido</footer>
     </div>
-  </div>
-
-  <footer>Agrosol · Error 403 · Acceso Prohibido</footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </main>
 </body>
 </html>

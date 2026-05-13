@@ -12,7 +12,7 @@
         <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
           {{ title }}
         </h2>
-        {{ buttons.input_icon_button(func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', size='5', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
+        {{ buttons.input_icon_button(permiso='btn_close_modal', label_log='Cerrar modal', func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', size='5', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
       </div>
 
       <div id="{{ modal_id }}-content" class="modal-body"
@@ -62,13 +62,13 @@
       </div>
     </div>
     {# Botones de acciones #}
-    <div class="flex gap-2 pt-2">
-      {{ buttons.icon_text_button(
+      <div class="flex gap-2 pt-2">
+      {{ buttons.icon_text_button(permiso='btn_edit_detail', label_log='Editar registro detalle',
         func_type='button', type='btn-icon-text-menu', role='button', icon_size='4',
         icon_name='icon-pencil-fill', text='Editar', action='openModal', target='modal-edit',
         hx_get=row.edit_url, hx_target="#modal-edit-content", hx_swap="innerHTML"
       ) }}
-      {{ buttons.icon_text_button(
+      {{ buttons.icon_text_button(permiso='btn_delete_detail', label_log='Eliminar registro detalle',
         func_type='button', type='btn-icon-text-menu-danger', role='button', icon_size='4',
         icon_name='icon-trash-fill', text='Eliminar', action='openModal', target='modal-delete',
         hx_get=row.delete_url, hx_target="#modal-delete-content", hx_swap="innerHTML"
@@ -105,8 +105,8 @@
             </p>
           </div>
           <div class="flex justify-end gap-2 mt-2 col-span-12">
-            {{ buttons.icon_text_button(func_type='submit', type='btn-icon-text-danger', icon_name='icon-logout-fill', icon_size='4', text='Cerrar Sesión', action='cerrarSesionAhora', target='modal-delete') }}
-            {{ buttons.button(func_type='button', type='btn-ghost', text='¡Sigo aquí!', action='continuarSesion') }}
+            {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Cerrar sesión', func_type='submit', type='btn-icon-text-danger', icon_name='icon-logout-fill', icon_size='4', text='Cerrar Sesión', action='cerrarSesionAhora', target='modal-delete') }}
+            {{ buttons.button(permiso='btn_continuar_sesion', label_log='Continuar sesión', func_type='button', type='btn-ghost', text='¡Sigo aquí!', action='continuarSesion') }}
           </div>
         </section>
       </div>
