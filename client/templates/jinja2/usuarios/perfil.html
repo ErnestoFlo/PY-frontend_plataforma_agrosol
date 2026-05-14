@@ -19,10 +19,10 @@
             <h1 class="heading-1">{{ request.user.get_full_name() or request.user.username }}</h1>
             <p class="body text-primary-theme mb-1">@{{ request.user.username }}</p>
             {% if request.user.profile.cargo %}
-            <p style="color:var(--muted);font-size:.85rem;margin-bottom:.6rem;">
-              <i class="bi bi-briefcase me-1"></i>{{ request.user.profile.cargo }}
+            <div class="body text-muted flex items-center gap-2 mb-2">
+              {{ request.user.profile.cargo }}
               {% if request.user.profile.area %}· <span style="color:var(--acento);">{{ request.user.profile.area }}</span>{% endif %}
-            </p>
+            </div>
             {% endif %}
             <div class="d-flex gap-2 flex-wrap">
               {% if request.user.is_superuser %}
@@ -131,7 +131,7 @@
               {% else %}
                 <p class="mono uppercase m-0">Sin foto de perfil</p>
               {% endif %}
-            {{ buttons.icon_text_button(permiso='btn_cambiar_foto', label_log='Cambiar foto de perfil', func_type='button', type='btn-icon-text-secondary', text='Cambiar foto', icon_name='icon-camera-regular', icon_size='5', action='openmodal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
+            {{ buttons.icon_text_button(permiso='btn_cambiar_foto', label_log='Cambiar foto de perfil', func_type='button', type='btn-icon-text-secondary', text='Cambiar foto', icon_name='icon-camera-regular', icon_size='5', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
           </div>
         </div>
       </div>

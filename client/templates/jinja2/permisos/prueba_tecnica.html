@@ -76,7 +76,7 @@
           {% if not permisos or permisos.c_textbox.ver %}
             <div class="card mb-4 componente-card" >
               <p class="mono uppercase mb-3">Textbox {{ badges.badge('Texto', 'info') }}</p>
-              {{ inputs.input(permiso='c_textbox', label_log='Textbox', label='Escribe aquí', name="c-textbox", type='text') }}
+              {{ inputs.input(permiso='c_textbox', label_log='Textbox', label='Escribe aquí', name="c-textbox", id='c-textbox', type='text') }}
               <p class="mono mt-2">
                 Input de texto libre · máx. 255 caracteres
               </p>
@@ -87,7 +87,7 @@
           {% if not permisos or permisos.c_password.ver %}
             <div class="card mb-4 componente-card" {% if permisos and not permisos.c_password.usar %} aria-disabled='true'{% endif %}>
               <p class="mono uppercase mb-3">Password Textbox {{ badges.badge('Password', 'info') }}</p>
-              {{ inputs.input_password(permiso='c_password', label_log='Password textbox', label='Escribe aquí', name="c-password") }}
+              {{ inputs.input_password(permiso='c_password', label_log='Password textbox', label='Escribe aquí', name="c-password", id='c-password') }}
             </div>
           {% endif %}
 
@@ -95,7 +95,7 @@
           {% if not permisos or permisos.c_combobox.ver %}
             <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_combobox.usar %} aria-disabled='true'{% endif %}>
               <p class="mono uppercase mb-3">Combobox / Select {{ badges.badge('Select', 'info') }}</p>
-              {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", url='/agrosol/api/opciones/') }}
+              {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", id='c-combobox', url='/agrosol/api/opciones/') }}
             </div>
           {% endif %}
 
@@ -103,7 +103,7 @@
           {% if not permisos or permisos.c_datepicker.ver %}
             <div class="card mb-4 componente-card"  {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
               <p class="mono uppercase mb-3">Date / Hour picker {{ badges.badge('Fecha y Hora', 'info') }}</p>
-              {{ inputs.input_icon(permiso='c_date_hourpicker', label_log='Fecha y hora', label='Fecha y Hora', name="c-date-hourpicker", icon_name='icon-date-fill') }}
+              {{ inputs.input_icon(permiso='c_date_hourpicker', label_log='Fecha y hora', label='Fecha y Hora', name="c-date-hourpicker", id='c-date-hourpicker', icon_name='icon-date-fill') }}
             </div>
           {% endif %}
 
@@ -111,7 +111,7 @@
           {% if not permisos or permisos.c_datepicker.ver %}
             <div class="card mb-4 componente-card" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker" {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
               <p class="mono uppercase mb-3">Datepicker {{ badges.badge('Fecha', 'info') }}</p>
-              {{ inputs.input_icon(permiso='c_datepicker', label_log='Datepicker', label='Fecha', name="c-datepicker", icon_name='icon-date-fill') }}
+              {{ inputs.input_icon(permiso='c_datepicker', label_log='Datepicker', label='Fecha', name="c-datepicker", id='c-date-hourpicker', icon_name='icon-date-fill') }}
             </div>
           {% endif %}
 
@@ -132,7 +132,7 @@
           {% if not permisos or permisos.c_searcher.ver %}
             <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_searcher.usar %} aria-disabled='true'{% endif %}>
               <p class="mono uppercase mb-3">Searcher {{ badges.badge('Búsqueda', 'info') }}</p>
-              {{ inputs.input_search(permiso='input_c_searcher', label_log='Buscar producto', name="c-searcher", placeholder="Buscar producto...", action='filtrarSugerencias') }}
+              {{ inputs.input_search(permiso='input_c_searcher', label_log='Buscar producto', name="c-searcher", id='c-searcher', placeholder="Buscar producto...", action='filtrarSugerencias') }}
               <p class="mono mt-2">
                 Búsqueda con sugerencias dinámicas
               </p>
@@ -144,9 +144,9 @@
             <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_checkbox.usar %} aria-disabled='true' {% endif %}>
               <p class="mono uppercase mb-3">Checkboxes {{ badges.badge('Múltiple', 'info') }}</p>
               {% call inputs.input_wrapper(permiso='c_checkbox', label_log='Wrapper Disponibilidad', label='Disponibilidad') %}
-                {{ inputs.input_checkbox(label='Opción A — Disponible', name='c-check1', checked=true) }}
-                {{ inputs.input_checkbox(label='Opción B — En revisión', name='c-check2') }}
-                {{ inputs.input_checkbox(label='Opción C — Pendiente', name='c-check3') }}
+                {{ inputs.input_checkbox(label='Opción A — Disponible', name='c-check1', id='c-check1', checked=true) }}
+                {{ inputs.input_checkbox(label='Opción B — En revisión', name='c-check2',  id='c-check2') }}
+                {{ inputs.input_checkbox(label='Opción C — Pendiente', name='c-check3',  id='c-check3') }}
               {% endcall %}
             </div>
           {% endif %}
@@ -156,9 +156,9 @@
             <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_radio.usar %} aria-disabled='true' {% endif %}>
               <p class="mono uppercase mb-3">Radiobutton {{ badges.badge('Único', 'info') }}</p>
                 {% call inputs.input_wrapper(permiso='c_radiobutton', label_log='Wrapper Prioridad', label='Prioridad') %}
-                  {{ inputs.input_radiobutton(label='Alta', name='c-radio', checked=true, value='Alto') }}
-                  {{ inputs.input_radiobutton(label='Media', name='c-radio', value='Medio') }}
-                  {{ inputs.input_radiobutton(label='Baja', name='c-radio', value='Bajo') }}
+                  {{ inputs.input_radiobutton(label='Alta', name='c-radio', id='c-radio', checked=true, value='Alto') }}
+                  {{ inputs.input_radiobutton(label='Media', name='c-radio', id='c-radio', value='Medio') }}
+                  {{ inputs.input_radiobutton(label='Baja', name='c-radio', id='c-radio', value='Bajo') }}
                 {% endcall %}
             </div>
           {% endif %}
@@ -167,8 +167,8 @@
           {% if not permisos or permisos.c_toggle.ver %}
           <div class="card componente-card">
             {% call inputs.input_wrapper(permiso='c_toggle', label_log='Toggle / Switch', label='Preferencias') %}
-              {{ inputs.input_toggle(label='Notificaciones', description='Recibir alertas del sistema', name='c-toggle1',  checked=true) }}
-              {{ inputs.input_toggle(label='Modo público', description='Visible para otros usuarios', name='c-toggle2') }}
+              {{ inputs.input_toggle(label='Notificaciones', description='Recibir alertas del sistema', name='c-toggle1', id='c-toggle1',  checked=true) }}
+              {{ inputs.input_toggle(label='Modo público', description='Visible para otros usuarios', name='c-toggle2', id='c-toggle2') }}
             {% endcall %}
           </div>
           {% endif %}
@@ -181,7 +181,7 @@
           {% if not permisos or permisos.c_color.ver %}
             <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_color.usar %} aria-disabled='true' {% endif %}>
               <p class="mono uppercase mb-3">Color Picker {{ badges.badge('Color', 'info') }}</p>
-              {{ inputs.input_color(permiso='c_color', label_log='Selector de color', name='c-color') }}
+              {{ inputs.input_color(permiso='c_color', label_log='Selector de color', name='c-color', id='c-color') }}
             </div>
           {% endif %}
         </div>
@@ -189,7 +189,7 @@
           {% if not permisos or permisos.c_file.ver %}
             <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_file.usar %} aria-disabled='true' {% endif %}>
               <p class="mono uppercase mb-3">File / Image Upload {{ badges.badge('Archivo', 'info') }}</p>
-              {{ inputs.input_file(permiso='c_file', label_log='Subir archivo', name='c-file', accept='image/*' ) }}
+              {{ inputs.input_file(permiso='c_file', label_log='Subir archivo', name='c-file', id='c-file', accept='image/*' ) }}
             </div>
           {% endif %}
         </div>

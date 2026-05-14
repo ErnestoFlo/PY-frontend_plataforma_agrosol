@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // *********************************************************
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
+
   // Inicialización de módulos que lo requieran
   // Inicializa tablas responsivas de todo el proyecto
   if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="proveedores"]')}  // Tabla de proveedores
@@ -54,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="continuarSesion"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.continuarSesion())})
   // **** INPUTS ****
   document.querySelectorAll('[data-action="filtrarSugerencias"]').forEach(searcher => {searcher.addEventListener('input', (e) => filtrarSugerencias(e.currentTarget.value))})
+  document.querySelectorAll('[data-action="actualizarIniciales"]').forEach(input => {input.addEventListener('input', (e) => actualizarIniciales())})
   // **** COMBOBOXES ****
   document.querySelectorAll('[data-action="comboboxToggle"]').forEach(trigger => {trigger.addEventListener('click', (e) => comboboxToggle(e.currentTarget))})
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
@@ -80,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!zone) return
     zone.classList.remove('drag-over')
   })
-
   document.addEventListener('drop', (e) => {
     const zone = e.target.closest('[data-action="filePickerZone"]')
     if (!zone) return
@@ -92,7 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   document.addEventListener('change', (e) => {
     if (!e.target.classList.contains('file-input')) return
+
     const picker = e.target.closest('.file-picker')
+    const isAvatarInput = picker?.dataset.name === 'c-file-foto'
+
+    if (isAvatarInput) {
+      previewAvatar(e.target)
+      return
+    }
+
     handleFiles(picker, e.target, e.target.files)
   })
 
@@ -377,6 +386,29 @@ function handleFiles(picker, input, files) {
   input.files = files
 }
 
+// Avatar Upload Preview
+  function previewAvatar(input) {
+    if (!input.files || !input.files[0]) return
+    const reader = new FileReader()
+    reader.onload = e => {
+      const img = document.getElementById('avatar-img-preview')
+      img.src = e.target.result
+      img.style.display = 'block'
+      const initials = document.getElementById('avatar-initials')
+      if (initials) {
+        initials.style.display = 'none'
+      }
+    }
+    reader.readAsDataURL(input.files[0])
+  }
+  function actualizarIniciales() {
+    console.log('ejecutando')
+    const fn = document.getElementById('f-first_name').value.trim();
+    const ln = document.getElementById('f-last_name').value.trim();
+    document.getElementById('avatar-initials').textContent =
+      ((fn[0] || '') + (ln[0] || '')).toUpperCase() || '?';
+  }
+
   // Mostrar - Ocultar Contraseña
   function togglePassword(btn){
     const inputId = btn.dataset.target
@@ -486,6 +518,10 @@ function handleFiles(picker, input, files) {
       if (isFormModal && !url.searchParams.has('fragment')) {
         url.searchParams.set('fragment', 'form')
       }
+      if (isFormModal && !url.searchParams.has('edit_form')) {
+        url.searchParams.set('edit_form', true)
+      }
+      console.log("URL antes de normalizar:", get_url)
       requestUrl = `${url.pathname}${url.search}`
 
       htmx.ajax('GET', requestUrl, {
@@ -676,6 +712,16 @@ function handleFiles(picker, input, files) {
         row.classList.toggle('hidden', tipo !== 'todos' && row.dataset.tipo !== tipo);
       });
     }
+
+  // Mostrar mensaje de éxito almacenado en sessionStorage (desde HTMX o redirecciones) 
+  // cuando la pagina recarga en su totalidad y se necesita dar feedback de una accion previa
+  const message = sessionStorage.getItem('success_message');
+
+  if (message) {
+    AlertManager.success(message);
+    sessionStorage.removeItem('success_message');
+  }
+
 })
 
   // Cerrar el modal cuando hay un clic en el botón cerrar

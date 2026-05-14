@@ -1,8 +1,8 @@
-{% macro avatar(user, size="4", action=none, action_icon=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none ) %}
+{% macro avatar(user, size="4", x_params='', id=none, action=none, action_icon=none, target=none, hx_get=none, hx_target=none, hx_swap=none, hx_trigger=none ) %}
 
-  <div class="w-{{ size }} h-{{ size }} min-w-{{ size }} min-h-{{ size }} max-w-{{ size }} max-h-{{ size }} bg-surface-3 rounded-full shadow-md relative" style="width: var(--spacing-{{ size }});">
+  <div class="w-{{ size }} h-{{ size }} min-w-{{ size }} min-h-{{ size }} max-w-{{ size }} max-h-{{ size }} bg-surface-3 rounded-full shadow-md relative {{ x_params }}" style="width: var(--spacing-{{ size }});">
     <div 
-      class="flex flex-col h-{{ size }} w-{{ size }} items-center justify-center  overflow-hidden bg-surface-3 rounded-full relative"
+      class="flex flex-col h-full w-full items-center justify-center  overflow-hidden bg-surface-3 rounded-full relative"
       {% if action %}data-action="{{ action }}"{% endif %}
       {% if target %}data-target="{{ target }}"{% endif %}
       {% if hx_get %}hx-get="{{ hx_get }}"{% endif %}
@@ -11,9 +11,10 @@
       {% if hx_trigger %}hx-trigger="{{ hx_trigger }}"{% endif %}
     >
       {% if user.profile.avatar.name %}
-        <img src="{{ user.profile.avatar.url }}" alt="Foto de perfil de {{ user.username }}" class="w-full h-full object-cover">
+        <img src="{{ user.profile.avatar.url }}" alt="Foto de perfil de {{ user.username }}" {% if id %}id="{{ id }}"{% endif %} class="w-full h-full object-cover"/>
       {% else %}
-        <div class="h-full w-full flex items-center justify-center text-fg font-display font-bold text-[1.5em]"> {{ user.profile.initials }} </div>
+        <img class="hidden w-full h-full object-cover" {% if id %}id="{{ id }}"{% endif %} />
+        <div id="avatar-initials" class="h-full w-full flex items-center justify-center text-fg font-display font-bold text-[1.5em]"> {{ user.profile.initials }} </div>
       {% endif %}
     </div>
     {% if action %}

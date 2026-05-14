@@ -16,24 +16,24 @@
     {# — Sección: Datos generales — #}
     <div role="group" aria-labelledby="seccion-datos-generales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
       <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Datos generales</p>
-      {{ inputs.input(permiso='proveedor_nombre', label_log='Nombre de Proveedor', field=form.proveedor, x_params="col-span-12", name='proveedor', label='Nombre de Proveedor', type='text') }}
-      {{ inputs.input(permiso='proveedor_direccion', label_log='Dirección proveedor', field=form.direccion, x_params="col-span-12", name='direccion', label='Dirección', type='text') }}
-      {{ inputs.input(permiso='proveedor_contacto', label_log='Contacto proveedor', field=form.contacto, x_params="col-span-12", name='contacto', label='Contacto', type='text') }}
-      {{ inputs.input(permiso='proveedor_cargo', label_log='Cargo contacto', field=form.cargo, x_params="col-span-12", name='cargo', label='Cargo', type='text') }}
+      {{ inputs.input(permiso='proveedor_nombre', label_log='Nombre de Proveedor', field=form.proveedor, x_params="col-span-12", name='proveedor', id='proveedor', label='Nombre de Proveedor', type='text') }}
+      {{ inputs.input(permiso='proveedor_direccion', label_log='Dirección proveedor', field=form.direccion, x_params="col-span-12", name='direccion', id='direccion', label='Dirección', type='text') }}
+      {{ inputs.input(permiso='proveedor_contacto', label_log='Contacto proveedor', field=form.contacto, x_params="col-span-12", name='contacto', id='contacto', label='Contacto', type='text') }}
+      {{ inputs.input(permiso='proveedor_cargo', label_log='Cargo contacto', field=form.cargo, x_params="col-span-12", name='cargo', id='cargo', label='Cargo', type='text') }}
     </div>
 
     {# — Sección: Contacto — #}
     <div role="group" aria-labelledby="seccion-contacto" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
       <p id="seccion-contacto" class="col-span-12 text-sm font-medium text-neutral-500">Contacto</p>
-      {{ inputs.input(permiso='proveedor_telefono', label_log='Teléfono proveedor', field=form.telefono, x_params="col-span-12", name='telefono', label='Teléfono', type='text') }}
-      {{ inputs.input(permiso='proveedor_celular', label_log='Celular proveedor', field=form.celular, x_params="col-span-12", name='celular', label='Celular', type='text') }}
-      {{ inputs.input(permiso='proveedor_email', label_log='Email proveedor', field=form.email, x_params="col-span-12", name='email', label='Email', type='text') }}
+      {{ inputs.input(permiso='proveedor_telefono', label_log='Teléfono proveedor', field=form.telefono, x_params="col-span-12", name='telefono', id='telefono', label='Teléfono', type='text') }}
+      {{ inputs.input(permiso='proveedor_celular', label_log='Celular proveedor', field=form.celular, x_params="col-span-12", name='celular', id='celular',  label='Celular', type='text') }}
+      {{ inputs.input(permiso='proveedor_email', label_log='Email proveedor', field=form.email, x_params="col-span-12", name='email', id='email',  label='Email', type='text') }}
     </div>
 
     {# — Sección: Otros — #}
     <div role="group" aria-labelledby="seccion-otros" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
       <p id="seccion-otros" class="col-span-12 text-sm font-medium text-neutral-500">Otros</p>
-      {{ inputs.input(permiso='proveedor_terminos', label_log='Términos de pago', field=form.terminos_de_pago, x_params="col-span-12", name='terminos-de-pago', label='Términos de Pago', type='text') }}
+      {{ inputs.input(permiso='proveedor_terminos', label_log='Términos de pago', field=form.terminos_de_pago, x_params="col-span-12", name='terminos-de-pago', id='terminos-de-pago',  label='Términos de Pago', type='text') }}
     </div>
     
     {# — Botones de acción — #}

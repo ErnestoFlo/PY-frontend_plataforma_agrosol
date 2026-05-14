@@ -1,7 +1,6 @@
 {% extends 'layouts/navigation.html' %}
 
 {% import 'components/buttons.html' as buttons %}
-{% import 'partials/skeletons.html' as skeletons %}
 {% from 'partials/modals.html' import modal %}
 
 
@@ -30,11 +29,5 @@
     {{ modal(modal_id='modal-edit', title='Editar Proveedor', size='modal-lg', show_footer=False) }}
     {{ modal(modal_id='modal-delete', title='Eliminar Proveedor', size='modal-md', show_footer=False) }}
     {{ modal(modal_id='modal-detail', title='Detalle del Proveedor', size='modal-lg', show_footer=False) }}
-
-    <div id="skeleton-template" class="hidden w-full h-full max-h-full">
-      {{ skeletons.skeleton_default() }}
-    </div>
-    <!-- Contenedor de Alertas -->
-    <div id="alerts-container" class="fixed bottom-4 right-4 z-20 flex flex-col gap-2 w-auto"></div>
   </section>
 {% endblock %}

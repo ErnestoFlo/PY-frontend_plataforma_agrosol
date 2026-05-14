@@ -1,0 +1,51 @@
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/inputs.html' as inputs %}
+{% from 'components/avatars.html' import avatar %}
+
+<form method="POST"
+      class="grid grid-cols-12 gap-x-6 gap-y-4"
+      enctype="multipart/form-data"
+      hx-post="{{ url(submit_url) }}"
+      hx-swap="none"
+      hx-on::after-request="
+        if(event.detail.successful) {
+          sessionStorage.setItem(
+            'success_message',
+            'Usuario actualizado exitosamente'
+          );
+          window.location.reload();
+        }
+      ">
+  {{ render_csrf_token(request)|safe }}
+  
+    {# — Sección: Foto de Perfil — #}
+    <div role="group" aria-labelledby="seccion-foto-perfil" class="col-span-12 grid grid-cols-[auto_1fr] gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5 items-center">          
+      <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Foto de Perfil</p>
+      {{ avatar(user=request.user, size='16', id='avatar-img-preview') }} 
+      {{ inputs.input_file(permiso='c_file_foto', label_log='Subir Foto Perfil', id='c-file-foto', name='avatar', accept='image/*', x_params='col-span-9', compact=true) }}
+    </div>
+
+
+    {# — Sección: Datos Personales — #}
+    <div role="group" aria-labelledby="seccion-datos-personales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+      <p id="seccion-datos-personales" class="col-span-12 text-sm font-medium text-neutral-500">Datos personales</p>
+      {{ inputs.input(permiso='usuario_nombre', label_log='Nombre de usuario', x_params="col-span-12", name='first_name', id='f-first_name', label='Nombre', type='text', value=request.user.first_name, action='actualizarIniciales') }}
+      {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-first_name',  label='Apellido', type='text', value=request.user.last_name, action='actualizarIniciales') }}
+      {{ inputs.input(permiso='usuario_email', label_log='Email usuario', x_params="col-span-12", name='email', id='email',  label='Email', type='text', value=request.user.email) }}
+    </div>
+
+    {# — Sección: Datos Adicionales — #}
+    <div role="group" aria-labelledby="seccion-datos-adicionales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+      <p id="seccion-datos-adicionales" class="col-span-12 text-sm font-medium text-neutral-500">Datos Adicionales</p>
+      {{ inputs.input(permiso='usuario_cargo', label_log='Cargo de usuario', x_params="col-span-12", name='cargo', id='cargo',  label='Cargo', type='text', value=request.user.profile.cargo) }}
+      {{ inputs.input(permiso='usuario_area', label_log='Area usuario', x_params="col-span-12", name='area', id='area',  label='Área', type='text', value=request.user.profile.area) }}
+      {{ inputs.input(permiso='usuario_telefono', label_log='Telefono usuario', x_params="col-span-12", name='telefono', id='telefono', label='Teléfono', type='text', value=request.user.profile.telefono) }}
+    </div>
+    
+    {# — Botones de acción — #}
+    <div class="flex justify-end gap-2 mt-2 col-span-12">
+      {{ buttons.button(permiso='btn_cancelar', label_log='Cancelar', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target=modal_name) }}
+      {{ buttons.button(permiso='btn_guardar_usuario', label_log='Guardar usuario', func_type='submit', type='btn-primary', text='Editar') }}
+    </div>
+
+</form>

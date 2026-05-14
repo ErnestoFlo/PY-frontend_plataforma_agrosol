@@ -1,3 +1,5 @@
+{% import 'partials/skeletons.html' as skeletons %}
+
 <!DOCTYPE html>
 <html lang="en" prefers-color-scheme="light" class="selection:bg-primary-500 selection:text-neutral-50">
   <head>
@@ -22,6 +24,12 @@
   <body class="bg-bg relative flex flex-col items-center">
     {% block content %}
     {% endblock %}
+    <!-- Contenedor para usar el mismo skeleton por defecto -->
+    <div id="skeleton-template" class="hidden w-full h-full max-h-full">
+      {{ skeletons.skeleton_default() }}
+    </div>
+    <!-- Contenedor de Alertas -->
+    <div id="alerts-container" class="fixed bottom-4 right-4 z-20 flex flex-col gap-2 w-auto"></div>
     <script src="{{ static('js/htmx.min.js') }}"></script>
     <script src="{{ static('js/swiper-bundle.min.js') }}"></script>
     <script src="{{ static('js/flatpickr.js') }}"></script>
@@ -35,7 +43,7 @@
       const LOG_URL = "{{ url('registro_elemento') }}";
 
       function registrarLog(clave, label) {
-        // Falla silenciosamente — nunca interrumpe la 
+        // Falla silenciosamente — nunca interrumpe el flujo del proyecto
         try {
           const fd = new FormData();
           fd.append('csrfmiddlewaretoken', CSRF_LOG);

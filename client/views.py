@@ -1136,6 +1136,7 @@ def registro_elemento(request):
 # ── Vista: logs del usuario en su perfil (ya autenticado) ────
 @login_required
 def perfil(request):
+
     if request.method == "POST":
         # Actualizar perfil PRIMERO (antes de guardar el usuario)
         p = request.user.profile
@@ -1157,8 +1158,19 @@ def perfil(request):
     logs = ActivityLog.objects.filter(
         usuario=request.user
     ).select_related('modulo').order_by('-fecha')[:50]
- 
-    return render(request, "usuarios/perfil.html", {'logs': logs})
+    
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'logs': logs,
+        'submit_url': 'perfil',
+        'modal_name': 'modal-edit',
+        'edit_url': f'/agrosol/perfil/',
+    }
+    if is_htmx:
+        return render(request, "usuarios/editar_perfil.html", context)
+    else:
+        return render(request, "usuarios/perfil.html", context)
+
  
  
 # ── Vista: logs de un usuario para el superadmin ─────────────

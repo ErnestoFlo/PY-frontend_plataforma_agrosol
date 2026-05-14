@@ -50,8 +50,8 @@
                       Usuario o contraseña incorrectos.
                     </div>
                   {% endif %}
-                  {{ inputs.input(permiso='input_username', label_log='Usuario', field=form.username, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', type='text', name='username', label='Usuario') }}
-                  {{ inputs.input_password(permiso='input_password', label_log='Contraseña', field=form.password, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', name='password', label='Contraseña') }}
+                  {{ inputs.input(permiso='input_username', label_log='Usuario', field=form.username, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', type='text', name='username', id='username',  label='Usuario') }}
+                  {{ inputs.input_password(permiso='input_password', label_log='Contraseña', field=form.password, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', name='password', id='password',  label='Contraseña') }}
                 </div>
                 {{ buttons.button(permiso='btn_ingresar', label_log='Ingresar', func_type="submit", x_params="w-1/2", type='btn-primary', text='Ingresar') }}
               </form>
