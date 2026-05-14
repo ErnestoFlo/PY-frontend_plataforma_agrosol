@@ -14,7 +14,6 @@
   6. HTMX reemplaza tabla + cierra modal -->
 
 {% from 'components/buttons.html' import button %}
-{% macro delete_proveedor() %}
 
 <section class='grid grid-cols-12 gap-x-6 gap-y-4'>
   <p class="text-fg-body mt-2 col-span-12">¿Está seguro que desea eliminar este elemento?</p>
@@ -30,5 +29,3 @@
     {{ button(permiso='btn_eliminar_proveedor', label_log='Eliminar proveedor', func_type='submit', type='btn-danger', text='Eliminar') }}
   </form>
 </section>
-
-{% endmacro %}

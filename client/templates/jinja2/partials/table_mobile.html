@@ -1,0 +1,13 @@
+
+
+{# Variante mobile basada en cards; comparte paginación con desktop. #}
+<div id="table_mobile" class="mobile-table-container flex-1 overflow-y-auto px-2 py-1 md:py-4">
+  <div class="overflow-x-auto rounded-xl flex-1 flex flex-col h-full">
+    <div class="overflow-y-auto rounded-xl flex-auto mb-2">
+      <div id="{{ table_id }}-mobile-body" class="flex flex-col gap-3">
+        {% include 'partials/table_mobile_rows.html' %}
+      </div>
+    </div>
+    {% include 'partials/table_pagination.html' %}
+  </div>
+</div>

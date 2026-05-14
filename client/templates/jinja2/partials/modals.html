@@ -12,7 +12,7 @@
         <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
           {{ title }}
         </h2>
-        {{ buttons.input_icon_button(permiso='btn_close_modal', label_log='Cerrar modal', func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', size='5', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
+        {{ buttons.input_icon_button(permiso='btn_close_modal', label_log='Cerrar modal', func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
       </div>
 
       <div id="{{ modal_id }}-content" class="modal-body"
@@ -41,38 +41,6 @@
       </div>
       {% endif %}
 
-    </div>
-  </div>
-{% endmacro %}
-
-{% macro item_detail_modal(row, id_col) %}
-  <div class="modal-detail-content flex flex-col gap-4">
-    {# Información del registro #}
-    <div class="flex flex-col gap-3 pb-4 border-b border-surface-3">
-      <div class="flex flex-col gap-1">
-        <p class="text-fg font-semibold text-base">{{ row.id_col }}</p>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        {% for key, value in row.items() %}
-        <div class="flex flex-col gap-1">
-          <label class="text-xs uppercase tracking-wide text-fg-muted font-semibold">{{ key }}</label>
-          <p class="text-fg">{{ value }}</p>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    {# Botones de acciones #}
-      <div class="flex gap-2 pt-2">
-      {{ buttons.icon_text_button(permiso='btn_edit_detail', label_log='Editar registro detalle',
-        func_type='button', type='btn-icon-text-menu', role='button', icon_size='4',
-        icon_name='icon-pencil-fill', text='Editar', action='openModal', target='modal-edit',
-        hx_get=row.edit_url, hx_target="#modal-edit-content", hx_swap="innerHTML"
-      ) }}
-      {{ buttons.icon_text_button(permiso='btn_delete_detail', label_log='Eliminar registro detalle',
-        func_type='button', type='btn-icon-text-menu-danger', role='button', icon_size='4',
-        icon_name='icon-trash-fill', text='Eliminar', action='openModal', target='modal-delete',
-        hx_get=row.delete_url, hx_target="#modal-delete-content", hx_swap="innerHTML"
-      ) }}
     </div>
   </div>
 {% endmacro %}

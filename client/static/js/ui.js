@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
   // Inicialización de módulos que lo requieran
-  if (window.ProveedoresUI) {window.ProveedoresUI.initResponsiveTable('[data-responsive-table="proveedores"]')} // Inicializa tablas responsivas del módulo de proveedores
+  // Inicializa tablas responsivas de todo el proyecto
+  if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="proveedores"]')}  // Tabla de proveedores
+  if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="usuarios"]')}  // Tabla de usuarios
   if (window.Login) {window.Login.init()} // Inicializa el módulo de login (inactividad)
   flatpickr("#c-date-hourpicker", {
         enableTime: true,

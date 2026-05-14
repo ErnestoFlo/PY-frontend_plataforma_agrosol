@@ -1,5 +1,6 @@
 from .forms import *
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from .services import api_client, proveedores
 from django.contrib.auth.decorators import login_required 
 from django.contrib.auth.models import User, Group
@@ -70,13 +71,13 @@ def get_options(request):
     Usado por HTMX para inyectar/actualizar opciones de forma dinámica.
     """
     options = [
-        {'id': 1, 'nombre': 'Opcion 1'},
-        {'id': 2, 'nombre': 'Opcion 2'},
-        {'id': 3, 'nombre': 'Opcion 3'},
-        {'id': 4, 'nombre': 'Opcion 4'},
-        {'id': 5, 'nombre': 'Opcion 5'}
+        {'id': 1, 'nombre': 'Electronica'},
+        {'id': 2, 'nombre': 'Ropa'},
+        {'id': 3, 'nombre': 'Alimentos'},
+        {'id': 4, 'nombre': 'Herramientas'},
+        {'id': 5, 'nombre': 'Software'}
     ]
-    return render(request, 'partials/combobox_options.html', {
+    return render(request, 'partials/options_lists.html', {
         'options': [{'value': o['id'], 'label': o['nombre']} for o in options]
     })
 
@@ -170,7 +171,7 @@ def list_proveedores(request):
         columns = ['ID', 'Proveedor', 'Dirección', 'Contacto', 'Cargo', 'Teléfono', 'Celular', 'Email', 'Términos de Pago']
         data = dict(zip(columns, proveedor_dict.values()))
 
-        return render(request, 'components/modals.html#item_detail_modal', {
+        return render(request, 'partials/item_detail_modal.html', {
             'row': data,
             'id_col': data['Proveedor'],
             'edit_url': edit_url,
@@ -183,7 +184,8 @@ def list_proveedores(request):
 
     # 🔹 TABLA MOBILE (cards)
     if is_htmx and fragment == "table_mobile":
-        return render(request, 'partials/tables.html#table_mobile', {
+        print('entro')
+        return render(request, 'partials/table_mobile.html', {
             **table_context,
             'table_id': 'tabla-prov',
             'fragment': 'table_mobile',
@@ -191,7 +193,7 @@ def list_proveedores(request):
 
     # 🔹 SOLO TABLA COMPLETA (para skeleton → carga inicial)
     if is_htmx and fragment == "table":
-        return render(request, 'partials/tables.html#table', {
+        return render(request, 'partials/table.html', {
             **table_context,
             'with_actions': True,
             'table_id': 'tabla-prov',
@@ -201,7 +203,7 @@ def list_proveedores(request):
 
     # 🔹 SOLO FILAS (paginación)
     if is_htmx:
-        return render(request, 'partials/tables.html#table', {
+        return render(request, 'partials/table.html', {
             **table_context,
             'with_actions': True,
             'table_id': 'tabla-prov',
@@ -282,12 +284,12 @@ def create_or_edit_proveedor(request, id=None):
                 proveedores_data = proveedores.get_all_proveedores()
                 table_context = get_data_for_table(proveedores_data, page, 'proveedores')
                 if is_mobile_view:
-                    return render(request, "partials/tables.html#table_mobile", {
+                    return render(request, "partials/table_mobile.html", {
                         **table_context,
                         'table_id': 'tabla-prov',
                         'fragment': 'table_mobile',
                     })
-                return render(request, "partials/tables.html#table", {
+                return render(request, "partials/table.html", {
                     **table_context,
                     'with_actions': True,
                     'table_id': 'tabla-prov',
@@ -298,14 +300,14 @@ def create_or_edit_proveedor(request, id=None):
             if rows and is_htmx and is_mobile_view:
                 proveedores_data = proveedores.get_all_proveedores()
                 table_context = get_data_for_table(proveedores_data, page, 'proveedores')
-                return render(request, "partials/tables.html#table_mobile", {
+                return render(request, "partials/table_mobile.html", {
                     **table_context,
                     'table_id': 'tabla-prov',
                     'fragment': 'table_mobile',
                 })
 
             if rows and is_htmx:
-                return render(request, "partials/tables.html#table_rows", {
+                return render(request, "partials/table_rows.html", {
                     'rows': rows,
                     'with_actions': True,
                 })
@@ -334,7 +336,7 @@ def create_or_edit_proveedor(request, id=None):
         modal_name = 'modal-create'
         submit_text = 'Crear'
     
-    template = "proveedores/form.html#form"
+    template = "proveedores/form.html"
     context = {
         "form": form,
         "proveedor_id": id,
@@ -350,7 +352,7 @@ def create_or_edit_proveedor(request, id=None):
     if is_htmx and fragment == "form":
         return render(request, template, context)
     if is_htmx:
-        return render(request, "proveedores/form.html#form", context)
+        return render(request, "proveedores/form.html", context)
     return redirect('proveedores')
 
 def confirm_delete(request, id):
@@ -372,7 +374,7 @@ def confirm_delete(request, id):
     viewport = request.GET.get('viewport', 'desktop')
     page = int(request.GET.get('page', 1))
     delete_url = f"/agrosol/proveedores/eliminar/{id}/?viewport={viewport}&page={page}"
-    return render(request, 'proveedores/confirm_delete.html#delete_proveedor', {
+    return render(request, 'proveedores/confirm_delete.html', {
         'row_id': id,
         'delete_url': delete_url,  # ← POST a esta URL
         'table_body_id': '#tabla-prov-body',  # ← HTMX reemplaza este elemento
@@ -413,7 +415,7 @@ def delete_proveedor(request, id):
         if request.headers.get('HX-Request') and viewport == 'mobile':
             proveedores_data = proveedores.get_all_proveedores()
             table_context = get_data_for_table(proveedores_data, page, 'proveedores')
-            return render(request, "partials/tables.html#table_mobile", {
+            return render(request, "partials/table_mobile.html", {
                 **table_context,
                 'table_id': 'tabla-prov',
                 'fragment': 'table_mobile',
@@ -493,6 +495,7 @@ def lista_usuarios(request):
         'activos':    usuarios.filter(is_active=True).count(),
         'staff':      usuarios.filter(is_staff=True).count(),
         'superusers': usuarios.filter(is_superuser=True).count(),
+        'create_url': 'agrosol/usuarios/crear'
     })
 
 @superuser_required

@@ -978,15 +978,6 @@
   .bg-black {
     background-color: var(--color-black);
   }
-  .bg-danger-200\/10 {
-    background-color: color-mix(in srgb, hsl(0 70% 70%) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-danger-200) 10%, transparent);
-    }
-  }
-  .bg-gray-50 {
-    background-color: var(--color-gray-50);
-  }
   .bg-neutral-50\/6 {
     background-color: color-mix(in srgb, hsl(40 5% 90%) 6%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1031,12 +1022,6 @@
   }
   .bg-surface-2 {
     background-color: var(--color-surface-2);
-  }
-  .bg-surface-2\/5 {
-    background-color: color-mix(in srgb, hsl(40 5% 90%) 5%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-surface-2) 5%, transparent);
-    }
   }
   .bg-surface-3 {
     background-color: var(--color-surface-3);
@@ -1237,9 +1222,6 @@
   }
   .text-danger-500 {
     color: var(--color-danger-500);
-  }
-  .text-danger-600 {
-    color: var(--color-danger-600);
   }
   .text-fg {
     color: var(--color-fg);

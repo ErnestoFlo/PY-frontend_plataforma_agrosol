@@ -1,0 +1,29 @@
+{% import "components/buttons.html" as buttons %}
+
+{% for row in rows %}
+  <div class="card p-4 flex flex-col gap-3">
+    <div class="flex justify-between items-start gap-2">
+      <div class="flex-1">
+        <h3 class="font-semibold text-fg text-base truncate">
+          {{ row.id_col }}
+        </h3>
+      </div>
+      {{ buttons.icon_button(permiso='btn_row_actions_mobile', label_log='Abrir acciones fila (mobile)',
+        func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0 rounded-md w-6 h-6', 
+        size='4', icon_name='icon-elipsis-horizontal-fill', action='openModal', 
+        target='modal-detail', hx_get=row.detail_url, hx_target="#modal-detail-content", hx_swap="innerHTML"
+      ) }}
+    </div>
+    {# Campos principales - Prioridad Alta #}
+    <div class="grid grid-cols-[auto_1fr] gap-2 text-sm">
+      {% for key, value in row.prior_cols.items() %}
+        <span class="text-fg-muted min-w-max capitalize">{{ key }}</span>
+        <span class="text-fg font-medium truncate">{{ value }}</span>
+      {% endfor %}
+    </div>
+  </div>
+{% else %}
+  <div class="text-center py-8 text-fg-muted">
+    <p>Sin registros</p>
+  </div>
+{% endfor %}

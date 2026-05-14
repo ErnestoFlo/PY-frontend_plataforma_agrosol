@@ -1,0 +1,44 @@
+{# Todas las acciones de paginación apuntan al contenedor completo para mantener header/body/paginador sincronizados. #}
+<div class="table-pagination card h-16 flex-auto py-2 md:py-2">
+  <button class="page-btn"
+    {% if current_page > 1 %}
+      hx-get="?page={{ current_page - 1 }}&fragment={{ fragment }}"
+      hx-target="#{{ table_id }}-container"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+    {% else %}
+      disabled
+    {% endif %}>
+    <svg class="w-4 h-4">
+      <use href="{{ static('sprite.svg') }}#icon-chevron-left-fill"/>
+    </svg>
+  </button>
+
+  {% for page in page_items %}
+    {% if page == 'ellipsis' %}
+      <span class="page-btn pointer-events-none opacity-70">...</span>
+    {% else %}
+      <button class="page-btn {% if page == current_page %}page-btn-active{% endif %}"
+        hx-get="?page={{ page }}&fragment={{ fragment }}"
+        hx-target="#{{ table_id }}-container"
+        hx-swap="innerHTML"
+        hx-push-url="true">
+        {{ page }}
+      </button>
+    {% endif %}
+  {% endfor %}
+
+  <button class="page-btn"
+    {% if current_page < total_pages %}
+      hx-get="?page={{ current_page - 1 }}&fragment={{ fragment }}"
+      hx-target="#{{ table_id }}-container"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+    {% else %}
+      disabled
+    {% endif %}>
+    <svg class="w-4 h-4">
+      <use href="{{ static('sprite.svg') }}#icon-chevron-right-fill"/>
+    </svg>
+  </button>
+</div>

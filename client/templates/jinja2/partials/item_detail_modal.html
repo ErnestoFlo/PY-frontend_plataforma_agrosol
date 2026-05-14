@@ -1,0 +1,31 @@
+{% import 'components/buttons.html' as buttons %}
+
+<div class="modal-detail-content flex flex-col gap-4">
+  {# Información del registro #}
+  <div class="flex flex-col gap-3 pb-4 border-b border-surface-3">
+    <div class="flex flex-col gap-1">
+      <p class="text-fg font-semibold text-base">{{ id_col }}</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      {% for key, value in row.items() %}
+      <div class="flex flex-col gap-1">
+        <label class="text-xs uppercase tracking-wide text-fg-muted font-semibold">{{ key }}</label>
+        <p class="text-fg">{{ value }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {# Botones de acciones #}
+    <div class="flex gap-2 pt-2">
+    {{ buttons.icon_text_button(permiso='btn_edit_detail', label_log='Editar registro detalle',
+      func_type='button', type='btn-icon-text-menu', role='button', icon_size='4',
+      icon_name='icon-pencil-fill', text='Editar', action='openModal', target='modal-edit',
+      hx_get=edit_url, hx_target="#modal-edit-content", hx_swap="innerHTML"
+    ) }}
+    {{ buttons.icon_text_button(permiso='btn_delete_detail', label_log='Eliminar registro detalle',
+      func_type='button', type='btn-icon-text-menu-danger', role='button', icon_size='4',
+      icon_name='icon-trash-fill', text='Eliminar', action='openModal', target='modal-delete',
+      hx_get=delete_url, hx_target="#modal-delete-content", hx_swap="innerHTML"
+    ) }}
+  </div>
+</div>

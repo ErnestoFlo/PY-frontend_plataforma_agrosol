@@ -29,6 +29,7 @@
       currentFragment = nextFragment
       const page = getPageFromUrl()
       const targetUrl = `${sourceUrl}?page=${page}&fragment=${nextFragment}`
+      console.log(targetUrl)
 
       htmx.ajax('GET', targetUrl, {
         target: responsiveTableContainer,
@@ -42,7 +43,7 @@
   }
 
 
-  window.ProveedoresUI = {
+  window.ResponsiveTable = {
     initResponsiveTable,
   }
 })()
