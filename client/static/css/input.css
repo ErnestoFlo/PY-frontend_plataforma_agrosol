@@ -579,7 +579,7 @@
   }
   .input-label{
     @apply
-    absolute left-2 top-2.25 text-fg transition-all duration-200 mx-1 px-1 text-sm;
+    absolute left-2 top-2.25 text-fg transition-all duration-200 mx-1 px-1 text-sm pointer-events-none;
   }
   .input-legend {
     @apply text-xs px-1 h-0 transition-all duration-200;
@@ -885,7 +885,7 @@
   .modal-sm  { @apply max-w-sm; }
   .modal-md  { @apply max-w-lg; }
   .modal-lg  { @apply max-w-2xl; }
-  .modal-xl  { @apply max-w-4xl; }
+  .modal-xl  { @apply max-w-dvw mx-4 md:mx-14; }
   .modal-header {
     @apply flex items-center justify-between pb-3 border-b border-neutral-600;
   }

@@ -3,14 +3,14 @@
 {% macro user_logs(logs) %}
   <div class="bar-filter w-full">
 
-    {{ input_search(permiso='input_buscar_logs', label_log='Buscar en logs', x_params='w-44 h-8 bg-surface-1 hover:bg-surface-2 border-none hidden md:flex', placeholder='Buscar en logs...', action='buscarLogs') }}
+    {{ input_search(permiso='input_buscar_logs', label_log='Buscar en logs', x_params='w-44 h-8 bg-surface-1 hover:bg-surface-2 border-none hidden md:flex', id='buscar_logs', name='buscar_logs', placeholder='Buscar en logs...', action='buscarLogs') }}
     <button data-action="filtrarLogs" data-type="todos"    id="f-todos"    class="btn-filter filtro-activo">Todos</button>
     <button data-action="filtrarLogs" data-type="login"    id="f-login"    class="btn-filter">Login</button>
     <button data-action="filtrarLogs" data-type="logout"   id="f-logout"   class="btn-filter">Logout</button>
     <button data-action="filtrarLogs" data-type="modulo"   id="f-modulo"   class="btn-filter">Módulos</button>
     <button data-action="filtrarLogs" data-type="elemento" id="f-elemento" class="btn-filter">Elementos</button>
   </div>
-  <div class="logs-container min-h-0 h-full w-full card px-3 py-2 overflow-y-scroll">
+  <div class="logs-container min-h-0 flex-1 w-full card px-3 py-2 overflow-y-auto">
     {% for log in logs %}
       <div class="log-row" data-tipo="{{ log.tipo_evento }}" data-texto="{{ log.descripcion|lower }} {{ log.ip|default('') }} {{ log.dispositivo|lower }} {{ log.modulo.nombre|default('')|lower }}">
         <div class="log-icon log-{{ log.color }}">

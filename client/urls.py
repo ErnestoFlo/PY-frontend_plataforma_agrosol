@@ -29,6 +29,8 @@ urlpatterns = [
     path("perfil/", views.perfil, name="perfil"),
     path("test-400/", views.test_400, name="test_400"),
     path("usuarios/crear/", views.crear_usuario, name="crear_usuario"),
+    path("usuarios/get_grupos/", views.get_grupos, name="get_grupos"),
+
 
     ### URLS DE PERMISOS ###
     path("permisos/", views.panel_permisos, name="panel_permisos"),

@@ -63,23 +63,27 @@
 {% endmacro %}
 
 {% macro input_combobox(permiso, label_log, label, id, name, url, value=none, field=none, type="text", x_params="", x_input_params="", x_icon_params="", disabled=false) %}
-  <fieldset class="input-container z-50 {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}" data-action="combobox"
+  <fieldset class="input-container z-50  relative overflow-visible{{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}" data-action="combobox"
+    hx-boost="false"
+    hx-on:htmx:before-request="event.stopPropagation()">    
+    <!-- Input visible que muestra la selección -->
+    {% if field is not none %}
+      {{ render_field(field, id=id, name=name, class="input field-input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name, disabled=disabled, hx_get=url, hx_trigger="click once", hx_target='#' ~ name ~ '-options', hx_swap="innerHTML") }}
+    {% else %}
+      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly {% if value %}value="{{ value }}"{% endif %} data-action="comboboxToggle" data-target="{{ id }}" {% if disabled %} disabled {% endif %}
+        data-htmx-no-submit="true"
         hx-get="{{ url }}"
         hx-trigger="click once"
         hx-target="#{{ name }}-options"
-        hx-swap="innerHTML">    
-    <!-- Input visible que muestra la selección -->
-    {% if field is not none %}
-      {{ render_field(field, id=id, name=name, class="input field-input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name, disabled=disabled) }}
-    {% else %}
-      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly {% if value %}value="{{ value }}"{% endif %} data-action="comboboxToggle" data-target="{{ id }}" {% if disabled %} disabled {% endif %}>
+        hx-swap="innerHTML"
+        hx-on:htmx:before-request="event.stopPropagation()"        >
     {% endif %}
 
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
     <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs">
       {{ label }}
     </label>
-    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}" data-action="combobox-Toggle" data-target="{{ name }}">
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}" data-action="comboboxToggle" data-target="{{ name }}">
       <use href="{{ static('sprite.svg') }}#icon-chevron-down-fill" />
     </svg>
     <!-- Combobox dropdown -->
@@ -142,7 +146,7 @@
 
 {% endmacro %}
 
-{% macro input_toggle(label, description, id, name, value=none, checked=False,  field=none, size="4", x_params="", x_icon_params="", disabled=false) %}
+{% macro input_toggle(label, description, id, name, value=none, checked=false,  field=none, size="4", x_params="", x_icon_params="", disabled=false) %}
   <div class="toggle-row">
     <div>
       <p class="body">{{ label }}</p>
@@ -159,10 +163,10 @@
   </div>
 {% endmacro %}
 
-{% macro input_wrapper(permiso, label_log, label='') %}
+{% macro input_wrapper(permiso, label_log, label='', x_params='') %}
 
-  <div role="group" aria-labelledby="seccion-{{ label }}" class="w-full flex flex-col items-start justify-center gap-y-4 border border-fg/15 rounded-xl p-4" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">          
-    <h3 class="body-lg font-bold mb-1">
+  <div role="group" aria-labelledby="seccion-{{ label }}" class="w-full flex flex-col items-start justify-center gap-y-4 border border-fg/15 rounded-xl p-4 {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">          
+    <h3 id="seccion-{{ label }}" class="col-span-12 text-sm font-medium text-neutral-500">
       {{ label }}
     </h3>
     <div class="w-full flex flex-col items-start justify-center gap-3">

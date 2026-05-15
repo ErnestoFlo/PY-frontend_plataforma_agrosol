@@ -1,0 +1,22 @@
+{% from 'components/buttons.html' import button %}
+
+<section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+  <p class="text-fg-body mt-2 col-span-12">¿Está seguro que desea limpiar todos los logs de este usuario?</p>
+  <form method="POST" 
+        class="flex justify-end gap-2 mt-2 col-span-12"
+        hx-post="{{ url('logs_limpiar_usuario', kwargs={'id': usuario_visto.id}) }}"
+        hx-swap="none"
+        hx-on::after-request="
+          if(event.detail.successful) {
+            sessionStorage.setItem(
+              'danger_message',
+              'Limpieza de logs completa'
+            );
+            window.location.reload();
+          }
+        ">
+    {{ render_csrf_token(request)|safe }}
+    {{ button(permiso='btn_cancelar_limpieza', label_log='Cancelar limpieza', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target='modal-clean') }}
+    {{ button(permiso='btn_limpiar_logs', label_log='Boton Limpiar logs', func_type='submit', type='btn-danger', text='Limpiar') }}
+  </form>
+</section>

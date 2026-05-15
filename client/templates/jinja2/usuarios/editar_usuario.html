@@ -1,0 +1,96 @@
+{# Regla de swap:
+  - create o mobile: refrescar contenedor completo (#tabla-prov-container)
+  - edit desktop: reemplazar solo la fila afectada (#row-<id>)
+#}
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/inputs.html' as inputs %}
+{% from 'components/avatars.html' import avatar %}
+{% from 'components/badges.html' import badge_icon %}
+
+<div class="flex flex-col gap-3">
+  <form method="POST"
+        class="grid grid-cols-12 gap-x-6 gap-y-4"
+        enctype="multipart/form-data"
+        hx-post="{{ url('editar_usuario', kwargs={'id': usuario.id}) }}"
+        hx-swap="none"
+        hx-on::after-request="
+          if(event.detail.successful) {
+            sessionStorage.setItem(
+              'success_message',
+              'Usuario actualizado exitosamente'
+            );
+            window.location.reload();
+          }
+        ">
+    {{ render_csrf_token(request)|safe }}
+    
+    {# — Sección: Encabezado — #}
+    <div role="group" aria-labelledby="seccion-foto-perfil" class="col-span-12 grid grid-cols-[auto_1fr] gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5 items-center">
+      {{ avatar(user=usuario, size='16', id='avatar-img-preview') }}
+      <div class="flex flex-col items-start gap-2">
+        <h2 class="heading-3 font-bold m-0">
+          {{ usuario.get_full_name() or usuario.username }}
+        </h2>
+        <p class="mono">
+          @{{ usuario.username }}
+        </p>
+        <!-- Badge de rol actual -->
+        {% if usuario.is_superuser %}
+          {{ badge_icon(variant='danger', icon='icon-shield-regular', text='Super Admin') }}
+        {% elif usuario.is_staff %}
+          {{ badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
+        {% else %}
+          {{ badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
+        {% endif %}
+      </div>
+    </div>
+
+
+    {# — Sección: Datos Personales — #}
+    <div role="group" aria-labelledby="seccion-datos-personales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+      <p id="seccion-datos-personales" class="col-span-12 text-sm font-medium text-neutral-500">Datos personales</p>
+      {{ inputs.input(permiso='usuario_nombre', label_log='Nombre de usuario', x_params="col-span-12", name='first_name', id='f-first_name', label='Nombre', type='text', value=usuario.first_name, action='actualizarIniciales') }}
+      {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-last_name',  label='Apellido', type='text', value=usuario.last_name, action='actualizarIniciales') }}
+      {{ inputs.input(permiso='usuario_email', label_log='Email usuario', x_params="col-span-12", name='email', id='email',  label='Email', type='text', value=usuario.email) }}
+    </div>
+
+    {# — Sección: Datos Adicionales — #}
+    <div role="group" aria-labelledby="seccion-datos-adicionales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+      <p id="seccion-datos-adicionales" class="col-span-12 text-sm font-medium text-neutral-500">Datos Adicionales</p>
+      {{ inputs.input(permiso='usuario_cargo', label_log='Cargo de usuario', x_params="col-span-12", name='cargo', id='cargo',  label='Cargo', type='text', value=usuario.profile.cargo) }}
+      {{ inputs.input(permiso='usuario_area', label_log='Area usuario', x_params="col-span-12", name='area', id='area',  label='Área', type='text', value=usuario.profile.area) }}
+      {{ inputs.input(permiso='usuario_telefono', label_log='Telefono usuario', x_params="col-span-12", name='telefono', id='telefono', label='Teléfono', type='text', value=usuario.profile.telefono) }}
+    </div>
+    
+    {# — Sección: Permisos y Rol — #}
+    {% call inputs.input_wrapper(permiso='seccion_permisos_rol', label_log='Seccion Permisos y Rol', label='Permisos y Rol', x_params='col-span-12') %}
+      {{ inputs.input_toggle(x_params="col-span-12", name='is_staff', id='is_staff',  label='Staff', description='Permite acceder al panel /admin/ con permisos asignados', checked=usuario.is_staff) }}
+      {{ inputs.input_toggle(x_params="col-span-12", name='is_superuser', id='is_superuser',  label='Superusuario', description='Acceso total al sistema sin restricciones de permisos', checked=usuario.is_superuser) }}
+    {% endcall %}
+
+    {# — Botones de acción — #}
+    <div class="flex justify-end gap-2 mt-2 col-span-12">
+      {{ buttons.button(permiso='btn_cancelar', label_log='Cancelar', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target=modal_name) }}
+      {{ buttons.button(permiso='btn_editar_usuario', label_log='Editar usuario', func_type='submit', type='btn-primary', text='Editar') }}
+    </div>
+  </form>
+  <!-- DANGER ZONE — Desactivar -->
+  {% if usuario.is_active and not usuario.is_superuser %}
+  <div class="">
+    <div class="card bg-surface-danger text-fg-danger border-border-danger">
+      <div>
+        <p class="heading-3">
+          <svg class="h-8 w-8 text-fg-warning mb-4">
+            <use href="{{ static('sprite.svg') }}#icon-triangle-warn-regular" />
+          </svg>
+          Zona de peligro
+        </p>
+        <p cllass="mono">
+          Desactivar la cuenta impide que el usuario pueda iniciar sesión. No se eliminan sus datos.
+        </p>
+      </div>
+      {{ buttons.icon_text_button(permiso='btn_desactivar_usuario', label_log='Botón Descativar Usuario', func_type='button', type='btn-icon-text-danger', text='Desactivar', icon_name='icon-user-minus-regular', icon_size='4', x_params='px-3 py-2 bg-surface-danger text-fg-danger border-border-danger mt-4', action='openModal', target='modal-deactivate', hx_get=url('desactivar_usuario', kwargs={'id': usuario.id}), hx_target="#modal-delete-content", hx_swap="innerHTML") }}
+    </div>
+  </div>
+</div>
+{% endif %}

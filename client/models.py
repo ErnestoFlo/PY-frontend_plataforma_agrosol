@@ -26,7 +26,10 @@ class UserProfile(models.Model):
     def initials(self):
         first = (self.user.first_name or "")[:1].upper()
         last = (self.user.last_name or "")[:1].upper()
-        return first + last
+        if first != "" or last != "":
+            return first + last
+        else:
+            return "?"
     
 # Cada vez que se crea un User, crear su perfil automáticamente
 @receiver(post_save, sender=User)

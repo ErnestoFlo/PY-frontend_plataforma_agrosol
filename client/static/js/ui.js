@@ -3,7 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
 
-  // Inicialización de módulos que lo requieran
+document.body.addEventListener("htmx:beforeRequest", (e) => {
+  console.log("🔥 REQUEST:", {
+    url: e.detail.path,
+    target: e.detail.target,
+    element: e.detail.elt
+  });
+});  // Inicialización de módulos que lo requieran
   // Inicializa tablas responsivas de todo el proyecto
   if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="proveedores"]')}  // Tabla de proveedores
   if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="usuarios"]')}  // Tabla de usuarios
@@ -396,10 +402,7 @@ function handleFiles(picker, input, files) {
       const img = document.getElementById('avatar-img-preview')
       img.src = e.target.result
       img.style.display = 'block'
-      const initials = document.getElementById('avatar-initials')
-      if (initials) {
-        initials.style.display = 'none'
-      }
+      img.nextElementSibling.style.display = 'none'
     }
     reader.readAsDataURL(input.files[0])
   }
@@ -413,6 +416,7 @@ function handleFiles(picker, input, files) {
 
   // Mostrar - Ocultar Contraseña
   function togglePassword(btn){
+    console.log('ejecutado')
     const inputId = btn.dataset.target
     const input = document.getElementById(inputId)
     const sprite = btn.dataset.sprite
@@ -717,11 +721,26 @@ function handleFiles(picker, input, files) {
 
   // Mostrar mensaje de éxito almacenado en sessionStorage (desde HTMX o redirecciones) 
   // cuando la pagina recarga en su totalidad y se necesita dar feedback de una accion previa
-  const message = sessionStorage.getItem('success_message');
+  const message_success = sessionStorage.getItem('success_message');
+  const message_info = sessionStorage.getItem('info_message');
+  const message_warning = sessionStorage.getItem('warning_message');
+  const message_danger = sessionStorage.getItem('danger_message');
 
-  if (message) {
-    AlertManager.success(message);
+  if (message_success) {
+    AlertManager.success(message_success);
     sessionStorage.removeItem('success_message');
+  }
+  if (message_info) {
+    AlertManager.info(message_info);
+    sessionStorage.removeItem('info_message');
+  }
+  if (message_warning) {
+    AlertManager.warning(message_warning);
+    sessionStorage.removeItem('warning_message');
+  }
+  if (message_danger) {
+    AlertManager.danger(message_danger);
+    sessionStorage.removeItem('danger_message');
   }
 
 })

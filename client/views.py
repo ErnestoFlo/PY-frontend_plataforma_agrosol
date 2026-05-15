@@ -521,7 +521,7 @@ def lista_usuarios(request):
 
     # 🔹 Página completa (fallback normal)
     return render(request, "usuarios/lista.html", {
-        'pagename': 'Proveedores',
+        'pagename': 'Lista de Usuarios',
         'columns': columns,
         'path': request.path,
         'usuarios':   usuarios,
@@ -533,96 +533,118 @@ def lista_usuarios(request):
     })
 
 @superuser_required
-@require_POST
 def crear_usuario(request):
-    """
-    Crea un nuevo usuario desde el modal de la lista de usuarios.
-    Recibe multipart/form-data (para poder incluir avatar).
-    Retorna JSON.
-    """
-    username     = request.POST.get('username', '').strip()
-    first_name   = request.POST.get('first_name', '').strip()
-    last_name    = request.POST.get('last_name', '').strip()
-    email        = request.POST.get('email', '').strip()
-    password1    = request.POST.get('password1', '')
-    password2    = request.POST.get('password2', '')
-    cargo        = request.POST.get('cargo', '').strip()
-    area         = request.POST.get('area', '').strip()
-    telefono     = request.POST.get('telefono', '').strip()
-    is_staff     = request.POST.get('is_staff',     '0') == '1'
-    is_superuser = request.POST.get('is_superuser', '0') == '1'
-    grupo_id     = request.POST.get('grupo', '').strip()
- 
-    # ── Validaciones ──
-    if not username:
-        return JsonResponse({'success': False, 'error': 'El username es obligatorio.'}, status=400)
- 
-    if User.objects.filter(username=username).exists():
-        return JsonResponse({'success': False, 'error': f'El username "{username}" ya está en uso.'}, status=400)
- 
-    if not password1:
-        return JsonResponse({'success': False, 'error': 'La contraseña es obligatoria.'}, status=400)
- 
-    if len(password1) < 8:
-        return JsonResponse({'success': False, 'error': 'La contraseña debe tener mínimo 8 caracteres.'}, status=400)
- 
-    if password1 != password2:
-        return JsonResponse({'success': False, 'error': 'Las contraseñas no coinciden.'}, status=400)
- 
-    if email and User.objects.filter(email=email).exists():
-        return JsonResponse({'success': False, 'error': f'El email "{email}" ya está en uso.'}, status=400)
- 
-    # ── Crear el User ──
-    usuario = User.objects.create_user(
-        username=username,
-        password=password1,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-    )
-    usuario.is_staff     = is_staff
-    usuario.is_superuser = is_superuser
-    usuario.save()
- 
-    # ── Actualizar perfil extendido ──
-    perfil = usuario.profile  # se crea automáticamente con la signal
-    perfil.cargo    = cargo
-    perfil.area     = area
-    perfil.telefono = telefono
-    if 'avatar' in request.FILES:
-        perfil.avatar = request.FILES['avatar']
-    perfil.save()
- 
-    # ── Asignar grupo ──
-    if grupo_id:
-        try:
-            grupo = Group.objects.get(id=int(grupo_id))
-            usuario.groups.add(grupo)
-        except (Group.DoesNotExist, ValueError):
-            pass  # Si el grupo no existe, simplemente no se asigna
- 
-    # ── Preparar respuesta ──
-    avatar_url = None
-    if perfil.avatar and perfil.avatar.name:
-        avatar_url = perfil.avatar.url
- 
-    return JsonResponse({
-        'success': True,
-        'usuario': {
-            'id':          usuario.id,
-            'username':    usuario.username,
-            'first_name':  usuario.first_name,
-            'last_name':   usuario.last_name,
-            'full_name':   usuario.get_full_name() or usuario.username,
-            'email':       usuario.email,
-            'cargo':       perfil.cargo,
-            'area':        perfil.area,
-            'is_staff':    usuario.is_staff,
-            'is_superuser':usuario.is_superuser,
-            'avatar_url':  avatar_url,
-            'date_joined': usuario.date_joined.strftime('%d/%m/%Y'),
-        }
-    })
+    if request.method == 'POST':
+        """
+        Crea un nuevo usuario desde el modal de la lista de usuarios.
+        Recibe multipart/form-data (para poder incluir avatar).
+        Retorna JSON.
+        """
+        username     = request.POST.get('username', '').strip()
+        first_name   = request.POST.get('first_name', '').strip()
+        last_name    = request.POST.get('last_name', '').strip()
+        email        = request.POST.get('email', '').strip()
+        password1    = request.POST.get('password1', '')
+        password2    = request.POST.get('password2', '')
+        cargo        = request.POST.get('cargo', '').strip()
+        area         = request.POST.get('area', '').strip()
+        telefono     = request.POST.get('telefono', '').strip()
+        is_staff     = request.POST.get('is_staff',     '0') == '1'
+        is_superuser = request.POST.get('is_superuser', '0') == '1'
+        grupo_id     = request.POST.get('grupo', '').strip()
+    
+        # ── Validaciones ──
+        if not username:
+            return JsonResponse({'success': False, 'error': 'El username es obligatorio.'}, status=400)
+    
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'success': False, 'error': f'El username "{username}" ya está en uso.'}, status=400)
+    
+        if not password1:
+            return JsonResponse({'success': False, 'error': 'La contraseña es obligatoria.'}, status=400)
+    
+        if len(password1) < 8:
+            return JsonResponse({'success': False, 'error': 'La contraseña debe tener mínimo 8 caracteres.'}, status=400)
+    
+        if password1 != password2:
+            return JsonResponse({'success': False, 'error': 'Las contraseñas no coinciden.'}, status=400)
+    
+        if email and User.objects.filter(email=email).exists():
+            return JsonResponse({'success': False, 'error': f'El email "{email}" ya está en uso.'}, status=400)
+    
+        # ── Crear el User ──
+        usuario = User.objects.create_user(
+            username=username,
+            password=password1,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        usuario.is_staff     = is_staff
+        usuario.is_superuser = is_superuser
+        usuario.save()
+    
+        # ── Actualizar perfil extendido ──
+        perfil = usuario.profile  # se crea automáticamente con la signal
+        perfil.cargo    = cargo
+        perfil.area     = area
+        perfil.telefono = telefono
+        if 'avatar' in request.FILES:
+            perfil.avatar = request.FILES['avatar']
+        perfil.save()
+    
+        # ── Asignar grupo ──
+        if grupo_id:
+            try:
+                grupo = Group.objects.get(id=int(grupo_id))
+                usuario.groups.add(grupo)
+            except (Group.DoesNotExist, ValueError):
+                pass  # Si el grupo no existe, simplemente no se asigna
+    
+        # ── Preparar respuesta ──
+        avatar_url = None
+        if perfil.avatar and perfil.avatar.name:
+            avatar_url = perfil.avatar.url
+    
+        return JsonResponse({
+            'success': True,
+            'usuario': {
+                'id':          usuario.id,
+                'username':    usuario.username,
+                'first_name':  usuario.first_name,
+                'last_name':   usuario.last_name,
+                'full_name':   usuario.get_full_name() or usuario.username,
+                'email':       usuario.email,
+                'cargo':       perfil.cargo,
+                'area':        perfil.area,
+                'is_staff':    usuario.is_staff,
+                'is_superuser':usuario.is_superuser,
+                'avatar_url':  avatar_url,
+                'date_joined': usuario.date_joined.strftime('%d/%m/%Y'),
+            }
+        })
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'modal_name': 'modal-create',
+    }
+    if is_htmx:
+        return render(request, "usuarios/crear.html", context)
+    else:
+        return render(request, "usuarios/lista.html", context)
+
+@login_required
+def get_grupos(request):
+    grupos   = Group.objects.all().order_by('name')  # ← necesario para el select del modal
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'grupos': grupos,             # ← pasar grupos al template
+    }
+    if is_htmx:
+        return render(request, "partials/combobox_options.html", context)
+    else:
+        return render(request, "usuarios/lista.html", context)
+
+
 
 # ── EDITAR USUARIO ──
 @superuser_required
@@ -650,9 +672,15 @@ def editar_usuario(request, id):
 
         return redirect('lista_usuarios')
 
-    return render(request, 'usuarios/editar.html', {
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'modal_name': 'modal-edit',
         'usuario': usuario
-    })
+    }
+    if is_htmx:
+        return render(request, "usuarios/editar_usuario.html", context)
+    else:
+        return render(request, "usuarios/lista.html", context)
 
 
 # ── DESACTIVAR USUARIO (soft delete) ──
@@ -671,9 +699,16 @@ def desactivar_usuario(request, id):
         usuario.save()
         return redirect('lista_usuarios')
 
-    return render(request, 'usuarios/confirmar_desactivar.html', {
-        'usuario': usuario
-    })
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'modal_name': 'modal-deactivate',
+        'usuario': usuario,
+    }
+
+    if is_htmx:
+        return render(request, "usuarios/confirmar_desactivar.html", context)
+    else:
+        return redirect('lista_usuarios')
 
 ########## PÁGINA DE ERRORES ###########
 
@@ -1212,30 +1247,45 @@ def perfil(request):
 def logs_usuario(request, id):
     from .models import ActivityLog
     usuario_visto = get_object_or_404(User, id=id)
- 
     logs = ActivityLog.objects.filter(
         usuario=usuario_visto
     ).select_related('modulo').order_by('-fecha')
- 
-    return render(request, 'usuarios/logs_usuario.html', {
+
+    is_htmx = request.headers.get('HX-Request')
+    context = {
         'usuario_visto':   usuario_visto,
         'logs':            logs,
         'total_logs':      logs.count(),
         'total_login':     logs.filter(tipo_evento='login').count(),
         'total_modulos':   logs.filter(tipo_evento='modulo').count(),
         'total_elementos': logs.filter(tipo_evento='elemento').count(),
-    })
- 
+        'modal_name': 'modal-logs',
+    }
+    if is_htmx:
+        return render(request, "usuarios/logs_usuario.html", context)
+    else:
+        return redirect('lista_usuarios')
  
 # ── Vista: limpiar logs de un usuario (superadmin) ───────────
 @superuser_required
-@require_POST
 def logs_limpiar_usuario(request, id):
     from .models import ActivityLog
     usuario_visto = get_object_or_404(User, id=id)
-    eliminados = ActivityLog.objects.filter(usuario=usuario_visto).count()
-    ActivityLog.objects.filter(usuario=usuario_visto).delete()
-    return redirect('logs_usuario', id=id)
+
+    if request.method == 'POST':
+        eliminados = ActivityLog.objects.filter(usuario=usuario_visto).count()
+        ActivityLog.objects.filter(usuario=usuario_visto).delete()
+
+    is_htmx = request.headers.get('HX-Request')
+    context = {
+        'modal_name': 'modal-clean',
+        'usuario_visto': usuario_visto,
+    }
+
+    if is_htmx:
+        return render(request, "usuarios/confirmar_limpieza_logs.html", context)
+    else:
+        return redirect('lista_usuarios')
 
 
 def error_403(request, exception=None):

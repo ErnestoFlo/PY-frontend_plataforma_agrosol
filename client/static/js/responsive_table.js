@@ -27,10 +27,10 @@
       if (!forceReload && currentFragment === nextFragment) return
 
       currentFragment = nextFragment
-      const page = '';
+      const page = ' ';
       let targetUrl = '';
       try{page = getPageFromUrl()} catch {}
-      if (page != '') {
+      if (page != ' ') {
         targetUrl = `${sourceUrl}?page=${page}&fragment=${nextFragment}`
       } else {
         targetUrl = `${sourceUrl}?fragment=${nextFragment}`

@@ -1,13 +1,13 @@
 {% import 'components/buttons.html' as buttons %}
 
-{% macro modal(modal_id, title, size=none, confirm_text=none, show_footer=False, confirm_url=none) %}
+{% macro modal(modal_id, title, size=none, confirm_text=none, show_footer=False, confirm_url=none, x_params='', x_body_params='') %}
   <div id="{{ modal_id }}"
     class="modal-overlay hidden"
     data-action="modal"
     role="dialog"
     aria-modal="true"
     aria-labelledby="{{ modal_id }}-title">
-    <div class="modal-container card {{ size|default('modal-md') }}">
+    <div class="modal-container card {{ size|default('modal-md') }} {{ x_params }}">
       <div class="modal-header">
         <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
           {{ title }}
@@ -15,7 +15,7 @@
         {{ buttons.input_icon_button(permiso='btn_close_modal', label_log='Cerrar modal', func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
       </div>
 
-      <div id="{{ modal_id }}-content" class="modal-body"
+      <div id="{{ modal_id }}-content" class="modal-body {{ x_body_params }}"
           hx-target="this"
           hx-swap="innerHTML">
         <!-- HTMX Inyecta aquí -->

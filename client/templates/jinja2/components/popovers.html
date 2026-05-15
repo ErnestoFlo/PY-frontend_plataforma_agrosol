@@ -81,7 +81,7 @@
             permiso='btn_eliminación', label_log='Botón abrir eliminación', 
             func_type='button', type='btn-icon-text-menu-danger', role='menuitem',
             icon_size='4', icon_name='icon-user-minus-regular', text='Desactivar',
-            action='openModal', target='modal-delete', hx_get=url('desactivar_usuario', kwargs={'id': user.id}), 
+            action='openModal', target='modal-deactivate', hx_get=url('desactivar_usuario', kwargs={'id': user.id}), 
             hx_target="#modal-delete-content", hx_swap="innerHTML"
             ) }}
         {% endif %}

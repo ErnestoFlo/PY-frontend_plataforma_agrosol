@@ -60,28 +60,34 @@
                 </div>
               </div>
               <nav class="flex gap-3" role="none">
-                {{ buttons.icon_button(
-                  permiso='btn_edición', label_log='Botón abrir edición', 
-                  func_type='button', type='btn-icon-ghost-neutral', 
-                  size='4', icon_name='icon-pencil-fill',
-                  action='openModal', target='modal-edit', hx_get=url('editar_usuario', kwargs={'id': user.id}), 
-                  hx_target="#modal-edit-content", hx_swap="innerHTML", x_params='p-1'
-                  ) }}
-                {{ buttons.icon_button(
-                  permiso='btn_edición', label_log='Botón abrir edición', 
-                  func_type='button', type='btn-icon-ghost-neutral', 
-                  size='4', icon_name='icon-history-regular', x_params='p-1', 
-                  action='openModal', target='modal-logs', hx_get=url('logs_usuario', kwargs={'id': user.id}), 
-                  hx_target="#modal-logs-content", hx_swap="innerHTML"
-                  ) }}
-                {% if u.is_active and not u.is_superuser %}
+                {% if u != request.user %}
                   {{ buttons.icon_button(
-                    permiso='btn_eliminación', label_log='Botón abrir eliminación', 
-                    func_type='button', type='btn-icon-ghost-danger',
-                    size='4', icon_name='icon-user-minus-regular', x_params='p-1',
-                    action='openModal', target='modal-delete', hx_get=url('desactivar_usuario', kwargs={'id': user.id}), 
-                    hx_target="#modal-delete-content", hx_swap="innerHTML"
+                    permiso='btn_edición', label_log='Botón abrir edición', 
+                    func_type='button', type='btn-icon-ghost-neutral', 
+                    size='4', icon_name='icon-pencil-fill',
+                    action='openModal', target='modal-edit', hx_get=url('editar_usuario', kwargs={'id': u.id}), 
+                    hx_target="#modal-edit-content", hx_swap="innerHTML", x_params='p-1'
                     ) }}
+                  {{ buttons.icon_button(
+                    permiso='btn_edición', label_log='Botón abrir edición', 
+                    func_type='button', type='btn-icon-ghost-neutral', 
+                    size='4', icon_name='icon-history-regular', x_params='p-1', 
+                    action='openModal', target='modal-logs', hx_get=url('logs_usuario', kwargs={'id': u.id}), 
+                    hx_target="#modal-logs-content", hx_swap="innerHTML"
+                    ) }}
+                  {% if u.is_active and not u.is_superuser %}
+                    {{ buttons.icon_button(
+                      permiso='btn_eliminación', label_log='Botón abrir eliminación', 
+                      func_type='button', type='btn-icon-ghost-danger',
+                      size='4', icon_name='icon-user-minus-regular', x_params='p-1',
+                      action='openModal', target='modal-deactivate', hx_get=url('desactivar_usuario', kwargs={'id': u.id}), 
+                      hx_target="#modal-delete-content", hx_swap="innerHTML"
+                      ) }}
+                  {% endif %}
+                {% else %}
+                  <a href="{{ url('perfil') }}" title="Mi perfil">
+                    {{ buttons.icon_button(permiso='btn_perfil', label_log='Abrir perfil de usuario', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-user-regular', size='4') }}
+                  </a>
                 {% endif %}
               </nav>
             </div>
