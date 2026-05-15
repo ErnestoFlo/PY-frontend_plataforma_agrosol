@@ -55,6 +55,40 @@
   </div>
 {% endmacro %}
 
+{% macro user_actions(user) %}
+  <div id="actions-{{ user.id }}"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
+          func_type='button', type='btn-icon-text-menu', role='menuitem', 
+          icon_size='4', icon_name='icon-pencil-fill', text='Editar', 
+          action='openModal', target='modal-edit', hx_get=url('editar_usuario', kwargs={'id': user.id}), 
+          hx_target="#modal-edit-content", hx_swap="innerHTML"
+          ) }}
+        {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
+          func_type='button', type='btn-icon-text-menu', role='menuitem', 
+          icon_size='4', icon_name='icon-history-regular', text='Ver Actividad', 
+          action='openModal', target='modal-logs', hx_get=url('logs_usuario', kwargs={'id': user.id}), 
+          hx_target="#modal-logs-content", hx_swap="innerHTML"
+          ) }}
+        {% if user.is_active and not user.is_superuser %}
+          {{ buttons.icon_text_button(
+            permiso='btn_eliminación', label_log='Botón abrir eliminación', 
+            func_type='button', type='btn-icon-text-menu-danger', role='menuitem',
+            icon_size='4', icon_name='icon-user-minus-regular', text='Desactivar',
+            action='openModal', target='modal-delete', hx_get=url('desactivar_usuario', kwargs={'id': user.id}), 
+            hx_target="#modal-delete-content", hx_swap="innerHTML"
+            ) }}
+        {% endif %}
+      </nav>
+  </div>
+{% endmacro %}
+
 {% macro nav_menu(user, request) %}
   <div id="nav-menu"
     class="popover card p-2 bg-surface-1"    

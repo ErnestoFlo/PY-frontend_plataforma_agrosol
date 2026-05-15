@@ -30,7 +30,7 @@
               {% elif request.user.is_staff %}
                 {{ badges.badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
               {% else %}
-                {{ badges.badge_icon(variant='primary', icon='icon-user-regular', text='Usuario') }}
+                {{ badges.badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
               {% endif %}
               {% if request.user.is_active %}
                 {{ badges.badge_icon(variant='success', icon='icon-check-circle-fill', text='Activo') }}

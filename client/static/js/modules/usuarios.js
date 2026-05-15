@@ -1,5 +1,24 @@
 (function() {
-  const CSRF = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+  document.addEventListener('DOMContentLoaded', () => {
+    const CSRF = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    // ── BÚSQUEDA DE USUARIOS ──
+    document.querySelector('[data-action="buscarUsuarios"]').addEventListener('input', function() {
+      const q    = this.value.toLowerCase();
+      const fila = document.querySelectorAll('.fila');
+      let n = 0;
+      fila.forEach(f => {
+        const ok = f.textContent.toLowerCase().includes(q);
+        f.style.display = ok ? '' : 'none';
+        if (ok) n++;
+      });
+      const total = fila.length;
+      document.getElementById('info-resultado').textContent = q
+        ? `${n} resultado${n !== 1 ? 's' : ''} para "${this.value}"`
+        : `${total} usuario${total !== 1 ? 's' : ''} en total`;
+    });
+  })
+
 
   // ── CREAR USUARIO ──
   async function crearUsuario() {
@@ -59,4 +78,5 @@
       btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Crear Usuario';
     }
   }
+
 })();

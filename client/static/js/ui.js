@@ -54,9 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="cerrarSesionAhora"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.cerrarSesionAhora())})
   document.querySelectorAll('[data-action="continuarSesion"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.continuarSesion())})
   // **** INPUTS ****
-  document.querySelectorAll('[data-action="filtrarSugerencias"]').forEach(searcher => {searcher.addEventListener('input', (e) => filtrarSugerencias(e.currentTarget.value))})
-  document.querySelectorAll('[data-action="actualizarIniciales"]').forEach(input => {input.addEventListener('input', (e) => actualizarIniciales())})
-  // **** COMBOBOXES ****
+  document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-action="actualizarIniciales"]')) {actualizarIniciales();}
+
+    if (e.target.matches('[data-action="filtrarSugerencias"]')) {filtrarSugerencias(e.target.value);}
+});  // **** COMBOBOXES ****
   document.querySelectorAll('[data-action="comboboxToggle"]').forEach(trigger => {trigger.addEventListener('click', (e) => comboboxToggle(e.currentTarget))})
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
   // ***** TOGGLE *****
@@ -405,8 +407,8 @@ function handleFiles(picker, input, files) {
     console.log('ejecutando')
     const fn = document.getElementById('f-first_name').value.trim();
     const ln = document.getElementById('f-last_name').value.trim();
-    document.getElementById('avatar-initials').textContent =
-      ((fn[0] || '') + (ln[0] || '')).toUpperCase() || '?';
+    avatar = document.querySelector('#avatar-img-preview')
+    avatar.nextElementSibling.textContent = ((fn[0] || '') + (ln[0] || '')).toUpperCase() || '?';
   }
 
   // Mostrar - Ocultar Contraseña

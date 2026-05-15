@@ -30,7 +30,7 @@
     <div role="group" aria-labelledby="seccion-datos-personales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
       <p id="seccion-datos-personales" class="col-span-12 text-sm font-medium text-neutral-500">Datos personales</p>
       {{ inputs.input(permiso='usuario_nombre', label_log='Nombre de usuario', x_params="col-span-12", name='first_name', id='f-first_name', label='Nombre', type='text', value=request.user.first_name, action='actualizarIniciales') }}
-      {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-first_name',  label='Apellido', type='text', value=request.user.last_name, action='actualizarIniciales') }}
+      {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-last_name',  label='Apellido', type='text', value=request.user.last_name, action='actualizarIniciales') }}
       {{ inputs.input(permiso='usuario_email', label_log='Email usuario', x_params="col-span-12", name='email', id='email',  label='Email', type='text', value=request.user.email) }}
     </div>
 

@@ -486,16 +486,50 @@ def superuser_required(view_func):
 # ── LISTADO DE USUARIOS ──
 @superuser_required
 def lista_usuarios(request):
+    viewport = request.GET.get('viewport', 'desktop')
+    
     usuarios = User.objects.all().order_by('-date_joined')
     grupos   = Group.objects.all().order_by('name')  # ← necesario para el select del modal
-    return render(request, 'usuarios/lista.html', {
+
+    is_htmx = request.headers.get('HX-Request')
+    fragment = request.GET.get('fragment')
+    columns = ['', 'Usuario', 'Email', 'Cargo / Área', 'Rol', 'Estado', 'Desde']
+
+    # Si no llega fragmento explícito en HTMX, usar desktop por defecto.
+    if is_htmx and fragment not in ("table", "table_mobile"):
+        fragment = "table"
+
+    # 🔹 TABLA MOBILE (cards)
+    if is_htmx and fragment == "table_mobile":
+        print('entro')
+        return render(request, 'usuarios/table_mobile.html', {
+            'fragment': 'table_mobile',
+            'usuarios':   usuarios,
+            'grupos':     grupos,             # ← pasar grupos al template
+            'total':      usuarios.count(),
+        })
+
+    # 🔹 SOLO TABLA COMPLETA (para skeleton → carga inicial)
+    if is_htmx and fragment == "table":
+        return render(request, 'usuarios/table_pc.html', {
+            'columns': columns,
+            'fragment': 'table',
+            'usuarios': usuarios,
+            'grupos': grupos,   # ← pasar grupos al template
+            'total':      usuarios.count(),
+        })
+
+    # 🔹 Página completa (fallback normal)
+    return render(request, "usuarios/lista.html", {
+        'pagename': 'Proveedores',
+        'columns': columns,
+        'path': request.path,
         'usuarios':   usuarios,
         'grupos':     grupos,             # ← pasar grupos al template
         'total':      usuarios.count(),
         'activos':    usuarios.filter(is_active=True).count(),
         'staff':      usuarios.filter(is_staff=True).count(),
         'superusers': usuarios.filter(is_superuser=True).count(),
-        'create_url': 'agrosol/usuarios/crear'
     })
 
 @superuser_required

@@ -27,9 +27,14 @@
       if (!forceReload && currentFragment === nextFragment) return
 
       currentFragment = nextFragment
-      const page = getPageFromUrl()
-      const targetUrl = `${sourceUrl}?page=${page}&fragment=${nextFragment}`
-      console.log(targetUrl)
+      const page = '';
+      let targetUrl = '';
+      try{page = getPageFromUrl()} catch {}
+      if (page != '') {
+        targetUrl = `${sourceUrl}?page=${page}&fragment=${nextFragment}`
+      } else {
+        targetUrl = `${sourceUrl}?fragment=${nextFragment}`
+      }
 
       htmx.ajax('GET', targetUrl, {
         target: responsiveTableContainer,

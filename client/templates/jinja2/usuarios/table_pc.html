@@ -1,0 +1,88 @@
+{% from 'components/avatars.html' import avatar %}
+{% from 'components/popovers.html' import user_actions %}
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+
+<div id="table" class="table-container card px-4 py-2 flex flex-col h-full">
+  <div class="overflow-x-auto rounded-xl flex-1 flex flex-col h-full">
+    <div class="overflow-y-auto rounded-xl flex-auto">
+      <table class="data-table rounded-t-xl">
+        <thead class="card rounded-none rounded-t-xl sticky top-0 z-10 border-bottom p-0 bg-surface-1">
+          <tr class="p-0 bg-transparent rounded-t-xl">
+            {% for col in columns %}
+              <th class="table-th border-none leading-5">{{ col }}</th>
+            {% endfor %}
+            <th class="table-th w-auto border-transparent rounded-se-xl">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="table-users-body" class="w-full">
+          {% for u in usuarios %}
+            <tr class="table-tr fila" id="fila-u-{{ u.id }}">
+              <td class="table-td">{{ avatar(user=u, size='12') }}</td>
+              <td class="table-td flex flex-col items-start gap-2">
+                <div class="body-lg flex flex-col">
+                  {{ u.get_full_name() or u.username }}
+                </div>
+                <div class="mono w-full flex justify-between items-center">
+                  {{ u.username }}
+                  {% if u == request.user %}
+                    <div>
+                      {{ badges.badge(variant='success', text='Tú') }}
+                    </div>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="table-td body text-fg-muted">{{ u.email|default("—") }}</td>
+              <td class="table-td">
+                {% if u.profile.cargo %}
+                  <p class="body"> {{ u.profile.cargo }} </p>
+                  <p class="body"> {{ u.profile.area }} </p>
+                {% else %}
+                  <span class="body text-fg-muted"> - </span>
+                {% endif %}
+              </td>
+              <td class="table-td">
+                {% if u.is_superuser %}
+                  {{ badges.badge_icon(variant='danger', icon='icon-shield-regular', text='Super Admin') }}
+                {% elif u.is_staff %}
+                  {{ badges.badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
+                {% else %}
+                  {{ badges.badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
+                {% endif %}
+              </td>
+              <td class="table-td">
+                {% if request.user.is_active %}
+                  {{ badges.badge_icon(variant='success', icon='icon-check-circle-fill', text='Activo') }}
+                {% else %}
+                  {{ badges.badge_icon(variant='danger', icon='icon-xmark-circle-fill', text='Inactivo') }}
+                {% endif %}
+              </td>
+              <td class="table-td mono" >
+                {{ date_format(u.date_joined, "%d/%B/%Y") }}
+              </td>
+              <td class="table-td overflow-visible justify-center gap-2 relative" data-action="popoverContainer">
+                {% if u != request.user %}
+                  {{ buttons.icon_button(permiso='btn_row_actions', label_log='Abrir acciones fila', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-horizontal-fill', size='4', action='togglePopover', target='actions-' ~ u.id, attrs="aria-haspopup='true' aria-expanded='false'") }}
+                  {{ user_actions(u) }}
+                {% else %}
+                  <a href="{{ url('perfil') }}" title="Mi perfil">
+                    {{ buttons.icon_button(permiso='btn_perfil', label_log='Abrir perfil de usuario', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-user-regular', size='4') }}
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="99" class="table-td text-center text-fg-muted py-8">
+                Sin registros
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="p-3">
+        <span class="mono" id="info-resultado">{{ total }} usuarios en total</span>
+      </div>
+    </div>
+  </div>
+</div>
