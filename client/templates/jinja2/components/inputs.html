@@ -64,19 +64,12 @@
 
 {% macro input_combobox(permiso, label_log, label, id, name, url, value=none, field=none, type="text", x_params="", x_input_params="", x_icon_params="", disabled=false) %}
   <fieldset class="input-container z-50  relative overflow-visible{{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}" data-action="combobox"
-    hx-boost="false"
-    hx-on:htmx:before-request="event.stopPropagation()">    
+    hx-disinherit="hx-post hx-target hx-include">
     <!-- Input visible que muestra la selección -->
     {% if field is not none %}
-      {{ render_field(field, id=id, name=name, class="input field-input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name, disabled=disabled, hx_get=url, hx_trigger="click once", hx_target='#' ~ name ~ '-options', hx_swap="innerHTML") }}
+      {{ render_field(field, id=id, name=name, class="input field-input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name, disabled=disabled) }}
     {% else %}
-      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly {% if value %}value="{{ value }}"{% endif %} data-action="comboboxToggle" data-target="{{ id }}" {% if disabled %} disabled {% endif %}
-        data-htmx-no-submit="true"
-        hx-get="{{ url }}"
-        hx-trigger="click once"
-        hx-target="#{{ name }}-options"
-        hx-swap="innerHTML"
-        hx-on:htmx:before-request="event.stopPropagation()"        >
+      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly {% if value %}value="{{ value }}"{% endif %} data-action="comboboxToggle" data-target="{{ id }}" {% if disabled %} disabled {% endif %}>
     {% endif %}
 
     <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
@@ -89,6 +82,12 @@
     <!-- Combobox dropdown -->
     {{ combobox_dropdown(name) }}
   </fieldset>
+  <select id="f-grupo" class="field-input">
+    <option class="opacity-0" value="">Sin grupo (sin permisos de módulos)</option>
+    {% for grupo in grupos %}
+      <option value="{{ grupo.id }}">{{ grupo.name }}</option>
+    {% endfor %}
+  </select>
 {% endmacro %}
 
 {% macro input_range(permiso, label_log, min='0', max='100', def_value='50', field=none, x_params="", x_input_params="", disabled=false) %}

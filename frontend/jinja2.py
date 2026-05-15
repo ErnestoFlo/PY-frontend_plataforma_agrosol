@@ -13,6 +13,10 @@ def date_format(value, fmt="%d/%m/%Y"):
         return ""
     return value.strftime(fmt)
 
+# limit: Permite limitar la cantidad de caracteres mostrados en una cadena. Reemplazo de 'slice' en DjangoTemplates
+def limit(value, n):
+    return value[:n]
+
 # render_field: Permite renderizar un campo de formulario con atributos personalizados.
 def render_field(field, **attrs):
     if field is None:
@@ -53,6 +57,7 @@ def environment(**options):
         "url": reverse,
         "render_field": render_field,
         "date_format": date_format,
+        "limit": limit,
         "csrf_token_only": lambda request: get_token(request),
     })
 

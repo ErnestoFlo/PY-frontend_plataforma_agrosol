@@ -51,7 +51,7 @@
                 {% endif %}
               </td>
               <td class="table-td">
-                {% if request.user.is_active %}
+                {% if u.is_active %}
                   {{ badges.badge_icon(variant='success', icon='icon-check-circle-fill', text='Activo') }}
                 {% else %}
                   {{ badges.badge_icon(variant='danger', icon='icon-xmark-circle-fill', text='Inactivo') }}

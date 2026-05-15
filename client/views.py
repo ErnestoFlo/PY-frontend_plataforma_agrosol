@@ -77,7 +77,7 @@ def get_options(request):
         {'id': 4, 'nombre': 'Herramientas'},
         {'id': 5, 'nombre': 'Software'}
     ]
-    return render(request, 'partials/options_lists.html', {
+    return render(request, 'partials/combobox_options.html', {
         'options': [{'value': o['id'], 'label': o['nombre']} for o in options]
     })
 
@@ -637,7 +637,7 @@ def get_grupos(request):
     grupos   = Group.objects.all().order_by('name')  # ← necesario para el select del modal
     is_htmx = request.headers.get('HX-Request')
     context = {
-        'grupos': grupos,             # ← pasar grupos al template
+        'options': grupos,             # ← pasar grupos al template
     }
     if is_htmx:
         return render(request, "partials/combobox_options.html", context)
@@ -750,28 +750,71 @@ def superuser_required(view_func):
 @superuser_required
 def panel_permisos(request):
     from django.contrib.auth.models import Group
-    grupos  = Group.objects.all().order_by('name').prefetch_related(
-        'user_set', 'accesos_modulos__modulo'
+    grupos_qs = Group.objects.all().order_by('name').prefetch_related(
+    'user_set', 'accesos_modulos__modulo'
     )
-    modulos = Modulo.objects.filter(activo=True).prefetch_related('accesos__group')
-    usuarios_activos = User.objects.filter(
-        is_active=True, is_superuser=False
-    ).order_by('first_name','username').select_related('profile').prefetch_related('groups')
-
-    usuarios_con_grupo = usuarios_activos.filter(groups__isnull=False).distinct()
-    usuarios_sin_grupo = usuarios_activos.filter(groups=None)
-
+    modulos_qs = Modulo.objects.filter(activo=True).prefetch_related('accesos__group')
+    usuarios_qs = User.objects.filter(
+        is_active=True,
+        is_superuser=False
+    ).order_by('first_name', 'username').select_related('profile').prefetch_related('groups')
+    usuarios_con_grupo_qs = usuarios_qs.filter(groups__isnull=False).distinct()
+    usuarios_sin_grupo_qs = usuarios_qs.filter(groups=None)
+    # ─────────────────────────────────────────────
+    # SERIALIZACIÓN PARA FRONTEND (IMPORTANTE)
+    # ─────────────────────────────────────────────
+    grupos = [
+        {
+            "id": g.id,
+            "name": g.name,
+            "usuarios": list(g.user_set.values_list("id", flat=True)),
+            "modulos": list(
+                g.accesos_modulos.values_list("modulo_id", flat=True)
+            ),
+        }
+        for g in grupos_qs
+    ]
+    modulos = [
+        {
+            "id": m.id,
+            "nombre": m.nombre,
+            "icono": m.icono,
+            "slug": m.slug,
+            "url_name": m.url_name,
+            "descripcion": m.descripcion,
+            "grupos": list(
+                m.accesos.values_list("group_id", flat=True)
+            ),
+            # opcional si usas escaneo de elementos
+            "elementos": []
+        }
+        for m in modulos_qs
+    ]
+    usuarios_activos = [
+        {
+            "id": u.id,
+            "nombre": u.get_full_name() or u.username,
+            "username": u.username,
+            "cargo": getattr(getattr(u, "profile", None), "cargo", ""),
+            "avatar": getattr(getattr(u, "profile", None), "avatar", None),
+            "grupos": list(u.groups.values_list("id", flat=True)),
+        }
+        for u in usuarios_qs
+    ]
+    usuarios_con_grupo = usuarios_con_grupo_qs.count()
+    usuarios_sin_grupo = usuarios_sin_grupo_qs.count()
     return render(request, 'permisos/panel.html', {
-        'grupos':           grupos,
-        'modulos':          modulos,
-        'todos_usuarios':   usuarios_activos,
-        'lista_sin_grupo':  usuarios_sin_grupo,
-        'total_grupos':     grupos.count(),
-        'total_modulos':    modulos.count(),
-        'total_usuarios':   usuarios_activos.count(),
-        'usuarios_sin_grupo':  usuarios_sin_grupo.count(),
-        'usuarios_asignados':  usuarios_con_grupo.count(),
-    })
+        'grupos': grupos,
+        'modulos': modulos,
+        'todos_usuarios': usuarios_activos,
+
+        'lista_sin_grupo': usuarios_sin_grupo_qs,  # si no lo usas en JS, puedes dejar QS aquí
+        'total_grupos': grupos_qs.count(),
+        'total_modulos': modulos_qs.count(),
+        'total_usuarios': usuarios_qs.count(),
+        'usuarios_sin_grupo': usuarios_sin_grupo,
+        'usuarios_asignados': usuarios_con_grupo,
+})
 
 
 # 2. Agregar modulo_crear

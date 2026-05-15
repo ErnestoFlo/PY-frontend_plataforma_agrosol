@@ -9,7 +9,8 @@ document.body.addEventListener("htmx:beforeRequest", (e) => {
     target: e.detail.target,
     element: e.detail.elt
   });
-});  // Inicialización de módulos que lo requieran
+});
+  // Inicialización de módulos que lo requieran
   // Inicializa tablas responsivas de todo el proyecto
   if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="proveedores"]')}  // Tabla de proveedores
   if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="usuarios"]')}  // Tabla de usuarios
@@ -538,6 +539,14 @@ function handleFiles(picker, input, files) {
     }
 
     document.body.style.overflow = 'hidden'
+  }
+
+  // SWITCH TABS
+  function switchTab(t){
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(`tab-${t}`).classList.add('active');
+    document.getElementById(`tab-btn-${t}`).classList.add('active');
   }
 
   // ============================================================================

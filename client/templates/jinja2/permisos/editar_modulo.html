@@ -1,0 +1,57 @@
+<!-- MODAL EDITAR MÓDULO -->
+<div class="modal fade modal-custom" id="modal-editar-modulo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+          <i class="bi bi-pencil me-2" style="color:var(--azul);"></i>
+          Editar Módulo
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Error -->
+        <div id="edit-error" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.7rem 1rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--rojo);display:none;align-items:center;gap:.5rem;margin-bottom:1rem;">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span id="edit-error-msg"></span>
+        </div>
+
+        <input type="hidden" id="edit-id">
+
+        <div class="mb-3">
+          <p class="field-label">Nombre</p>
+          <input type="text" id="edit-nombre" class="field-input" placeholder="Nombre del módulo">
+        </div>
+
+        <div class="mb-3">
+          <p class="field-label">Ícono <span style="font-size:.58rem;color:var(--muted);">(Bootstrap Icons)</span></p>
+          <div class="icon-prev-wrap">
+            <div class="icon-prev"><i class="bi bi-grid" id="edit-icon-prev"></i></div>
+            <input type="text" id="edit-icono" class="field-input"
+                    placeholder="bi-grid"
+                    oninput="document.getElementById('edit-icon-prev').className='bi '+this.value">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <p class="field-label">URL Name</p>
+          <input type="text" id="edit-urlname" class="field-input" placeholder="Ej: lista_usuarios">
+          <p style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:.3rem;">
+            El <code>name=</code> de tu <code>urls.py</code> — vincula el módulo con la pantalla
+          </p>
+        </div>
+
+        <div class="mb-2">
+          <p class="field-label">Descripción <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+          <input type="text" id="edit-descripcion" class="field-input" placeholder="Breve descripción...">
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn-outline" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-save" id="btn-guardar-edicion" onclick="guardarEdicionModulo()">
+          <i class="bi bi-check2 me-1"></i>Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

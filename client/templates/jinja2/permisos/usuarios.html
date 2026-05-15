@@ -1,0 +1,25 @@
+  <!-- MODAL USUARIOS -->
+  <div class="modal fade modal-custom" id="modal-usuarios" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-person-plus me-2" style="color:var(--verde);"></i>
+            Usuarios en <span id="modal-u-nombre" style="color:var(--verde);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div style="position:relative;margin-bottom:1rem;">
+            <i class="bi bi-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;"></i>
+            <input type="text" id="search-u" class="field-input" style="padding-left:2.4rem;"
+                   placeholder="Buscar..." oninput="renderUsuarios(this.value)">
+          </div>
+          <div id="lista-u-modal"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>

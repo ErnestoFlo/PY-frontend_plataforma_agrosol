@@ -3,75 +3,61 @@
 {% from 'components/avatars.html' import avatar %}
 
 <form method="POST"
-      class="grid grid-cols-12 gap-x-6 gap-y-4"
-      enctype="multipart/form-data"
-      hx-post="{{ url('crear_usuario') }}"
-      hx-swap="none"
-      hx-trigger="submit"
-      hx-include=":not([data-htmx-no-submit])"
-      hx-boost="false"
-      hx-on::after-request="
-        if(event.detail.successful) {
-          sessionStorage.setItem(
-            'success_message',
-            'Usuario creado exitosamente'
-          );
-          window.location.reload();
-        }
-      ">
+    class="grid grid-cols-12 gap-x-6 gap-y-4"
+    enctype="multipart/form-data"
+>
   {{ render_csrf_token(request)|safe }}
-  
-    {# — Sección: Foto de Perfil — #}
-    <div role="group" aria-labelledby="seccion-foto-perfil" class="col-span-12 grid grid-cols-[auto_1fr] gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5 items-center">          
-      <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Foto de Perfil</p>
-      <div class="w-16 h-16 min-w-16 min-h-16 max-w-16 max-h-16 bg-surface-3 rounded-full shadow-md relative {{ x_params }}" style="width: var(--spacing-16);">
-        <div  class="flex flex-col h-full w-full items-center justify-center  overflow-hidden bg-surface-3 rounded-full relative">
-            <img class="hidden w-full h-full object-cover"id="avatar-img-preview"/>
-            <div id="avatar-initials" class="h-full w-full flex items-center justify-center text-fg font-display font-bold text-[1.5em]"> ? </div>
-        </div>
+
+  {# — Sección: Foto de Perfil — #}
+  <div role="group" aria-labelledby="seccion-foto-perfil" class="col-span-12 grid grid-cols-[auto_1fr] gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5 items-center">          
+    <p id="seccion-datos-generales" class="col-span-12 text-sm font-medium text-neutral-500">Foto de Perfil</p>
+    <div class="w-16 h-16 min-w-16 min-h-16 max-w-16 max-h-16 bg-surface-3 rounded-full shadow-md relative {{ x_params }}" style="width: var(--spacing-16);">
+      <div  class="flex flex-col h-full w-full items-center justify-center  overflow-hidden bg-surface-3 rounded-full relative">
+          <img class="hidden w-full h-full object-cover"id="avatar-img-preview"/>
+          <div id="avatar-initials" class="h-full w-full flex items-center justify-center text-fg font-display font-bold text-[1.5em]"> ? </div>
       </div>
-      {{ inputs.input_file(permiso='c_file_foto', label_log='Subir Foto Perfil', id='c-file-foto', name='avatar', accept='image/*', x_params='col-span-9', compact=true) }}
     </div>
+    {{ inputs.input_file(permiso='c_file_foto', label_log='Subir Foto Perfil', id='c-file-foto', name='avatar', accept='image/*', x_params='col-span-9', compact=true) }}
+  </div>
 
 
-    {# — Sección: Datos Personales — #}
-    <div role="group" aria-labelledby="seccion-datos-personales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
-      <p id="seccion-datos-personales" class="col-span-12 text-sm font-medium text-neutral-500">Datos personales</p>
-      {{ inputs.input(permiso='usuario_nombre', label_log='Nombre de usuario', x_params="col-span-12", name='first_name', id='f-first_name', label='Nombre', type='text', action='actualizarIniciales') }}
-      {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-last_name',  label='Apellido', type='text', action='actualizarIniciales') }}
-      {{ inputs.input(permiso='usuario_email', label_log='Email usuario', x_params="col-span-12", name='email', id='email',  label='Email', type='text') }}
-    </div>
+  {# — Sección: Datos Personales — #}
+  <div role="group" aria-labelledby="seccion-datos-personales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+    <p id="seccion-datos-personales" class="col-span-12 text-sm font-medium text-neutral-500">Datos personales</p>
+    {{ inputs.input(permiso='usuario_nombre', label_log='Nombre de usuario', x_params="col-span-12", name='first_name', id='f-first_name', label='Nombre', type='text', action='actualizarIniciales') }}
+    {{ inputs.input(permiso='usuario_apellido', label_log='Apellido usuario', x_params="col-span-12", name='last_name', id='f-last_name',  label='Apellido', type='text', action='actualizarIniciales') }}
+    {{ inputs.input(permiso='usuario_email', label_log='Email usuario', x_params="col-span-12", name='email', id='email',  label='Email', type='text') }}
+  </div>
 
-    {# — Sección: Datos Adicionales — #}
-    <div role="group" aria-labelledby="seccion-datos-adicionales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
-      <p id="seccion-datos-adicionales" class="col-span-12 text-sm font-medium text-neutral-500">Datos Adicionales</p>
-      {{ inputs.input(permiso='usuario_cargo', label_log='Cargo de usuario', x_params="col-span-12", name='cargo', id='cargo',  label='Cargo', type='text') }}
-      {{ inputs.input(permiso='usuario_area', label_log='Area usuario', x_params="col-span-12", name='area', id='area',  label='Área', type='text') }}
-      {{ inputs.input(permiso='usuario_telefono', label_log='Telefono usuario', x_params="col-span-12", name='telefono', id='telefono', label='Teléfono', type='text') }}
-    </div>
+  {# — Sección: Datos Adicionales — #}
+  <div role="group" aria-labelledby="seccion-datos-adicionales" class="col-span-12 md:col-span-6 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+    <p id="seccion-datos-adicionales" class="col-span-12 text-sm font-medium text-neutral-500">Datos Adicionales</p>
+    {{ inputs.input(permiso='usuario_cargo', label_log='Cargo de usuario', x_params="col-span-12", name='cargo', id='cargo',  label='Cargo', type='text') }}
+    {{ inputs.input(permiso='usuario_area', label_log='Area usuario', x_params="col-span-12", name='area', id='area',  label='Área', type='text') }}
+    {{ inputs.input(permiso='usuario_telefono', label_log='Telefono usuario', x_params="col-span-12", name='telefono', id='telefono', label='Teléfono', type='text') }}
+  </div>
 
-    {# — Sección: Contraseña — #}
-    <div role="group" aria-labelledby="seccion-password" class="col-span-12 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
-      <p id="seccion-password" class="col-span-12 text-sm font-medium text-neutral-500">Contraseña</p>
-      {{ inputs.input_password(permiso='usuario_contra1', label_log='Contraseña 1 de Usuario', x_params="col-span-12 md:col-span-6", name='password1', id='f-password1', label='Contraseña') }}
-      {{ inputs.input_password(permiso='usuario_contra2', label_log='Contraseña 2 de Usuario', x_params="col-span-12 md:col-span-6", name='password2', id='f-password2',  label='Confirmar Contraseña') }}
-    </div>
+  {# — Sección: Contraseña — #}
+  <div role="group" aria-labelledby="seccion-password" class="col-span-12 grid grid-cols-12 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+    <p id="seccion-password" class="col-span-12 text-sm font-medium text-neutral-500">Contraseña</p>
+    {{ inputs.input_password(permiso='usuario_contra1', label_log='Contraseña 1 de Usuario', x_params="col-span-12 md:col-span-6", name='password1', id='f-password1', label='Contraseña') }}
+    {{ inputs.input_password(permiso='usuario_contra2', label_log='Contraseña 2 de Usuario', x_params="col-span-12 md:col-span-6", name='password2', id='f-password2',  label='Confirmar Contraseña') }}
+  </div>
 
-    {# — Sección: Permisos y Rol — #}
-    {% call inputs.input_wrapper(permiso='seccion_permisos_rol', label_log='Seccion Permisos y Rol', label='Permisos y Rol', x_params='col-span-12') %}
-      {{ inputs.input_toggle(x_params="col-span-12", name='is_staff', id='is_staff',  label='Staff', description='Permite acceder al panel /admin/ con permisos asignados') }}
-      {{ inputs.input_toggle(x_params="col-span-12", name='is_superuser', id='is_superuser',  label='Superusuario', description='Acceso total al sistema sin restricciones de permisos') }}
-    {% endcall %}
+  {# — Sección: Permisos y Rol — #}
+  {% call inputs.input_wrapper(permiso='seccion_permisos_rol', label_log='Seccion Permisos y Rol', label='Permisos y Rol', x_params='col-span-12') %}
+    {{ inputs.input_toggle(x_params="col-span-12", name='is_staff', id='is_staff',  label='Staff', description='Permite acceder al panel /admin/ con permisos asignados') }}
+    {{ inputs.input_toggle(x_params="col-span-12", name='is_superuser', id='is_superuser',  label='Superusuario', description='Acceso total al sistema sin restricciones de permisos') }}
+  {% endcall %}
 
-    {# — Sección: Grupo Asignado — #}
-    <div role="group" aria-labelledby="seccion-grupo_asignado" class="col-span-12 md:col-span-6 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
-      <p id="seccion-grupo_asignado" class="col-span-12 text-sm font-medium text-neutral-500">Grupo Asignado</p>
-      {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", id='c-combobox', url=url('get_grupos')) }}
-    </div>    
-    {# — Botones de acción — #}
-    <div class="flex justify-end gap-2 mt-2 col-span-12">
-      {{ buttons.button(permiso='btn_cancelar', label_log='Cancelar', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target=modal_name) }}
-      {{ buttons.button(permiso='btn_crear_usuario', label_log='Crear usuario', func_type='submit', type='btn-primary', text='Crear') }}
-    </div>
-
+  {# — Sección: Grupo Asignado — #}
+  <div role="group" aria-labelledby="seccion-grupo_asignado" class="col-span-12 md:col-span-6 gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5">          
+    <p id="seccion-grupo_asignado" class="col-span-12 text-sm font-medium text-neutral-500">Grupo Asignado</p>
+    {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", id='c-combobox', url=url('get_grupos')) }}
+  </div>    
+  {# — Botones de acción — #}
+  <div class="flex justify-end gap-2 mt-2 col-span-12">
+    {{ buttons.button(permiso='btn_cancelar', label_log='Cancelar', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target=modal_name) }}
+    {{ buttons.button(permiso='btn_crear_usuario', label_log='Crear usuario', func_type='submit', type='btn-primary', text='Crear') }}
+  </div>
 </form>

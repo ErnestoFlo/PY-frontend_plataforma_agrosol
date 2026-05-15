@@ -1,0 +1,51 @@
+  <!-- MODAL MÓDULOS (asignar módulos al grupo) -->
+  <div class="modal fade modal-custom" id="modal-modulos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-collection me-2" style="color:var(--naranja);"></i>
+            Módulos para <span id="modal-m-nombre" style="color:var(--naranja);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:0;">
+
+          <!-- Lista de módulos -->
+          <div id="panel-lista-modulos" style="padding:1.25rem 1.5rem;">
+            <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1rem;">
+              <i class="bi bi-info-circle me-1"></i>
+              Asigna módulos al grupo. En cada módulo con elementos puedes configurar
+              qué puede ver/usar el grupo.
+            </p>
+            <div id="lista-m-modal"></div>
+          </div>
+
+          <!-- Panel de permisos de elementos (se muestra al hacer click en Permisos) -->
+          <div id="panel-permisos-elementos" style="display:none;padding:1.25rem 1.5rem;">
+            <button onclick="volverAModulos()" style="background:none;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;margin-bottom:1rem;display:flex;align-items:center;gap:.4rem;">
+              <i class="bi bi-arrow-left"></i>Volver a módulos
+            </button>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+              <div id="perm-modulo-icon" style="width:36px;height:36px;border-radius:9px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;color:var(--naranja);font-size:1rem;flex-shrink:0;"></div>
+              <div>
+                <p style="font-weight:800;font-size:.95rem;margin:0;" id="perm-modulo-nombre"></p>
+                <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:0;">
+                  Configurando permisos para <span id="perm-grupo-nombre" style="color:var(--verde);"></span>
+                </p>
+              </div>
+            </div>
+            <div id="lista-permisos-elementos">
+              <div style="text-align:center;padding:2rem;color:var(--muted);">
+                <span class="spinner-border spinner-border-sm me-2"></span>Cargando elementos...
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
