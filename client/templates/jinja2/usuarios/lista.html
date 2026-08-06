@@ -1,0 +1,80 @@
+{% extends 'layouts/settings.html' %}
+
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/inputs.html' as inputs %}
+{% from 'partials/modals.html' import modal %}
+
+{% block view %}
+  <div class="flex flex-col gap-3 items-center py-4 max-w-7xl">
+
+    <!-- HEADER -->
+    <div class="w-full">
+      <p class="mono mb-1">Panel de Superusuario</p>
+      <h1 class="heading-1 mb-4">Gestión de Usuarios</h1>
+    </div>
+
+    <!-- STATS -->
+    <div class="w-full grid grid-cols-2 md:grid-cols-4 g-3 mb-4">
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-user-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total }}</p><p class="mono text-lg text-fg">Total</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-user-check-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ activos }}</p><p class="mono text-lg text-fg">Activos</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-accent-500">
+            <use href="{{ static('sprite.svg') }}#icon-star-sheriff-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ staff }}</p><p class="mono text-lg text-fg">Staff</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-danger-500">
+            <use href="{{ static('sprite.svg') }}#icon-shield-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ superusers }}</p><p class="mono text-lg text-fg">Superusers</p></div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <p class="heading-2 mb-3 w-full">Listado de Usuarios</p>
+    <div class="w-full card px-3 py-2 flex justify-between items-center gap-3">
+      {{ inputs.input_search(permiso='input_buscar_usuarios', label_log='Buscar en usuarios', id='users_searcher', name='users_searcher', x_params='w-44 h-8 bg-surface-1 hover:bg-surface-2 border-none', placeholder='Buscar en usuarios...', action='buscarUsuarios') }}
+      {{ buttons.icon_button(permiso='btn_creacion_usuario', label_log='Botón Creacion de Usuario', func_type='button', type='btn-icon-primary', size="4", icon_name="icon-plus-fill", x_params='p-2 rounded-md aspect-square', action='openModal', target='modal-create', hx_get=url('crear_usuario'), hx_target="#modal-create-content", hx_swap="innerHTML") }}
+    </div>
+
+    <!-- TABLA -->
+    <div
+      id="tabla-users-container"
+      class="w-full flex flex-col flex-1"
+      data-responsive-table="usuarios"
+      data-source-url="{{ url('lista_usuarios') }}"
+    >
+      {{ skeletons.skeleton_table() }}
+    </div>
+    <footer class="mono text-center">Agrosol · Panel de Administración · Solo acceso Superusuario</footer>
+  </div>
+
+
+  {# Modales #}
+  {{ modal(modal_id='modal-create', title='Crear Usuario', size='modal-lg', show_footer=False) }}
+  {{ modal(modal_id='modal-edit', title='Editar Usuario', size='modal-lg', show_footer=False) }}
+  {{ modal(modal_id='modal-logs', title='Logs de Usuario', size='modal-xl',  x_body_params='overflow-y-auto md:overflow-hidden', show_footer=False) }}
+  {{ modal(modal_id='modal-deactivate', title='Desactivar Usuario', size='modal-md', show_footer=False) }}
+  {{ modal(modal_id='modal-clean', title='Limpiar Logs de Usuario', size='modal-lg', show_footer=False) }}
+
+  <script src="{{ static('js/modules/usuarios.js') }}"></script>
+{% endblock %}

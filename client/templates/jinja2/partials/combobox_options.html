@@ -1,0 +1,10 @@
+{% for option in options %}
+  <li class="combobox-option list-item text-sm z-10" data-value="{{ option.id }}" data-action="combobox-select">
+    {{ option.name }}
+  </li>
+{% endfor %}
+
+{% macro combobox_dropdown(name) %}
+  <ul id="{{ name }}-options" class="list combobox-dropdown hidden" data-input="{{ name }}" tabindex="-1" style="z-index: 999;">
+  </ul>
+{% endmacro %}

@@ -1,0 +1,30 @@
+{% from 'components/popovers.html' import bottombar_popover %}
+{% macro bottombar(bar_items) %}
+  <nav class="bottombar card flex justify-center rounded-3xl" aria-label="Navegación principal móvil">
+    {% for item in bar_items %}
+      {% if item.group %}
+        <!-- Item con sub-modulos  -->
+        <div data-action="popoverContainer" class="relative flex items-center justify-center p-0">
+          <button type="button"
+            class="bottombar-item"
+            data-action="togglePopover"
+            data-tipo="btn_modulo"
+            data-label="Boton abrir submenú de módulo"
+            data-target="bottombar-more"
+            aria-haspopup="true">
+            <svg aria-hidden="true"><use href="{{ static('sprite.svg') }}#{{ item.icon }}"/></svg>
+            <span>{{ item.label }}</span>
+          </button>
+          {{ bottombar_popover(item) }}
+        </div>
+      {% else %}
+        <a href="{{ url(item.url) }}" class="bottombar-item {% if item.is_active %}active{% endif %}" data-action="bottombarItem">
+          <svg aria-hidden="true"><use  href="{{ static('sprite.svg') }}#{{ item.icon }}"/></svg>
+          <span>{{ item.label }}</span>
+        </a>
+      {% endif %}
+    {% else %}
+      <p class="text-fg-muted text-xs px-3">Sin menú</p>
+    {% endfor %}
+  </nav>
+{% endmacro %}

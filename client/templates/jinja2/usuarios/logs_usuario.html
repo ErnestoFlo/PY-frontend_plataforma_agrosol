@@ -1,0 +1,107 @@
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+{% from 'components/avatars.html' import avatar %}
+{% from 'partials/logs.html' import user_logs %}
+
+<div class="flex flex-col gap-3 lg:grid lg:grid-rows-1 lg:grid-cols-[1fr_auto] py-1">
+  
+  <div class="h-auto lg:overflow-y-auto lg:mr-1 lg:px-2">
+    <!-- HEADER -->
+    <div class="w-full">
+      <p class="mono mb-1">Registro de Actividad</p>
+      <h1 class="heading-1 mb-4">Logs de Usuario</h1>
+    </div>
+
+    <!-- USUARIO -->
+    {# — Sección: Encabezado — #}
+    <div role="group" aria-labelledby="seccion-foto-perfil" class="w-full flex-col justify-between md:justify-center gap-x-6 gap-y-4 border border-fg/15 rounded-xl p-5 mb-3 items-center">
+      <div class="flex-grow flex flex-wrap">
+        {{ avatar(user=usuario_visto, size='16', id='avatar-img-preview') }}
+        <div class="flex flex-col items-start gap-2 m-0 md:ml-3">
+          <h2 class="heading-3 font-bold m-0">
+            {{ usuario_visto.get_full_name() or usuario_visto.username }}
+          </h2>
+          <div class="flex flex-wrap items-center gap-3 m-0">
+            <p class="mono">
+              @{{ usuario_visto.username }}
+            </p>
+            <p class="mono text-nowrap">
+              {% if usuario_visto.profile.cargo %} · {{ usuario_visto.profile.cargo }}{% endif %}
+              {% if usuario_visto.profile.area %} · {{ usuario_visto.profile.area }}{% endif %}
+            </p>
+            <div class="">
+              {% for g in usuario_visto.groups.all() %}
+              {{ badges.badge(variant='info', text=g.name) }}
+              {% endfor %}
+            </div>
+            <!-- Badge de rol actual -->
+            {% if usuario_visto.is_superuser %}
+              {{ badges.badge_icon(variant='danger', icon='icon-shield-regular', text='Super Admin') }}
+            {% elif usuario_visto.is_staff %}
+              {{ badges.badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
+            {% else %}
+              {{ badges.badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="flex-grow-0 mt-3">
+        <!-- Form limpieza manual -->
+        {{ buttons.icon_text_button(permiso='btn_limpiar_logs', label_log='Botón Limpiar logs', func_type='button', type='btn-icon-text-danger', text='Limpiar Logs', icon_name='icon-trash-fill', icon_size='4', x_params='px-3 py-2', action='openModal', target='modal-clean', hx_get=url('logs_limpiar_usuario', kwargs={'id': usuario_visto.id}), hx_target="#modal-clean-content", hx_swap="innerHTML") }}
+      </div>
+    </div>
+
+
+    <!-- STATS -->
+    <div class="w-full grid grid-cols-2 g-3 mb-4">
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-history-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_logs }}</p><p class="mono text-lg text-fg">Total</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-login-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_login }}</p><p class="mono text-lg text-fg">Logins</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-info-500">
+            <use href="{{ static('sprite.svg') }}#icon-module-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_modulos }}</p><p class="mono text-lg text-fg">Módulos</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-warning-500">
+            <use href="{{ static('sprite.svg') }}#icon-cursor-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_elementos }}</p><p class="mono text-lg text-fg truncate">Interacciones</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="lg:overflow-hidden lg:h-[70vh] w-full lg:max-w-md grid grid-rows-[auto_1fr] min-h-0">
+    <!-- FILTROS Y BÚSQUEDA -->
+      <p class="h-full w-full heading-2 mb-4">Registro completo</p>
+      <div class="h-full w-full min-h-0 mb-4 grid grid-rows-[auto_1fr] grid-cols-1 relative">
+        {% if logs %}
+          {{ user_logs(logs) }}
+        {% endif %}
+      </div>
+  </div>
+</div>
+
+  <footer class="w-full text-center body text-fg-muted mt-3">Agrosol · Logs de Actividad · Solo Superusuarios</footer>
+
+  <script src="{{ static('js/logs.js') }}"></script>
+
+</body>
+</html>

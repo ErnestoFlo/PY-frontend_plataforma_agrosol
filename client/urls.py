@@ -1,12 +1,14 @@
 from django.urls import path
 from . import views
 from django.conf import settings
+from django.views.static import serve
 from django.conf.urls.static import static
 
 
 urlpatterns = [
     ### BIENVENIDA
     path("landing_login/", views.landing_login, name="landing"),
+    path("dashboard/", views.view1, name="dashboard"),
     ### URLS DE PROVEEDORES
     path("proveedores/", views.list_proveedores, name="proveedores"),
     path("proveedores/crear/", views.create_or_edit_proveedor, name="proveedores_crear"),
@@ -16,13 +18,9 @@ urlpatterns = [
 
     ### URLS DE DISEÑO
     path("design/test_components/", views.tests_components, name="tests_page"),
-    path("design/dashboard/", views.view1, name="dashboard"),
     
     ### URLS DE ENDPOINTS DINÁMICOS (HTMX)
-    path("api/proveedores/opciones/", views.get_options, name="get_proveedores_options"),
-    
-    ### URLS DE LOGIN ###
-    path("principio/", views.principio, name="principio"),
+    path("api/opciones/", views.get_options, name="get_proveedores_options"),
 
     ### URLS DE USUARIOS ###
     path("usuarios/", views.lista_usuarios, name="lista_usuarios"),
@@ -31,6 +29,8 @@ urlpatterns = [
     path("perfil/", views.perfil, name="perfil"),
     path("test-400/", views.test_400, name="test_400"),
     path("usuarios/crear/", views.crear_usuario, name="crear_usuario"),
+    path("usuarios/get_grupos/", views.get_grupos, name="get_grupos"),
+
 
     ### URLS DE PERMISOS ###
     path("permisos/", views.panel_permisos, name="panel_permisos"),

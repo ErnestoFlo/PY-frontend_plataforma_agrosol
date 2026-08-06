@@ -1,0 +1,280 @@
+{% extends 'layouts/settings.html' %}
+
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+{% from 'components/avatars.html' import avatar %}
+{% from 'partials/logs.html' import user_logs %}
+{% from 'partials/modals.html' import modal  %}
+
+{% block view %}
+  <div class="flex flex-col gap-3 lg:grid lg:grid-rows-1 lg:grid-cols-[1fr_auto] w-full h-full py-1">
+    {% if request.user.is_authenticated %}
+
+    <div class="h-auto lg:overflow-y-auto lg:mr-1 lg:px-2" style="scrollbar-width: none;">
+      <!-- HERO -->
+      <div class="card mb-5 md:py-8">
+        <div class="flex items-center gap-4 flex-wrap">
+          {{ avatar(user=request.user, size='20', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML', action_icon='icon-pencil-fill' ) }}
+          <div class="flex-grow-1">
+            <h1 class="heading-1">{{ request.user.get_full_name() or request.user.username }}</h1>
+            <p class="body text-primary-theme mb-1">@{{ request.user.username }}</p>
+            {% if request.user.profile.cargo %}
+            <div class="body text-muted flex items-center gap-2 mb-2">
+              {{ request.user.profile.cargo }}
+              {% if request.user.profile.area %}· <span style="color:var(--acento);">{{ request.user.profile.area }}</span>{% endif %}
+            </div>
+            {% endif %}
+            <div class="d-flex gap-2 flex-wrap">
+              {% if request.user.is_superuser %}
+                {{ badges.badge_icon(variant='danger', icon='icon-shield-regular', text='Super Admin') }}
+              {% elif request.user.is_staff %}
+                {{ badges.badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
+              {% else %}
+                {{ badges.badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
+              {% endif %}
+              {% if request.user.is_active %}
+                {{ badges.badge_icon(variant='success', icon='icon-check-circle-fill', text='Activo') }}
+              {% else %}
+                {{ badges.badge_icon(variant='danger', icon='icon-xmark-circle-fill', text='Inactivo') }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="w-full flex justify-center md:w-auto md:ms-auto">
+            {{ buttons.button(permiso='btn_editar_perfil', label_log='Editar Perfil', func_type='button', type='btn-secondary', x_params='btn', text='Editar Perfil', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN PERSONAL -->
+      <p class="heading-2 mb-4">Información Personal</p>
+      <div class="grid grid-cols-12 gap-3 mb-4">
+        <div class="md:col-span-4 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{{ static('sprite.svg') }}#icon-user-regular" />
+            </svg>
+            <p class="mono">Username</p>
+            <p class="body-lg">@{{ request.user.username }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-4 col-span-6">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{{ static('sprite.svg') }}#icon-letters-regular" />
+            </svg>
+            <p class="mono">Nombre</p>
+            <p class="body-lg">{{ request.user.first_name|default("—") }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-4 col-span-6">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{{ static('sprite.svg') }}#icon-letter-b-regular" />
+            </svg>
+            <p class="mono">Apellido</p>
+            <p class="body-lg">{{ request.user.last_name|default("—")}}</p>
+          </div>
+        </div>
+        <div class="md:col-span-6 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{{ static('sprite.svg') }}#icon-mail-regular" />
+            </svg>
+            <p class="mono">Email</p>
+            <p class="body-lg">{{ request.user.email|default("Sin email registrado") }}</p>
+          </div>
+        </div>
+        <div class="md:col-span-6 col-span-12">
+          <div class="card">
+            <svg class="h-8 w-8 text-primary-500 mb-4">
+              <use href="{{ static('sprite.svg') }}#icon-person-badge-regular" />
+            </svg>
+            <p class="mono">Nombre Completo</p>
+            <p class="body-lg">{{ request.user.get_full_name() or request.user.username }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN DEL PERFIL -->
+      <p class="heading-2 mb-4">Información Del Perfil</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card">
+            <div class="flex items-center gap-3 py-3 border-b border-fg-muted/50">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-suitcase-regular" />
+            </svg>
+              <span class="mono min-w-20">Cargo</span>
+              <span class="body ">{{ request.user.profile.cargo|default("—") }}</span>
+            </div>
+            <div class="flex items-center gap-3 py-3 border-b border-fg-muted/50">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-building-regular" />
+            </svg>
+              <span class="mono min-w-20">Área</span>
+              <span class="body">{{ request.user.profile.area|default("—") }}</span>
+            </div>
+            <div class="flex items-center gap-3 py-3">
+            <svg class="h-5 w-5 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-phone-regular" />
+            </svg>
+              <span class="mono min-w-20">Teléfono</span>
+              <span class="body">{{ request.user.profile.telefono|default("—") }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex flex-col items-center justify-center text-center gap-4">
+            <div class="w-full flex justify-center">{{ avatar(size='16', user=request.user) }}</div>
+              {% if request.user.profile.avatar.name %}
+                <p class="mono uppercase m-o">Foto de perfil actual</p>
+              {% else %}
+                <p class="mono uppercase m-0">Sin foto de perfil</p>
+              {% endif %}
+            {{ buttons.icon_text_button(permiso='btn_cambiar_foto', label_log='Cambiar foto de perfil', func_type='button', type='btn-icon-text-secondary', text='Cambiar foto', icon_name='icon-camera-regular', icon_size='5', action='openModal', target='modal-edit', hx_get=edit_url, hx_target='#modal-edit-content', hx_swap='innerHTML') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD (fechas) -->
+      <p class="heading-2 mb-4">Actividad</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex items-center gap-4">
+            <svg class="h-8 w-8 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-date-regular" />
+            </svg>
+            <div>
+              <p class="mono">Miembro desde</p>
+              <p class="body-lg">{{ date_format(request.user.date_joined, "%d de %B de %Y") }}</p>
+              <p class="mono mt-2" style="margin-bottom:0;">{{ date_format(request.user.date_joined, "%H:%M") }} hs</p>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-6 col-span-12">
+          <div class="card flex items-center gap-4">
+            <svg class="h-8 w-8 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-timer-regular" />
+            </svg>
+            <div>
+              <p class="mono">Último acceso</p>
+              <p class="body-lg">{{ date_format(request.user.last_login, "%H:%M")|default("Nunca") }}</p>
+              <p class="mono mt-2" style="margin-bottom:0;">{{ date_format(request.user.last_login, "%H:%M") }} hs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADO Y ROLES -->
+      <p class="heading-2 mb-4">Estado y Roles</p>
+      <div class="grid grid-cols-12 grid-rows-1 gap-3 mb-4">
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_authenticated %} <use class="text-primary-500" href="{{ static('sprite.svg') }}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{{ static('sprite.svg') }}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_authenticated</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_authenticated %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_active %} <use class="text-primary-500" href="{{ static('sprite.svg') }}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{{ static('sprite.svg') }}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_active</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_active %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_staff %} <use class="text-primary-500" href="{{ static('sprite.svg') }}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{{ static('sprite.svg') }}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_staff</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_staff %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="lg:col-span-3 col-span-6">
+          <div class="card text-center">
+            <div class="mb-3 flex items-center justify-center">
+              <svg class="h-8 w-8">
+                {% if request.user.is_superuser %} <use class="text-primary-500" href="{{ static('sprite.svg') }}#icon-check-circle-fill" />
+                {% else %}<use class="text-danger-500" href="{{ static('sprite.svg') }}#icon-xmark-circle-fill" />{% endif %}
+              </svg>
+            </div>
+            <p class="mono uppercase">is_superuser</p>
+            <p class="body-lg text-fg">
+              {% if request.user.is_superuser %}True{% else %}False{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRUPOS -->
+      <p class="heading-2 mb-4">Grupos / Roles Asignados</p>
+      <div class="card mb-4">
+        {% if request.user.groups.all() %}
+          {% for group in request.user.groups.all() %}
+            {{ badges.badge_icon(text=group.name, variant='success', icon='icon-users-group-regular', x_params='p-3 px-4') }}
+          {% endfor %}
+        {% else %}
+          <p class="body flex gap-3 items-center">
+            <svg class="h-6 w-6 text-primary-500">
+              <use href="{{ static('sprite.svg') }}#icon-info-circle-fill" />
+            </svg>
+            Este usuario no pertenece a ningún grupo todavía.
+          </p>
+        {% endif %}
+      </div>
+
+      <footer class="hidden lg:flex w-full justify-center h-auto text-fg-muted text-sm p-0 m-0">Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
+    </div>
+
+
+    <div class="lg:overflow-hidden lg:h-full w-full lg:w-96 grid grid-rows-[auto_1fr]">
+      <!-- MI ACTIVIDAD RECIENTE -->
+      <p class="h-full w-full heading-1 mb-4">Mi Actividad Reciente</p>
+      <div class="h-full w-full min-h-0 mb-4 grid grid-rows-[auto_1fr] grid-cols-1 relative">
+        {% if logs %}
+          {{ user_logs(logs) }}
+        {% else %}
+        <div class="row-span-2" style="background:var(--card);border:1px solid var(--borde);border-radius:14px;padding:2.5rem;text-align:center;color:var(--muted);">
+          <i class="bi bi-activity" style="font-size:1.8rem;display:block;margin-bottom:.5rem;"></i>
+          <p style="font-weight:700;margin:0;">Sin actividad registrada todavía</p>
+          <p style="font-size:.83rem;margin:.3rem 0 0;">Los eventos aparecerán aquí cuando uses el sistema</p>
+        </div>
+        {% endif %}
+      </div>
+
+      {% else %}
+      <div class="text-center py-5">
+        <i class="bi bi-lock" style="font-size:3rem;color:var(--muted);"></i>
+        <h2 class="mt-3" style="font-weight:800;">Acceso Restringido</h2>
+        <p style="color:var(--muted);">Debes iniciar sesión para ver esta página.</p>
+        <a href="{{ url('login') }}" class="btn btn-outline-success mt-2">Ir al Login</a>
+      </div>
+      {% endif %}
+      <footer class="lg:hidden flex w-full justify-center h-auto text-fg-muted text-sm pt-2">Agrosol · Sistema de Gestión · {{ request.user.username }}</footer>
+    </div>
+  </div>
+  
+  {# Modales #}
+  {{ modal(modal_id='modal-edit', title='Editar Usuario', size='modal-lg', show_footer=False) }}
+
+{% endblock %}

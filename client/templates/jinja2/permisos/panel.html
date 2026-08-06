@@ -1,0 +1,360 @@
+{% extends 'layouts/settings.html' %}
+
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/inputs.html' as inputs %}
+{% from 'partials/modals.html' import modal %}
+{% from 'partials/JSON_data.html' import json_data %}
+
+{% block view %}
+  <div class="flex flex-col gap-3 items-center py-4 max-w-7xl">
+
+    <!-- HEADER -->
+    <div class="w-full">
+      <p class="mono mb-1">Solo Superusuarios</p>
+      <h1 class="heading-1 mb-4">Grupos y Módulos</h1>
+    </div>
+
+    <!-- STATS -->
+    <div class="w-full grid grid-cols-2 md:grid-cols-4 g-3 mb-4">
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-users-group-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_grupos }}</p><p class="mono text-lg text-fg">Grupos</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-primary-500">
+            <use href="{{ static('sprite.svg') }}#icon-module-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ total_modulos }}</p><p class="mono text-lg text-fg">Módulos</p></div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-accent-500">
+            <use href="{{ static('sprite.svg') }}#icon-user-time-regular" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-2xl font-extrabold text-fg" id="stat-total">{{ usuarios_sin_grupo }}</p>
+          <p class="mono text-lg text-fg">Sin grupo 
+          </p>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="w-9 h-9 rounded-lg shrink-0">
+          <svg class="h-5 w-5 text-danger-500">
+            <use href="{{ static('sprite.svg') }}#icon-user-check-regular" />
+          </svg>
+        </div>
+        <div><p class="text-2xl font-extrabold text-fg" id="stat-total">{{ usuarios_asignados }}</p><p class="mono text-lg text-fg">Asignados</p></div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex gap-1.5 card mb-7 w-full">
+      <button type="button" class="flex-1 mono uppercase px-3 py-2 rounded-lg cursor-pointer active flex items-center justify-center gap-3" id="tab-btn-grupos" onclick="switchTab('grupos')">
+        <svg class="h-8 w-8 text-primary-500">
+          <use href="{{ static('sprite.svg') }}#icon-users-group-regular" />
+        </svg>
+        <p>Grupos</p>
+      </button>
+      <button type="button" class="flex-1 mono uppercase px-3 py-2 rounded-lg cursor-pointer active flex items-center justify-center gap-3" id="tab-btn-modulos" onclick="switchTab('modulos')">
+        <svg class="h-8 w-8 text-primary-500">
+          <use href="{{ static('sprite.svg') }}#icon-module-regular" />
+        </svg>
+        <p>Módulos</p>
+      </button>
+    </div>
+
+
+    <!-- ════════════ TAB GRUPOS ════════════ -->
+    <div id="tab-grupos" class="p-2 w-full">
+      <div class="grid grid-cols-[auto_1fr] gap-3">
+        <div>
+          <p class="heading-2 mb-3">Nuevo Grupo</p>
+          <div class="card">
+            <div class="mb-3">
+              <p class="field-label">Nombre del grupo</p>
+              {{ inputs.input(permiso='input_nuevo_grupo', label_log='Input Nuevo Grupo', id='nuevo-grupo-nombre', name='nuevo-grupo-nombre') }}
+            </div>
+            {{ buttons.icon_text_button(permiso='btn_crear_grupo', label_log='Boton crear grupo', text='Crear Grupo', icon_name='icon-plus-fill', x_params='w-full', on_click='crearGrupo()', attrs="id='btn-crear-grupo' name='btn-crear-grupo'") }}
+          </div>
+
+          {% if lista_sin_grupo %}
+          <p class="heading-3 mt-4">Sin grupo</p>
+          <div class="info-card">
+            <p class="mono mt-3">
+              <svg class="h-8 w-8 text-primary-500 mb-4">
+                <use href="{{ static('sprite.svg') }}#icon-triangle-warning-regular" />
+              </svg>
+              Sin acceso a módulos
+            </p>
+            {% for u in lista_sin_grupo %}
+            <div class="flex items-center gap-2.5 px-1.5 py-0 border-b border-fg-muted">
+              {{ avatar(user=u, size='16') }}
+              <span class="body">{{ u.get_full_name() or u.username }}</span>
+              {{ badges.badge(variant='info', text='Sin Grupo') }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="">
+          <p class="heading-2 mb-3">Grupos Configurados</p>
+          <div id="lista-grupos">
+            {% for grupo in grupos %}
+            <div class="card" id="grupo-card-{{ grupo.id }}">
+              <div class="">
+                <div>
+                  <p style="font-weight:800;font-size:.98rem;margin:0;">
+                    <i class="bi bi-people me-1" style="color:var(--verde);"></i>{{ grupo.name }}
+                  </p>
+                  <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.2rem 0 0;"
+                     id="grupo-meta-{{ grupo.id }}">
+                    {{ grupo.user_set|length }} usuarios ·
+                    {{ grupo.accesos_modulos|length }} módulos
+                  </p>
+                </div>
+                <div style="display:flex;gap:.5rem;flex-shrink:0;flex-wrap:wrap;">
+                  <button class="btn-outline naranja"
+                          onclick="abrirModalModulos({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Gestionar módulos">
+                    <i class="bi bi-collection"></i>Módulos
+                  </button>
+                  <button class="btn-outline"
+                          onclick="abrirModalUsuarios({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Gestionar usuarios">
+                    <i class="bi bi-person-plus"></i>Usuarios
+                  </button>
+                  <button class="btn-icon-sm rem"
+                          onclick="eliminarGrupo({{ grupo.id }},'{{ grupo.name }}')"
+                          title="Eliminar">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="grupo-body">
+                <!-- Módulos -->
+                <p class="subsection"><i class="bi bi-collection"></i>Módulos con acceso</p>
+                <div id="modulos-grupo-{{ grupo.id }}" style="margin-bottom:.85rem;">
+                  {% for acc in grupo.accesos_modulos.all() %}{% if acc.tiene_acceso %}
+                  <span class="acceso-chip" id="acceso-chip-{{ grupo.id }}-{{ acc.modulo.id }}">
+                    <i class="bi {{ acc.modulo.icono }}"></i>{{ acc.modulo.nombre }}
+                    <button class="acceso-chip-remove"
+                            onclick="revocarModulo({{ grupo.id }},{{ acc.modulo.id }},'{{ acc.modulo.nombre }}')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </span>
+                  {% endif %}{% else %}
+                  <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);"
+                     id="empty-modulos-{{ grupo.id }}">Sin módulos asignados</p>
+                  {% endfor %}
+                </div>
+                <!-- Usuarios -->
+                <p class="subsection"><i class="bi bi-people"></i>Usuarios</p>
+                <div id="usuarios-grupo-{{ grupo.id }}">
+                  {% for u in grupo.user_set.all() %}
+                  <span class="user-chip" id="chip-{{ grupo.id }}-{{ u.id }}">
+                    <div class="user-chip-avatar">
+                      {{ avatar(user=u) }}
+                    </div>
+                    {{ u.get_full_name() or u.username }}
+                    <button class="user-chip-remove"
+                            onclick="quitarUsuario({{ grupo.id }},{{ u.id }},'{{ u.get_full_name() or u.username }}')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </span>
+                  {% else %}
+                  <p class="mono"
+                     id="empty-usuarios-{{ grupo.id }}">Sin usuarios asignados</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="empty-state" id="empty-grupos">
+              <i class="bi bi-people"></i>
+              <p style="font-weight:700;">No hay grupos creados</p>
+              <p style="font-size:.83rem;">Crea el primero con el formulario</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════ TAB MÓDULOS ════════════ -->
+    <div id="tab-modulos" class="tab-pane">
+      <div class="row g-4">
+
+        <div class="col-lg-4">
+          <p class="section-title">Nuevo Módulo</p>
+          <div class="info-card">
+            <div class="mb-3">
+              <p class="field-label">Nombre</p>
+              <input type="text" id="mod-nombre" class="field-input" placeholder="Ej: Proveedores, Ventas...">
+            </div>
+            <div class="mb-3">
+              <p class="field-label">Ícono <span style="font-size:.58rem;color:var(--muted);">(Bootstrap Icons)</span></p>
+              <div class="icon-prev-wrap">
+                <div class="icon-prev"><i class="bi bi-grid" id="icon-prev-el"></i></div>
+                <input type="text" id="mod-icono" class="field-input" value="bi-grid"
+                       placeholder="bi-grid" oninput="document.getElementById('icon-prev-el').className='bi '+this.value">
+              </div>
+              <p class="mono mt-1.5">
+                <a href="https://icons.getbootstrap.com" target="_blank" style="color:var(--azul);">icons.getbootstrap.com</a>
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="field-label">URL Name <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+              <input type="text" id="mod-urlname" class="field-input" placeholder="Ej: lista_usuarios">
+              <p class="mono mt-1.5">
+                Nombre de la URL en <code>urls.py</code> para proteger el acceso
+              </p>
+            </div>
+            <div class="mb-3">
+              <p class="field-label">Descripción <span style="font-size:.58rem;color:var(--muted);">(opcional)</span></p>
+              <input type="text" id="mod-descripcion" class="field-input" placeholder="Breve descripción...">
+            </div>
+            <button class="btn-save w-100" id="btn-crear-modulo" onclick="crearModulo()">
+              <i class="bi bi-plus-lg"></i>Crear Módulo
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <p class="section-title">Módulos del Sistema</p>
+          <div id="lista-modulos">
+            {% for m in modulos %}
+            <div class="modulo-card" id="modulo-card-{{ m.id }}">
+              <div class="modulo-header">
+                <div style="display:flex;align-items:center;gap:.85rem;">
+                  <div class="modulo-icon"><i class="bi {{ m.icono }}"></i></div>
+                  <div>
+                    <p style="font-weight:800;font-size:.98rem;margin:0;">{{ m.nombre }}</p>
+                    <p style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);margin:.1rem 0 0;">
+                      {{ m.slug }}{% if m.url_name %} · <span style="color:var(--azul);">{{ m.url_name }}</span>{% endif %}
+                    </p>
+                  </div>
+                </div>
+                <div style="display:flex;gap:.4rem;">
+                  {% if m.url_name %}
+                  <button class="btn-icon-sm" style="color:var(--verde);border-color:rgba(74,222,128,.2);"
+                          onclick="escanearModulo({{ m.id }},'{{ m.nombre }}')"
+                          title="Escanear template — detecta elementos automáticamente">
+                    <i class="bi bi-search"></i>
+                  </button>
+                  <button class="btn-icon-sm" style="color:var(--muted);"
+                          onclick="verElementos({{ m.id }},'{{ m.nombre }}')"
+                          title="Ver elementos detectados"
+                          id="btn-elementos-{{ m.id }}">
+                    <i class="bi bi-list-check"></i>
+                    {% if m.elementos.count %}<span style="font-size:.55rem;margin-left:.1rem;">{{ m.elementos.count }}</span>{% endif %}
+                  </button>
+                  {% endif %}
+                  <button class="btn-icon-sm" style="color:var(--azul);border-color:rgba(96,165,250,.2);"
+                          onclick="abrirEditarModulo({{ m.id }},'{{ m.nombre }}','{{ m.icono }}','{{ m.url_name }}','{{ m.descripcion }}')"
+                          title="Editar módulo">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-icon-sm rem" onclick="eliminarModulo({{ m.id }},'{{ m.nombre }}')" title="Eliminar módulo">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="modulo-body">
+                {% if m.descripcion %}<p style="font-size:.83rem;color:var(--muted);margin-bottom:.6rem;">{{ m.descripcion }}</p>{% endif %}
+                {% if m.url_name %}
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+                  <p class="subsection" style="margin:0;"><i class="bi bi-puzzle"></i>Elementos detectados</p>
+                  <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:{% if m.elementos.count %}var(--verde){% else %}var(--muted){% endif %};">
+                    {{ m.elementos.count }} elementos
+                  </span>
+                </div>
+                {% if not m.elementos.count %}
+                <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.75rem;">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Haz click en <i class="bi bi-search"></i> para escanear el template
+                </p>
+                {% else %}
+                <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.75rem;" id="elementos-preview-{{ m.id }}">
+                  {% for e in limit(m.elementos.all(), 6) %}
+                  <span style="font-family:'DM Mono',monospace;font-size:.62rem;padding:.15rem .5rem;border-radius:999px;
+                    {% if e.tipo == 'accion' %}background:rgba(251,146,60,.08);color:var(--naranja);border:1px solid rgba(251,146,60,.2);
+                    {% elif e.tipo == 'componente' %}background:rgba(96,165,250,.08);color:var(--azul);border:1px solid rgba(96,165,250,.2);
+                    {% else %}background:rgba(74,222,128,.08);color:var(--verde);border:1px solid rgba(74,222,128,.2);{% endif %}">
+                    {{ e.label }}
+                  </span>
+                  {% endfor %}
+                  {% if m.elementos|length > 6 %}
+                  <span style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);">+{{ m.elementos|length - 6 }} más</span>
+                  {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+                <p class="subsection"><i class="bi bi-people"></i>Grupos con acceso</p>
+                <div id="grupos-modulo-{{ m.id }}">
+                  {% for acc in m.accesos.all() %}{% if acc.tiene_acceso %}
+                  <span class="badge-grupo-asignado" id="badge-gmod-{{ m.id }}-{{ acc.group.id }}">
+                    <i class="bi bi-people"></i>{{ acc.group.name }}
+                  </span>
+                  {% endif %}{% else %}
+                  <p class="mono"
+                     id="empty-gmod-{{ m.id }}">Ningún grupo tiene acceso todavía</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="empty-state" id="empty-modulos">
+              <i class="bi bi-collection"></i>
+              <p style="font-weight:700;">No hay módulos creados</p>
+              <p style="font-size:.83rem;">Crea el primero con el formulario</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>Agrosol · Grupos y Módulos · Solo Superusuarios</footer>
+
+
+    <!-- JSON DATA -->
+    {{ json_data('todos-usuarios-data', todos_usuarios) }}
+    {{ json_data('usuarios-sin-grupo-data', lista_sin_grupo) }}
+    {{ json_data('modulos-data', modulos) }}
+    {{ json_data('grupos-data', grupos) }}
+
+    <!-- URLS Y CSRF TOKEN -->
+     <script>
+      window.APP = {
+        csrf: "{{ csrf_token_only(request)|safe }}",
+
+        urls: {
+          grupoCrear: "{{ url('grupo_crear') }}",
+          grupoEliminar: "{{ url('grupo_eliminar', kwargs={'id': 0}) }}",
+          grupoAsignarUsuario: "{{ url('grupo_asignar_usuario', kwargs={'id': 0}) }}",
+
+          moduloCrear: "{{ url('modulo_crear') }}",
+          moduloEliminar: "{{ url('modulo_eliminar', kwargs={'id': 0}) }}",
+          moduloEditar: "{{ url('modulo_editar', kwargs={'id': 0}) }}",
+
+          grupoGestionarModulo: "{{ url('grupo_gestionar_modulo', kwargs={'id': 0}) }}",
+
+          moduloEscanear: "{{ url('modulo_escanear', kwargs={'id': 0}) }}",
+          moduloElementos: "{{ url('modulo_elementos', kwargs={'id': 0}) }}",
+
+          guardarPermisoElemento:
+            "{{ url('guardar_permiso_elemento', kwargs={'grupo_id': 0, 'elemento_id': 0}) }}"
+        }
+      };
+    </script>
+  </div>
+
+{% endblock %}

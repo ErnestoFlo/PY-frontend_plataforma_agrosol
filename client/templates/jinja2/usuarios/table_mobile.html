@@ -1,0 +1,106 @@
+
+{% from 'components/avatars.html' import avatar %}
+{% from 'components/popovers.html' import user_actions %}
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+
+{# Variante mobile basada en cards; comparte paginación con desktop. #}
+<div id="table_mobile" class="mobile-table-container flex-1 px-2 py-1 md:py-4">
+  <div class="overflow-x-auto rounded-xl flex-1 flex flex-col">
+    <div class="rounded-xl flex-auto mb-2">
+      <div id="table-users-mobile-body" class="flex flex-col gap-3">
+        {% for u in usuarios %}
+          <div class="card p-4 flex flex-col gap-3 fila">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex-1 flex justify-start items-center gap-3">
+                <div>
+                  {{ avatar(user=u, size='16') }}
+                </div>
+                <div class="heading-3 flex flex-col font-semibold text-fg text-base truncate">
+                  <div class="flex gap-2 items-center">{{ u.username }} {% if u == request.user %}{{ badges.badge(variant='success', text='Tú') }}{% endif %}</div>
+                  <p class="text-fg-muted" >{{ u.get_full_name() or u.username }}</p>
+                </div>
+              </div>
+            </div>
+            {# Campos principales - Prioridad Alta #}
+            <div class="flex flex-col gap-2 text-sm">
+              <div class="flex flex-col">
+                  <div class="flex justify-end items-center body-lg">
+                  </div>
+                  <div>
+                    {% if u.profile.cargo %}
+                      <p class="body"> {{ u.profile.cargo }} </p>
+                      <p class="body"> {{ u.profile.area }} </p>
+                    {% else %}
+                      <span class="body text-fg-muted"> - </span>
+                    {% endif %}
+                  </div>
+                  <div class="mono" >
+                    {{ date_format(u.date_joined, "%d de %B de %Y") }}
+                  </div>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="flex gap-3" >
+                <div>
+                  {% if u.is_superuser %}
+                    {{ badges.badge_icon(variant='danger', icon='icon-shield-regular', text='Super Admin') }}
+                  {% elif u.is_staff %}
+                    {{ badges.badge_icon(variant='accent', icon='icon-star-sheriff-regular', text='Staff') }}
+                  {% else %}
+                    {{ badges.badge_icon(variant='success', icon='icon-user-regular', text='Usuario') }}
+                  {% endif %}
+                </div>
+                <div>
+                  {% if u.is_active %}
+                    {{ badges.badge_icon(variant='success', icon='icon-check-circle-fill', text='Activo') }}
+                  {% else %}
+                    {{ badges.badge_icon(variant='danger', icon='icon-xmark-circle-fill', text='Inactivo') }}
+                  {% endif %}
+                </div>
+              </div>
+              <nav class="flex gap-3" role="none">
+                {% if u != request.user %}
+                  {{ buttons.icon_button(
+                    permiso='btn_edición', label_log='Botón abrir edición', 
+                    func_type='button', type='btn-icon-ghost-neutral', 
+                    size='4', icon_name='icon-pencil-fill',
+                    action='openModal', target='modal-edit', hx_get=url('editar_usuario', kwargs={'id': u.id}), 
+                    hx_target="#modal-edit-content", hx_swap="innerHTML", x_params='p-1'
+                    ) }}
+                  {{ buttons.icon_button(
+                    permiso='btn_edición', label_log='Botón abrir edición', 
+                    func_type='button', type='btn-icon-ghost-neutral', 
+                    size='4', icon_name='icon-history-regular', x_params='p-1', 
+                    action='openModal', target='modal-logs', hx_get=url('logs_usuario', kwargs={'id': u.id}), 
+                    hx_target="#modal-logs-content", hx_swap="innerHTML"
+                    ) }}
+                  {% if u.is_active and not u.is_superuser %}
+                    {{ buttons.icon_button(
+                      permiso='btn_eliminación', label_log='Botón abrir eliminación', 
+                      func_type='button', type='btn-icon-ghost-danger',
+                      size='4', icon_name='icon-user-minus-regular', x_params='p-1',
+                      action='openModal', target='modal-deactivate', hx_get=url('desactivar_usuario', kwargs={'id': u.id}), 
+                      hx_target="#modal-delete-content", hx_swap="innerHTML"
+                      ) }}
+                  {% endif %}
+                {% else %}
+                  <a href="{{ url('perfil') }}" title="Mi perfil">
+                    {{ buttons.icon_button(permiso='btn_perfil', label_log='Abrir perfil de usuario', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-user-regular', size='4') }}
+                  </a>
+                {% endif %}
+              </nav>
+            </div>
+          </div>
+        {% else %}
+          <div class="text-center py-8 text-fg-muted">
+            <p>Sin registros</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="p-3">
+      <span class="mono" id="info-resultado">{{ total }} usuarios en total</span>
+    </div>
+  </div>
+</div>

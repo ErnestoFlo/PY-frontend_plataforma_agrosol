@@ -1,0 +1,31 @@
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN
+  
+  Variables esperadas del contexto (views.py):
+  - row_id: ID del proveedor a eliminar
+  - delete_url: URL POST para eliminar (ej: "/agrosol/proveedores/eliminar/123")
+  - table_body_id: ID del contenedor de la tabla para actualizar (ej: "#tabla-prov-body")
+  
+  FLUJO:
+  1. User ve tabla con botón "Eliminar"
+  2. Click → confirm_delete() renderiza este modal
+  3. User confirma en modal
+  4. POST a delete_url (con CSRF token)
+  5. delete_proveedor() elimina + retorna tabla actualizada
+  6. HTMX reemplaza tabla + cierra modal -->
+
+{% from 'components/buttons.html' import button %}
+
+<section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+  <p class="text-fg-body mt-2 col-span-12">¿Está seguro que desea eliminar este elemento?</p>
+  <form method="POST" 
+        class="flex justify-end gap-2 mt-2 col-span-12"
+        hx-post="{{ delete_url }}"
+        hx-target="{% if is_mobile_view %}#tabla-prov-container{% else %}#row-{{ row_id }}{% endif %}"
+        hx-swap="{% if is_mobile_view %}innerHTML{% else %}outerHTML{% endif %}"
+        hx-on::after-request="if(event.detail.successful) { closeModal('modal-delete'); AlertManager.danger('Proveedor eliminado exitosamente'); }"
+        >
+    {{ render_csrf_token(request)|safe }}
+    {{ button(permiso='btn_cancelar', label_log='Cancelar eliminación', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target='modal-delete') }}
+    {{ button(permiso='btn_eliminar_proveedor', label_log='Eliminar proveedor', func_type='submit', type='btn-danger', text='Eliminar') }}
+  </form>
+</section>

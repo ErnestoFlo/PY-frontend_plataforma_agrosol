@@ -1,0 +1,248 @@
+{% from 'partials/combobox_options.html' import combobox_dropdown %}
+{% from 'components/buttons.html' import input_icon_button %}
+
+{% macro input(permiso, label_log, label, id, name, value=none, field=none, type="text", x_params="", x_input_params="", x_label_bg="", action=none, disabled=false) %}
+  <fieldset class="input-container {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">
+    {% if field is not none %}
+      {{ render_field(field, type=type, id=id, name=name, class="input field-input input-" ~ type ~ " " ~ x_input_params ~ " peer", placeholder=" ", data_action=action, disabled=disabled) }}
+    {% else %}
+      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input input-{{ type }} {{ x_input_params }} peer" placeholder=" " {% if value %}value="{{ value }}"{% endif %} data-action='{{ action }}' {% if disabled %} disabled {% endif %}>
+    {% endif %}
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}"> {{ label }} </label>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_search(permiso, label_log, id, name, value=none, field=none, placeholder="Búsqueda", x_params="", x_input_params="", x_icon_params="", action=none, disabled=false) %}
+  <fieldset class="input-container search-wrapper gap-1 {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">
+    {% if field is not none %}
+      {{ render_field(field, type='text', id=id, name=name, class="input field-input input-text peer", placeholder=placeholder, data_action=action, disabled=disabled) }}
+    {% else %}
+        <input type="text" id="{{ id }}" name="{{ name }}" class="input field-input input-text {{ x_input_params }} peer" placeholder='{{ placeholder }}' {% if value %}value="{{ value }}"{% endif %} data-action='{{ action }}' {% if disabled %} disabled {% endif %}>
+    {% endif %}
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}">
+      <use href="{{ static('sprite.svg') }}#icon-magnifyng-glass-fill" />
+    </svg>
+    <div class="absolute top-full left-0 right-0 list z-50 overflow-hidden hidden" id="search-results"></div>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_icon(permiso, label_log, label, icon_name, id, name, value=none, field=none, type="text", x_params="", x_input_params="", x_icon_params="", action=none, disabled=false) %}
+  <fieldset class="input-container {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}" >
+
+    {% if field is not none %}
+      {{ render_field(field, type=type, id=name, class="input field-input input-" ~ type ~ " " ~ x_input_params ~ " peer", placeholder=" ", data_action=action, disabled=disabled) }}
+    {% else %}
+      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input input-{{ type }} {{ x_input_params }} peer" placeholder=" ", {% if value %}value="{{ value }}"{% endif %} data-action='{{ action }}' {% if disabled %} disabled {% endif %}>
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs"> {{ label }} </label>
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}">
+      <use href="{{ static('sprite.svg') }}#{{ icon_name }}" />
+    </svg>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_password(permiso, label_log, label, id, name, value=none, field=none, x_params="", x_input_params="", x_icon_params="", x_label_bg="", action=none, disabled=false) %}
+  <fieldset class="input-container {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">
+
+    {% if field is not none %}
+      {{ render_field(field, type='password', id=id, name=name, class="input field-input " ~ x_input_params ~ " peer", placeholder=" ", data_action=action, disabled=disabled) }}
+    {% else %}
+      <input type="password" id="{{ id }}" name="{{ name }}" class="input field-input {{ x_input_params }} peer" placeholder=" " {% if value %}value="{{ value }}"{% endif %} data-action='{{ action }}' {% if disabled %} disabled {% endif %}>
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs {{ x_label_bg }}">
+      {{ label }}
+    </label>
+    {{ input_icon_button(permiso='btn_password', label_log='Boton ver contraseña', func_type="button", type='btn-icon-ghost-neutral', x_params='p-0 shrink-0', icon_name='icon-open-eye-regular', action='togglePassword', target=id) }}
+    </button>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_combobox(permiso, label_log, label, id, name, url, value=none, field=none, type="text", x_params="", x_input_params="", x_icon_params="", disabled=false) %}
+  <fieldset class="input-container z-50  relative overflow-visible{{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}" data-action="combobox"
+    hx-disinherit="hx-post hx-target hx-include">
+    <!-- Input visible que muestra la selección -->
+    {% if field is not none %}
+      {{ render_field(field, id=id, name=name, class="input field-input peer cursor-pointer caret-transparent", placeholder=" ", readonly='true', data_action='comboboxToggle', data_target=name, disabled=disabled) }}
+    {% else %}
+      <input type="{{ type }}" id="{{ id }}" name="{{ name }}" class="input field-input cursor-point caret-transparent {{ x_input_params }} peer" placeholder=" " readonly {% if value %}value="{{ value }}"{% endif %} data-action="comboboxToggle" data-target="{{ id }}" {% if disabled %} disabled {% endif %}>
+    {% endif %}
+
+    <legend class="input-legend peer-focus:text-primary-500 invisible max-w-0 peer-focus:max-w-full peer-[:not(:placeholder-shown)]:max-w-full">{{ label }}</legend>
+    <label for="{{ name }}" class="input-label peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary-500 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs">
+      {{ label }}
+    </label>
+    <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral {{ x_icon_params }}" data-action="comboboxToggle" data-target="{{ name }}">
+      <use href="{{ static('sprite.svg') }}#icon-chevron-down-fill" />
+    </svg>
+    <!-- Combobox dropdown -->
+    {{ combobox_dropdown(name) }}
+  </fieldset>
+  <select id="f-grupo" class="field-input">
+    <option class="opacity-0" value="">Sin grupo (sin permisos de módulos)</option>
+    {% for grupo in grupos %}
+      <option value="{{ grupo.id }}">{{ grupo.name }}</option>
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro input_range(permiso, label_log, min='0', max='100', def_value='50', field=none, x_params="", x_input_params="", disabled=false) %}
+  <fieldset class="range-track-container" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">
+    <div class="flex items-center gap-3 {{ x_params }}">
+      <input type="range" class="range-custom flex-grow-1 {{ x_input_params }}" id="c-range"
+            min="{{ min }}" max="{{ max }}" value="{{ def_value }}"
+            oninput="document.getElementById('range-val').textContent=this.value;"
+            {% if disabled %} disabled {% endif %}>
+      <output class="min-w-10 body-lg text-primary-500" id="range-val">{{ def_value }}</output>
+    </div>
+    <!-- Labels inferiores -->
+    <p class="mono mt-2">
+      Rango {{ min }}-{{ max }} · 
+    </p>
+  </fieldset>
+{% endmacro %}
+
+{% macro input_checkbox(label, id, name, checked=false, field=none, size="4", x_params="", x_icon_params="", disabled=false) %}
+
+  <div class=" group flex justify-start items-center {{ x_params }} relative gap-2">
+    {% if field is not none %}
+      {{ render_field(field, type='checkbox', id=id, name=name, class="opacity-0 absolute w-full h-full z-10", checked=checked, disabled=disabled) }}
+    {% else %}
+      <input type="checkbox" class="opacity-0 absolute top-0 left-0 w-full h-full z-10" id="{{ id }}" name="{{ name }}"  {% if checked %} checked {% endif %} {% if disabled %} disabled {% endif %}>
+    {% endif %}
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-1">
+      <svg class="w-{{ size }} h-{{ size }} {{ x_icon_params }} opacity-0 group-has-checked:opacity-100 text-neutral-50 z-10 pointer-events-none">
+        <use href="{{ static('sprite.svg') }}#icon-check-fill"/>
+      </svg>
+    </div>
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>
+  </div>
+  
+{% endmacro %}
+
+{% macro input_radiobutton(label, id, name, value=none, checked=False,  field=none, size="4", x_params="", x_icon_params="", disbaled=false) %}
+  
+  <div class=" group flex justify-end items-center {{ x_params }} relative gap-2">
+    {% if field is not none %}
+      {{ render_field(field, type='radio', id=id, name=name, class="opacity-0 absolute w-full h-full", checked=checked, value=value, disabled=disabled) }}
+    {% else %}
+      <input type="radio" class="opacity-0 absolute w-full h-full" id="remember-me" name="{{ name }}" {% if checked %} checked {% endif %} {% if value %} value="{{ value }}" {% endif %} {% if disabled %} disabled {% endif %}>
+    {% endif %}
+    <!-- Checkbox falso -->
+    <div class="w-5 h-5 rounded-full border-2 border-neutral-400 
+                group-has-checked:bg-primary-500 group-has-checked:border-primary-500
+                flex items-center justify-center transition-all p-0.5">
+    </div>
+    <div class="text-fg text-xs font-sans font-medium">{{ label }}</div>  
+  </div>  
+
+{% endmacro %}
+
+{% macro input_toggle(label, description, id, name, value=none, checked=false,  field=none, size="4", x_params="", x_icon_params="", disabled=false) %}
+  <div class="toggle-row">
+    <div>
+      <p class="body">{{ label }}</p>
+      <p class="mono">{{ description }}</p>
+    </div>  
+    <div class="toggle-switch relative w-11 h-6">
+      {% if field is not none %}
+        {{ render_field(field, type='checkbox', id=name, name=name, checked=checked, disabled=disabled) }}
+      {% else %}
+        <input type="checkbox" id="{{ id }}" name="{{ name }}" class="{{ x_params }}" {% if checked %} checked {% endif %} {% if disabled %} disabled {% endif %}>
+      {% endif %}
+      <span class="toggle-slider"></span>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro input_wrapper(permiso, label_log, label='', x_params='') %}
+
+  <div role="group" aria-labelledby="seccion-{{ label }}" class="w-full flex flex-col items-start justify-center gap-y-4 border border-fg/15 rounded-xl p-4 {{ x_params }}" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">          
+    <h3 id="seccion-{{ label }}" class="col-span-12 text-sm font-medium text-neutral-500">
+      {{ label }}
+    </h3>
+    <div class="w-full flex flex-col items-start justify-center gap-3">
+      {{ caller() }}
+    </div>
+  </div>
+
+{% endmacro %}
+
+{% macro input_color(permiso, label_log, id, name, value='#064805', disabled=false) %}
+
+  <div class="flex items-center gap-3" data-permiso="{{ permiso }}" data-tipo="componente" data-label="{{ label_log }}">
+    <input type="color" class="w-12 h-12 rounded-full bg-transparent cursor-pointer p-[2px] overflow-hidden" id="{{ id }}" name="{{ name }}" value="{{ value }}" {% if disabled %} disabled {% endif %}>
+    <input type="text" class="mono bg-bg/4 border border-fg-body px-2 py-3 w-28 rounded-lg" id="color-hex-val" value="{{ value }}" maxlength="7">
+  </div>
+
+{% endmacro %}
+
+{% macro input_file(permiso, label_log, id, name, field=none, preview=none, accept=none, multiple=false, compact=none, x_params="", x_icon_params="", disabled=false) %}
+<div class="file-picker cursor-pointer {{ x_params }}"
+    data-action="filePicker"
+    data-name="{{ id }}"
+    data-permiso="{{ permiso }}"
+    data-tipo="componente"
+    data-label="{{ label_log }}" >
+  {% if field is not none %}
+    {{ render_field(field,
+        type='file',
+        id=id,
+        name=name,
+        class="hidden file-input",
+        multiple=multiple,
+        accept=accept,
+        disabled=disabled) }}
+  {% else %}
+    <input type="file"
+            id="{{ id }}"
+            name="{{ name }}"
+            class="hidden file-input"
+            {% if multiple %}multiple{% endif %}
+            {% if accept %}accept="{{ accept }}"{% endif %}
+            {% if disabled %} disabled {% endif %}>
+  {% endif %}
+  {% if compact %}
+    <div class="file-picker-zone flex-row py-2 px-3"
+        data-action="filePickerZone">
+      <svg class="w-6 h-6 text-fg-muted {{ x_icon_params }}">
+        <use href="{{ static('sprite.svg') }}#icon-file-regular"/>
+      </svg>
+      <p class="text-sm text-fg-muted text-center">
+        Arrastra archivos aquí o
+        <span class="text-fg-success font-semibold">selecciona</span>
+      </p>
+      {% if accept %}
+        <p class="text-xs text-fg-muted">{{ accept }}</p>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="file-picker-zone"
+       data-action="filePickerZone">
+      <svg class="w-8 h-8 text-fg-muted {{ x_icon_params }}">
+        <use href="{{ static('sprite.svg') }}#icon-file-regular"/>
+      </svg>
+      <p class="text-sm text-fg-muted text-center">
+        Arrastra archivos aquí o
+        <span class="text-fg-success font-semibold">selecciona</span>
+      </p>
+      {% if accept %}
+        <p class="text-xs text-fg-muted">{{ accept }}</p>
+      {% endif %}
+    </div>
+    <ul class="file-list"></ul>
+    {% if preview %}
+      <div class="upload-preview w-full flex justify-between gap-3 hidden">
+        <img class="preview-img w-20 h-20 rounded-md border border-fg-muted" src="" alt="">
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endmacro %}

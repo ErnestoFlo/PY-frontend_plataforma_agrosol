@@ -1,0 +1,22 @@
+{% from 'components/buttons.html' import button %}
+
+<section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+  <p class="text-fg-body mt-2 col-span-12">¿Está seguro que desea desactivar a este usuario?</p>
+  <form method="POST" 
+        class="flex justify-end gap-2 mt-2 col-span-12"
+        hx-post="{{ url('desactivar_usuario', kwargs={'id': usuario.id}) }}"
+        hx-swap="none"
+        hx-on::after-request="
+          if(event.detail.successful) {
+            sessionStorage.setItem(
+              'danger_message',
+              'Usuario desactivado'
+            );
+            window.location.reload();
+          }
+        ">
+    {{ render_csrf_token(request)|safe }}
+    {{ button(permiso='btn_cancelar_desactivacion', label_log='Cancelar Desactivacion', func_type='button', type='btn-ghost', text='Cancelar', action='closeModal', target='modal-deactivate') }}
+    {{ button(permiso='btn_desactivar_usuario', label_log='Boton Desactivar Usuario', func_type='submit', type='btn-danger', text='Desactivar') }}
+  </form>
+</section>

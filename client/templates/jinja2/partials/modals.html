@@ -1,0 +1,83 @@
+{% import 'components/buttons.html' as buttons %}
+
+{% macro modal(modal_id, title, size=none, confirm_text=none, show_footer=False, confirm_url=none, x_params='', x_body_params='') %}
+  <div id="{{ modal_id }}"
+    class="modal-overlay hidden"
+    data-action="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="{{ modal_id }}-title">
+    <div class="modal-container card {{ size|default('modal-md') }} {{ x_params }}">
+      <div class="modal-header">
+        <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
+          {{ title }}
+        </h2>
+        {{ buttons.input_icon_button(permiso='btn_close_modal', label_log='Cerrar modal', func_type='button', type='btn-icon-ghost-neutral', x_params='p-1 shrink-0', icon_name='icon-xmark-fill', action='closeModal', target=modal_id) }}
+      </div>
+
+      <div id="{{ modal_id }}-content" class="modal-body {{ x_body_params }}"
+          hx-target="this"
+          hx-swap="innerHTML">
+        <!-- HTMX Inyecta aquí -->
+      </div>
+
+      {% if show_footer %}
+      <div class="modal-footer">
+        <button type="button"
+          class="btn btn-ghost text-sm"
+          data-action="closeModal"
+          data-target="{{ modal_id }}">
+          Cancelar
+        </button>
+        {% if confirm_url %}
+          <button type="button"
+            class="btn btn-primary text-sm"
+            hx-post="{{ confirm_url }}"
+            hx-target="#{{ modal_id }}-content"
+            hx-swap="innerHTML">
+            {{ confirm_text|default('Confirmar') }}
+          </button>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro inactivity_modal(modal_id, title, size=none) %}
+  <div id="{{ modal_id }}"
+    class="modal-overlay hidden"
+    data-action="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="{{ modal_id }}-title">
+    <div class="modal-container card {{ size|default('modal-md') }}">
+      <div class="modal-header">
+        <h2 id="{{ modal_id }}-title" class="font-display font-semibold text-lg text-fg">
+          {{ title }}
+        </h2>
+        <svg class="text-fg-body w-4 h-4">
+          <use href="{{ static('sprite.svg') }}#icon-timer-regular"></use>
+        </svg>
+      </div>
+      <div id="{{ modal_id }}-content" class="modal-body">
+        <section class='grid grid-cols-12 gap-x-6 gap-y-4'>
+          <div class="mt-2 col-span-12 h-2">
+            <div id="barra-progreso" class="progress-bar"></div>
+          </div>
+          <div class=" mt-2 col-span-12">
+            <p class="text-fg-body">
+              Tu sesión se cerrará automáticamente por inactividad en:<br>
+              <span class="text-primary-500 m-0 p-0 text-3xl" id="contador">60</span> segundos
+            </p>
+          </div>
+          <div class="flex justify-end gap-2 mt-2 col-span-12">
+            {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Cerrar sesión', func_type='submit', type='btn-icon-text-danger', icon_name='icon-logout-fill', icon_size='4', text='Cerrar Sesión', action='cerrarSesionAhora', target='modal-delete') }}
+            {{ buttons.button(permiso='btn_continuar_sesion', label_log='Continuar sesión', func_type='button', type='btn-ghost', text='¡Sigo aquí!', action='continuarSesion') }}
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

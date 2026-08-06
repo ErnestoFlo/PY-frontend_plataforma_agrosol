@@ -2,10 +2,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // *********************************************************
   // ******* INICIALIZACION DE COMPONENTES / LIBRERIAS *******
   // *********************************************************
-  if (window.ProveedoresUI) {
-    window.ProveedoresUI.initResponsiveTable('[data-responsive-table="proveedores"]')
-  }
-  flatpickr("#fecha_hora", {
+
+document.body.addEventListener("htmx:beforeRequest", (e) => {
+  console.log("🔥 REQUEST:", {
+    url: e.detail.path,
+    target: e.detail.target,
+    element: e.detail.elt
+  });
+});
+  // Inicialización de módulos que lo requieran
+  // Inicializa tablas responsivas de todo el proyecto
+  if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="proveedores"]')}  // Tabla de proveedores
+  if (window.ResponsiveTable) {window.ResponsiveTable.initResponsiveTable('[data-responsive-table="usuarios"]')}  // Tabla de usuarios
+  if (window.Login) {window.Login.init()} // Inicializa el módulo de login (inactividad)
+  flatpickr("#c-date-hourpicker", {
         enableTime: true,
         time_24hr: true,
         dateFormat: "Y-m-d H:i",
@@ -13,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         disableMobile: true,
         showMonths: 1,
   });
-  flatpickr("#fecha", {
+  flatpickr("#c-datepicker", {
         enableTime: false,
         time_24hr: true,
         dateFormat: "Y-m-d",
@@ -48,7 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="togglePassword"]').forEach(btn => {btn.addEventListener('click', (e) => togglePassword(e.currentTarget))})
   document.querySelectorAll('[data-action="collapseSidebar"]').forEach(btn => {btn.addEventListener('click', (e) => collapseSidebar(e.currentTarget))})
   document.querySelectorAll('[data-action="handleBack"]').forEach(btn => {btn.addEventListener('click', (e) => handleBack())})
-  // **** COMBOBOXES ****
+  document.querySelectorAll('[data-action="cerrarSesionAhora"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.cerrarSesionAhora())})
+  document.querySelectorAll('[data-action="continuarSesion"]').forEach(btn => {btn.addEventListener('click', (e) => window.Login.continuarSesion())})
+  // **** INPUTS ****
+  document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-action="actualizarIniciales"]')) {actualizarIniciales();}
+
+    if (e.target.matches('[data-action="filtrarSugerencias"]')) {filtrarSugerencias(e.target.value);}
+});  // **** COMBOBOXES ****
   document.querySelectorAll('[data-action="comboboxToggle"]').forEach(trigger => {trigger.addEventListener('click', (e) => comboboxToggle(e.currentTarget))})
   document.querySelectorAll('[data-action="combobox"]').forEach(container => {container.addEventListener('focusout', (e) => close_dropdown(e  ))})
   // ***** TOGGLE *****
@@ -56,21 +73,47 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', (e) => toggleSwitch(e.currentTarget))
   })
   // ***** FILE PICKER *****
-  document.querySelectorAll('[data-action="filePickerZone"]').forEach(zone => {
-    const inputId = zone.dataset.target
-    const input = document.getElementById(inputId)
-    if (!input) return
-
-    zone.addEventListener('click', () => input.click())
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over') })
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'))
-    zone.addEventListener('drop', (e) => {
-      e.preventDefault()
-      zone.classList.remove('drag-over')
-      renderFileList(inputId, e.dataTransfer.files)
-    })
-    input.addEventListener('change', () => renderFileList(inputId, input.files))
+  document.addEventListener('click', (e) => {
+    const zone = e.target.closest('[data-action="filePickerZone"]')
+    if (!zone) return
+    const picker = zone.closest('.file-picker')
+    const input = picker.querySelector('.file-input')
+    input.click()
   })
+  document.addEventListener('dragover', (e) => {
+    const zone = e.target.closest('[data-action="filePickerZone"]')
+    if (!zone) return
+    e.preventDefault()
+    zone.classList.add('drag-over')
+  })
+  document.addEventListener('dragleave', (e) => {
+    const zone = e.target.closest('[data-action="filePickerZone"]')
+    if (!zone) return
+    zone.classList.remove('drag-over')
+  })
+  document.addEventListener('drop', (e) => {
+    const zone = e.target.closest('[data-action="filePickerZone"]')
+    if (!zone) return
+    e.preventDefault()
+    zone.classList.remove('drag-over')
+    const picker = zone.closest('.file-picker')
+    const input = picker.querySelector('.file-input')
+    handleFiles(picker, input, e.dataTransfer.files)
+  })
+  document.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('file-input')) return
+
+    const picker = e.target.closest('.file-picker')
+    const isAvatarInput = picker?.dataset.name === 'c-file-foto'
+
+    if (isAvatarInput) {
+      previewAvatar(e.target)
+      return
+    }
+
+    handleFiles(picker, e.target, e.target.files)
+  })
+
   // ***** BOTTOM BAR *****
   document.querySelectorAll('[data-action="bottombarItem"]').forEach(item => {
     item.addEventListener('click', (e) => {
@@ -171,21 +214,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateThemeAssets(theme) {
     const btn = document.querySelector('[data-action="toggleTheme"]')
     const main_logo = document.querySelector('#main-logo')
-    if (!btn) return
-    const icon = btn.querySelector('use')
-    const sprite = btn.dataset.sprite;
-    icon.setAttribute(
-      'href',
-      theme === 'dark'
-        ? `${sprite}#icon-sun-regular`
-        : `${sprite}#icon-moon-regular`
-    )
-    main_logo.setAttribute(
-      'src',
-      theme === 'dark'
-        ? '/static/images/logo letras blancas icono color@4x-8.png'
-        : '/static/images/Logo princiapal@4x-8.png'
-    )
+    if (btn) {
+      const icon = btn.querySelector('use')
+      const sprite = btn.dataset.sprite;
+      icon.setAttribute(
+        'href',
+        theme === 'dark'
+          ? `${sprite}#icon-sun-regular`
+          : `${sprite}#icon-moon-regular`
+      )
+    }
+    if(main_logo){
+      main_logo.setAttribute(
+        'src',
+        theme === 'dark'
+          ? '/static/images/logo letras blancas icono color@4x-8.png'
+          : '/static/images/Logo princiapal@4x-8.png'
+      )
+    }
   }
 
   // OBSERVAR CAMBIOS EN ATRIBUTOS DE CUALQUIER ELEMENTO
@@ -253,8 +299,125 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+
+  const SUGERENCIAS = ['Proyecto Alpha','Stock Herramientas','Lote Alimentos Q1','Colección Ropa Verano','Dispositivos Electrónicos','Fertilizante NPK','Semillas Maíz','Abono Orgánico','Fungicida Mancozeb'];
+    // Sugerencias dinamicas para un buscador
+    const results = document.getElementById('search-results');
+    results.addEventListener('click', (e) => {
+      const item = e.target.closest('.suggestion');
+      if (!item) return;
+      seleccionarSugerencia(item.dataset.suggestion);
+    });
+
+
+    function seleccionarSugerencia(val) {
+      document.getElementById('c-searcher').value = val;
+      document.getElementById('search-results').classList.add('hidden');
+      AlertManager.info(`Seleccionado: ${val}`);
+    }
+
+    function filtrarSugerencias(q) {
+      if (!q.trim()) { results.classList.add('hidden'); return; }
+      const matches = SUGERENCIAS.filter(s => s.toLowerCase().includes(q.toLowerCase()));
+      if (!matches.length) { results.classList.add('hidden'); return; }
+      results.innerHTML = matches.map(m =>
+        `<div class="suggestion px-3 py-4 body cursor-pointer flex items-center gap-3" data-suggestion="${m}">
+          <svg class="w-5 h-5 p-0 input-button btn-icon-ghost-neutral">
+            <use href="/static/sprite.svg#icon-magnifyng-glass-fill" />
+          </svg>
+          ${m}
+        </div>`
+      ).join('');
+      results.classList.remove('hidden');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-wrapper')) {
+        document.getElementById('search-results').classList.remove('show');
+      }
+    });
+
+
+  // Color pickers sync
+  document.querySelector('#c-color')?.addEventListener('input', (e) => {
+    actualizarColor(e.target.value)
+  })
+  document.querySelector('#color-hex-val')?.addEventListener('input', (e) => {
+    sincronizarColor(e.target.value)
+  })
+  function actualizarColor(val) {
+    document.getElementById('color-hex-val').value = val;
+  }
+  function sincronizarColor(val) {
+    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+      document.getElementById('c-color').value = val;
+    }
+  }
+
+
+  // File Upload Preview
+function handleFiles(picker, input, files) {
+  const list = picker.querySelector('.file-list')
+  const preview = picker.querySelector('.upload-preview')
+  const img = picker.querySelector('.preview-img')
+
+  if (!list) return
+  list.innerHTML = ''
+  Array.from(files).forEach(file => {
+    const size = file.size < 1024 * 1024
+      ? `${(file.size / 1024).toFixed(1)} KB`
+      : `${(file.size / 1024 / 1024).toFixed(1)} MB`
+    const li = document.createElement('li')
+    li.className = 'file-item flex gap-2 items-center'
+    li.innerHTML = `
+      <svg class="w-4 h-4 text-fg-muted">
+        <use href="/static/sprite.svg#icon-file-regular"/>
+      </svg>
+      <span>${file.name}</span>
+      <span class="text-xs text-fg-muted">${size}</span>
+    `
+    list.appendChild(li)
+  })
+  // preview SOLO si es imagen
+  const first = files[0]
+  if (first && first.type.startsWith('image/')) {
+
+    const reader = new FileReader()
+
+    reader.onload = (ev) => {
+      img.src = ev.target.result
+      preview.classList.remove('hidden')
+    }
+
+    reader.readAsDataURL(first)
+  }
+  // Actualiza el input file para que el formulario lo envíe
+  input.files = files
+}
+
+// Avatar Upload Preview
+  function previewAvatar(input) {
+    if (!input.files || !input.files[0]) return
+    const reader = new FileReader()
+    reader.onload = e => {
+      const img = document.getElementById('avatar-img-preview')
+      img.src = e.target.result
+      img.style.display = 'block'
+      img.nextElementSibling.style.display = 'none'
+    }
+    reader.readAsDataURL(input.files[0])
+  }
+  function actualizarIniciales() {
+    console.log('ejecutando')
+    const fn = document.getElementById('f-first_name').value.trim();
+    const ln = document.getElementById('f-last_name').value.trim();
+    avatar = document.querySelector('#avatar-img-preview')
+    avatar.nextElementSibling.textContent = ((fn[0] || '') + (ln[0] || '')).toUpperCase() || '?';
+  }
+
   // Mostrar - Ocultar Contraseña
   function togglePassword(btn){
+    console.log('ejecutado')
     const inputId = btn.dataset.target
     const input = document.getElementById(inputId)
     const sprite = btn.dataset.sprite
@@ -362,6 +525,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isFormModal && !url.searchParams.has('fragment')) {
         url.searchParams.set('fragment', 'form')
       }
+      if (isFormModal && !url.searchParams.has('edit_form')) {
+        url.searchParams.set('edit_form', true)
+      }
+      console.log("URL antes de normalizar:", get_url)
       requestUrl = `${url.pathname}${url.search}`
 
       htmx.ajax('GET', requestUrl, {
@@ -372,6 +539,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.body.style.overflow = 'hidden'
+  }
+
+  // SWITCH TABS
+  function switchTab(t){
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(`tab-${t}`).classList.add('active');
+    document.getElementById(`tab-btn-${t}`).classList.add('active');
   }
 
   // ============================================================================
@@ -523,27 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.AlertManager = AlertManager
 
-
-  // File picker
-  function renderFileList(inputId, files) {
-    const list = document.getElementById(`${inputId}-files`)
-    if (!list) return
-    list.innerHTML = ''
-    Array.from(files).forEach(file => {
-      const size = file.size < 1024 * 1024
-        ? `${(file.size / 1024).toFixed(1)} KB`
-        : `${(file.size / 1024 / 1024).toFixed(1)} MB`
-      const li = document.createElement('li')
-      li.className = 'file-item'
-      li.innerHTML = `
-        <svg class="w-4 h-4 text-fg-muted shrink-0"><use href="/static/sprite.svg#icon-file-regular"/></svg>
-        <span class="file-item-name">${file.name}</span>
-        <span class="file-item-size">${size}</span>
-      `
-      list.appendChild(li)
-    })
-  }
-
   // Mostrar - Cerrar Popovers
   function togglePopover(popoverId) {
     const popover = document.getElementById(popoverId)
@@ -559,8 +713,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!popover) return
     popover.setAttribute('data-open', 'false')
   }
-
   window.closePopover = closePopover
+
+  // ==================================
+  // LOGS
+  // ==================================
+
+  // ── Filtros ──
+    function filtrarLogs(tipo) {
+      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('filtro-activo'));
+      document.getElementById('f-' + tipo)?.classList.add('filtro-activo');
+      document.querySelectorAll('.log-row').forEach(row => {
+        row.classList.toggle('hidden', tipo !== 'todos' && row.dataset.tipo !== tipo);
+      });
+    }
+
+  // Mostrar mensaje de éxito almacenado en sessionStorage (desde HTMX o redirecciones) 
+  // cuando la pagina recarga en su totalidad y se necesita dar feedback de una accion previa
+  const message_success = sessionStorage.getItem('success_message');
+  const message_info = sessionStorage.getItem('info_message');
+  const message_warning = sessionStorage.getItem('warning_message');
+  const message_danger = sessionStorage.getItem('danger_message');
+
+  if (message_success) {
+    AlertManager.success(message_success);
+    sessionStorage.removeItem('success_message');
+  }
+  if (message_info) {
+    AlertManager.info(message_info);
+    sessionStorage.removeItem('info_message');
+  }
+  if (message_warning) {
+    AlertManager.warning(message_warning);
+    sessionStorage.removeItem('warning_message');
+  }
+  if (message_danger) {
+    AlertManager.danger(message_danger);
+    sessionStorage.removeItem('danger_message');
+  }
+
 })
 
   // Cerrar el modal cuando hay un clic en el botón cerrar

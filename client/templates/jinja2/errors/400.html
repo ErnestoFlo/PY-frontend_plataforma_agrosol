@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>400 · Petición Incorrecta</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const theme = saved || (prefersDark ? 'dark' : 'light')
+      document.documentElement.setAttribute('data-theme', theme)
+    })()
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+    /* Project tokens (excerpt from input.css) */
+    :root{
+      --color-primary-600: hsl(148 88% 24%);
+      --color-accent-500: hsl(40 98% 30%);
+      --color-neutral-50:  hsl(40 5% 90%);
+      --color-neutral-100: hsl(40 5% 80%);
+      --color-neutral-300: hsl(40 5% 60%);
+      --color-neutral-700: hsl(40 5% 20%);
+      --color-neutral-900: hsl(40 5% 10%);
+
+      --color-surface-1: var(--color-neutral-50);
+      --color-surface-2: var(--color-neutral-50);
+      --color-bg: var(--color-neutral-100);
+
+      --color-fg: var(--color-neutral-900);
+      --color-fg-body: var(--color-neutral-700);
+      --color-fg-muted: var(--color-neutral-400, #6b7280);
+
+      --color-primary-theme: var(--color-primary-600);
+      --color-accent-theme: var(--color-accent-500);
+    }
+    [data-theme="dark"]{
+      --color-surface-1: var(--color-neutral-900);
+      --color-surface-2: var(--color-neutral-800);
+      --color-bg: var(--color-neutral-950);
+      --color-fg: var(--color-neutral-50);
+      --color-fg-body: var(--color-neutral-100);
+      --color-fg-muted: var(--color-neutral-500, #9ca3af);
+      --color-primary-theme: var(--color-primary-400, hsl(148 80% 58%));
+    }
+
+    /* Variable-driven utilities */
+    .page-bg{ background: var(--color-bg); }
+    .font-display { font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+    .text-fg { color: var(--color-fg); }
+    .text-fg-body { color: var(--color-fg-body); }
+    .text-fg-muted { color: var(--color-fg-muted); }
+    .text-primary-theme { color: var(--color-primary-theme); }
+    .text-accent-theme { color: var(--color-accent-theme); }
+    .bg-surface-2 { background: var(--color-surface-2); }
+    .bg-surface-1 { background: var(--color-surface-1); }
+    .bg-surface-1-6 { background: color-mix(in srgb, var(--color-surface-1) 6%, transparent); }
+    .shadow-c-md { box-shadow: var(--shadow-c-md, 0 8px 24px rgba(2,6,23,.12)); }
+    .heading-2 { font-size: 1.25rem; font-weight:700; }
+    .body-lg { font-size: 1rem; }
+    .btn { padding:.5rem .9rem; border-radius:.5rem; }
+    .btn-ghost { background: transparent; border:1px solid color-mix(in srgb, var(--color-fg) 8%, transparent); }
+    .btn-primary { background: var(--color-primary-theme); color:var(--color-fg-inverted, #fff); border:none; }
+    .bg-primary-theme-10 { background: color-mix(in srgb, var(--color-primary-theme) 10%, transparent); }
+  </style>
+</head>
+<body class="page-bg">
+  <main class="w-full min-h-screen flex items-center justify-center px-6 py-16">
+    <div class="max-w-3xl w-full">
+      <header class="flex items-center justify-between mb-8">
+        <a href="/" class="font-display font-bold text-lg text-fg">Agrosol</a>
+        <span class="mono text-sm text-fg-muted">Sistema de Gestión</span>
+      </header>
+
+      <section class="flex flex-col items-center text-center gap-4 p-8 bg-surface-2 rounded-xl shadow-c-md">
+        <div class="text-6xl md:text-8xl font-display font-extrabold leading-none text-fg">400</div>
+        <div class="w-20 h-20 rounded-full bg-primary-theme-10 flex items-center justify-center text-primary-theme text-2xl">
+          <!-- icon -->
+          ❌
+        </div>
+        <span class="mono text-xs bg-primary-theme-10 text-primary-theme px-2 py-1 rounded inline-block">BAD_REQUEST</span>
+        <h1 class="heading-2 mt-2">Petición Incorrecta</h1>
+        <p class="body-lg text-fg-body max-w-xl">El servidor no pudo procesar tu solicitud porque contiene datos inválidos, malformados o que no se pueden interpretar.</p>
+
+        <div class="flex gap-3 mt-6 justify-center">
+          <a href="javascript:history.back()" class="body btn btn-ghost text-fg-muted">Volver atrás</a>
+          <a href="/" class="btn btn-primary">Ir al inicio</a>
+        </div>
+      </section>
+
+      <footer class="mt-8 mono text-xs text-fg-muted text-center">Agrosol · Error 400 · Petición Incorrecta</footer>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% from 'components/navbar.html' import navbar_login %}
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/inputs.html' as inputs %}
+
+{% block content %}
+  <header class="flex justify-between items-center w-36/37 h-auto fixed my-3 mx-10 px-8 py-3 z-50 backdrop-blur-lg rounded-full shadow-lg bg-surface-1/5">
+    <div class="flex-1">
+      <img src="{{ static('images/logo letras blancas icono color@4x-8.png') }}" alt="" class="w-auto h-7">
+    </div>
+    {{ navbar_login() }}
+    <div class="flex-1 h-full hidden md:flex items-center justify-end">
+      <span class="text-neutral-100 text-xs">
+        Version 1.0
+      </span>
+    </div>
+  </header>
+  <main class="w-full flex flex-col flex-nowrap items-center h-auto max-w-screen overflow-y-auto relative">
+    <div class="w-full flex flex-col md:flex-row flex-nowrap items-center h-dvh px-10 md:px-20 max-w-screen relative overflow-hidden">
+      <div class="w-full h-dvh flex flex-col justify-between md:justify-center items-center gap-10 md:gap-20">
+        <div class="text-neutral-200 text-6xl lg:text-8xl font-display font-semibold flex-5 md:flex-6 flex flex-col justify-end md:items-center gap-5">
+          <div class="md:text-center">
+            De La <span class="text-neutral-50"><br>Mano</span>
+            Del<span class="text-neutral-50"><br> Agricultor</span>
+          </div>
+          <div class="text-neutral-200 text-base md:text-center lg:text-base w-4/5">
+            Esta es una descripción corta para la plataforma administrativa
+          </div>
+        </div>
+        <a href="#login" class="flex-1 w-full md:w-30 flex flex-col justify-end md:justify-start py-20 md:py-10">
+          {{ buttons.button(permiso='btn_ingresar', label_log='Ingresar', type='btn-contrast', x_params='w-full', text='Ingresar') }}
+        </a>
+      </div>
+      <!-- <div class="highlight w-1/2 aspect-square bg-primary-200/40 blur-3xl bottom-1/2 left-2/3 -z-10"></div>
+      <div class="highlight w-1/2 aspect-square bg-accent-200/35 blur-3xl bottom-1/2 right-2/3 -z-10"></div> -->
+    </div>
+    <div id="login" class="w-full flex items-center justify-center h-dvh px-5 md:px-20 max-w-screen relative overflow-hidden">
+      <div class="p-0  w-6/7 h-4/7 md:w-15/19 md:h-12/19 flex gap-4">
+        <div class="hidden md:block h-full w-3/5 p-3 overflow-hidden relative rounded-xl">
+          <img src="{{ static('images/login_image.jpg') }}" alt="" class="absolute object-cover object-center w-full h-full brightness-65 top-0 left-0">
+        </div>
+        <div class="h-full p-4 w-full md:w-2/5 backdrop-blur-lg shadow-lg bg-neutral-50/6 rounded-xl">
+            <div class="h-full w-full flex flex-col items-center justify-center gap-16">
+              <h1 class="font-display text-3xl font-bold text-neutral-50 text-center">Iniciar Sesión</h1>
+              <form method="POST" class="flex flex-col gap-15 items-center">
+                {{ render_csrf_token(request)|safe }}
+                <div class="flex flex-col gap-8 px-2 md:px-4">
+                  {% if form.errors %}
+                    <div class="text-danger-500">
+                      Usuario o contraseña incorrectos.
+                    </div>
+                  {% endif %}
+                  {{ inputs.input(permiso='input_username', label_log='Usuario', field=form.username, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', type='text', name='username', id='username',  label='Usuario') }}
+                  {{ inputs.input_password(permiso='input_password', label_log='Contraseña', field=form.password, x_input_params='text-neutral-100', x_params="w-full", x_label_bg='text-neutral-100', name='password', id='password',  label='Contraseña') }}
+                </div>
+                {{ buttons.button(permiso='btn_ingresar', label_log='Ingresar', func_type="submit", x_params="w-1/2", type='btn-primary', text='Ingresar') }}
+              </form>
+            </div>
+        </div>
+      </div>
+      <div class="bg-login" id="bg-login">
+        <div class="particle bg-primary-theme/15  -bottom-2/6 left-1/11" style="--dx: 60px; --dy: -40px; --ds: 1.1; animation-duration: 5s; animation-delay: 0s;"></div>
+        <div class="particle bg-accent-theme/15  top-1/6 -left-1/6" style="--dx: -50px; --dy: -60px; --ds: 1.2; animation-duration: 15s; animation-delay: -6s;"></div>
+        <div class="particle bg-accent-theme/15  -bottom-1/6 -right-1/3" style="--dx: -50px; --dy: -60px; --ds: 1.2; animation-duration: 12s; animation-delay: -2s;"></div>
+        <div class="particle bg-primary-theme/10 top-1/13 left-1/2" style="--dx: 40px; --dy: 50px; --ds: 1; animation-duration: 10s; animation-delay: -4s;"></div>
+      </div>
+    </div>
+    <img src="{{ static('images/welcome_bg.jpg') }}" alt="" class="absolute object-cover object-center h-full w-full brightness-40 -z-50 top-0 left-0">
+  </main>
+{% endblock %}

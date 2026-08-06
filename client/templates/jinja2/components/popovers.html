@@ -1,0 +1,136 @@
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/avatars.html' as avatars %}
+
+{% macro user_menu(popover_id, user, request) %}
+  <div id="{{ popover_id|default('user-menu') }}"
+    class="popover card p-2 bg-surface-1"
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+    <!-- Header con avatar, nombre y rol -->
+    <div class="popover-header">
+      <div class="w-full flex justify-center">
+        {{ avatars.avatar(size='16', user=user) }}
+      </div>
+      <span class="popover-username">{{ request.user.get_full_name() or request.user.username }}</span>
+      <span class="popover-role">@{{ user.username }}</span>
+    </div>
+
+    <!-- Opciones -->
+    <nav role="none">
+      <a href="{{ url('perfil') }}">
+        {{ buttons.icon_text_button(permiso='btn_perfil', label_log='Botón ver perfil', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-settings-fill', text='Configuración') }}
+      </a>
+      {{ buttons.icon_text_button(permiso='btn_tema', label_log='Botón cambiar tema de color', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
+      <form method="POST" action="{{ url('logout') }}">
+        {{ render_csrf_token(request)|safe }}
+        {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Botón cerrar sesión', func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
+      </form>
+    </nav>
+  </div>
+{% endmacro %}
+
+{% macro row_actions(row) %}
+  <div id="actions-{{ row.id }}"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
+          func_type='button', type='btn-icon-text-menu', role='menuitem', 
+          icon_size='4', icon_name='icon-pencil-fill', text='Editar', 
+          action='openModal', target='modal-edit', hx_get=row.edit_url, 
+          hx_target="#modal-edit-content", hx_swap="innerHTML"
+          ) }}
+        {{ buttons.icon_text_button(
+          permiso='btn_eliminación', label_log='Botón abrir eliminación', 
+          func_type='button', type='btn-icon-text-menu-danger', role='menuitem',
+          icon_size='4', icon_name='icon-trash-fill', text='Eliminar',
+          action='openModal', target='modal-delete', hx_get=row.delete_url, 
+          hx_target="#modal-delete-content", hx_swap="innerHTML"
+          ) }}
+      </nav>
+  </div>
+{% endmacro %}
+
+{% macro user_actions(user) %}
+  <div id="actions-{{ user.id }}"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
+          func_type='button', type='btn-icon-text-menu', role='menuitem', 
+          icon_size='4', icon_name='icon-pencil-fill', text='Editar', 
+          action='openModal', target='modal-edit', hx_get=url('editar_usuario', kwargs={'id': user.id}), 
+          hx_target="#modal-edit-content", hx_swap="innerHTML"
+          ) }}
+        {{ buttons.icon_text_button(
+          permiso='btn_edición', label_log='Botón abrir edición', 
+          func_type='button', type='btn-icon-text-menu', role='menuitem', 
+          icon_size='4', icon_name='icon-history-regular', text='Ver Actividad', 
+          action='openModal', target='modal-logs', hx_get=url('logs_usuario', kwargs={'id': user.id}), 
+          hx_target="#modal-logs-content", hx_swap="innerHTML"
+          ) }}
+        {% if user.is_active and not user.is_superuser %}
+          {{ buttons.icon_text_button(
+            permiso='btn_eliminación', label_log='Botón abrir eliminación', 
+            func_type='button', type='btn-icon-text-menu-danger', role='menuitem',
+            icon_size='4', icon_name='icon-user-minus-regular', text='Desactivar',
+            action='openModal', target='modal-deactivate', hx_get=url('desactivar_usuario', kwargs={'id': user.id}), 
+            hx_target="#modal-delete-content", hx_swap="innerHTML"
+            ) }}
+        {% endif %}
+      </nav>
+  </div>
+{% endmacro %}
+
+{% macro nav_menu(user, request) %}
+  <div id="nav-menu"
+    class="popover card p-2 bg-surface-1"    
+    data-open="false"
+    role="menu"
+    aria-label="Menú de usuario">
+      <nav role="none">
+        {% if user.is_superuser %}
+          <a href="{{ url('lista_usuarios') }}">
+            {{ buttons.icon_text_button(permiso='btn_lista_usuarios', label_log='Botón abrir usuarios', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-users-group-regular', text='Usuarios') }}
+          </a>
+          <a href="{{ url('panel_permisos') }}">
+            {{ buttons.icon_text_button(permiso='btn_panel_permisos', label_log='Abrir panel de permisos', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-shield-regular', text='Permisos') }}
+          </a>
+          <a href="{{ url('prueba_tecnica') }}">
+            {{ buttons.icon_text_button(permiso='btn_prueba_tecnica', label_log='Abrir prueba técnica', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-module-regular', text='Pruebas') }}
+          </a>
+        {% endif %}
+        {{ buttons.icon_text_button(permiso='btn_tema', label_log='Botón cambiar tema', func_type='button', type='btn-icon-text-menu', role='menuitem', icon_size='4', icon_name='icon-moon-regular', text='Cambiar Tema', action='toggleTheme') }}
+        <form method="POST" action="{{ url('logout') }}">
+          {{ render_csrf_token(request)|safe }}
+          {{ buttons.icon_text_button(permiso='btn_cerrar_sesion', label_log='Cerrar sesión', func_type='submit', type='btn-icon-text-menu-danger', role='menuitem', icon_size='4', icon_name='icon-logout-fill', text='Cerrar Sesión') }}
+        </form>
+      </nav>
+  </div>
+{% endmacro %}
+
+{% macro bottombar_popover(item) %}
+  <!-- Popover -->
+  <div id="bottombar-more"
+    class="bottombar-more-popover card p-0 bg-surface-1"
+    data-open="false"
+    role="menu">
+    <div class="w-full max-w-sm px-2 py-1 grid grid-cols-3">
+      {% for group_item in item.group %}
+
+        <a href="{{ url(group_item.url) }}" class="bottombar-item my-4 {% if group_item.is_active %}active{% endif %}" data-action="bottombarItem">
+          <svg aria-hidden="true"><use href="{{ static('sprite.svg') }}#{{ group_item.icon }}"/></svg>
+          <span>{{ group_item.label }}</span>
+        </a>
+
+      {% endfor %}
+    </div>
+  </div>
+{% endmacro %}

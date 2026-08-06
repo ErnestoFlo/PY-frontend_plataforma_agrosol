@@ -1,0 +1,203 @@
+{% extends 'layouts/settings.html' %}
+{% import 'components/buttons.html' as buttons %}
+{% import 'components/badges.html' as badges %}
+{% import 'components/inputs.html' as inputs %}
+
+{% block view %}
+  <div class="flex flex-col gap-3 w-full h-full py-1 max-w-6xl">
+    {% if request.user.is_authenticated %}
+    <!-- HERO -->
+    <p class="body text-muted">Módulo de Prueba Técnica</p>
+    <h1 class="heading-1">Biblioteca de Componentes</h1>
+    
+    <!-- ACCIONES -->
+    <p class="heading-2 my-4">Acciones</p>
+
+    {% if not permisos or permisos.seccion_acciones.ver %}
+    <div class="card accion-card {% if permisos and not permisos.seccion_acciones.usar %}pointer-events-none opacity-50{% endif %}" data-permiso="seccion_acciones" data-tipo="accion" data-label="Sección Acciones">
+      <p class="mono text-accent-500 mb-3">
+        Botones de CRUD + acciones auxiliares — disparan peticiones al servidor
+      </p>
+
+      <!-- CRUD principal -->
+      <div class="mb-4">
+        <p class="mono uppercase mb-3">CRUD Principal</p>
+        <div class="flex gap-3 flex-wrap">
+          {% if not permisos or permisos.btn_crear.ver %}
+            {{ buttons.icon_text_button(permiso='btn_crear', label_log='Botón Crear', func_type='button', type='btn-icon-text-primary', text='Crear', icon_name='icon-plus-fill', icon_size='4', on_click="AlertManager.success('Accion ejecutada: Crear')") }}
+          {% endif %}
+          {% if not permisos or permisos.btn_editar.ver %}
+            {{ buttons.icon_text_button(permiso='btn_editar', label_log='Botón Editar', func_type='button', type='btn-icon-text-secondary', text='Editar', icon_name='icon-pencil-regular', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Editar')") }}
+          {% endif %}
+          {% if not permisos or permisos.btn_eliminar.ver %}
+            {{ buttons.icon_text_button(permiso='btn_eliminar', label_log='Botón Eliminar', func_type='button', type='btn-icon-text-danger', text='Eliminar', icon_name='icon-trash-fill', icon_size='4', on_click="AlertManager.danger('Accion ejecutada: Eliminar')") }}
+          {% endif %}
+          {% if not permisos or permisos.btn_ver.ver %}
+            {{ buttons.icon_text_button(permiso='btn_ver', label_log='Botón Ver', func_type='button', type='btn-icon-text-secondary', text='Ver', icon_name='icon-open-eye-regular', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Ver')") }}
+          {% endif %}
+          {% if not permisos or permisos.btn_cancelar.ver %}
+            {{ buttons.icon_text_button(permiso='btn_cancelar', label_log='Botón Cancelar', func_type='button', type='btn-icon-text-ghost-neutral', text='Cancelar', icon_name='icon-xmark-fill', icon_size='4', on_click="AlertManager.info('Accion ejecutada: Cancelar')") }}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Icon buttons inline -->
+      <div>
+        <p class="mono uppercase mb-3">Icon Buttons (acciones inline en tabla)</p>
+        {% if not permisos or permisos.btn_iconos.ver %}
+        <div class="flex gap-2 items-center flex-wrap" data-permiso="btn_iconos" data-tipo="accion" data-label="Icon Buttons Inline" {% if permisos and not permisos.c_textbox.usar %} aria-disabled='true'{% endif %}>
+          {{ buttons.icon_button(permiso='btn_editar_inline', label_log='Editar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-pencil-regular', on_click="AlertManager.info('Editar registro')") }}
+          {{ buttons.icon_button(permiso='btn_eliminar_inline', label_log='Eliminar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-trash-fill', on_click="AlertManager.danger('Eliminar registro')") }}
+          {{ buttons.icon_button(permiso='btn_ver_inline', label_log='Ver detalle', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-open-eye-regular', on_click="AlertManager.warning('Ver detalle')") }}
+          {{ buttons.icon_button(permiso='btn_aprobar_inline', label_log='Aprobar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-check-circle-fill', on_click="AlertManager.success('Aprobado')") }}
+          {{ buttons.icon_button(permiso='btn_exportar_inline', label_log='Exportar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-download-regular', on_click="AlertManager.info('Exportando...')") }}
+          {{ buttons.icon_button(permiso='btn_duplicar_inline', label_log='Duplicar registro', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-file-regular', on_click="AlertManager.success('Registro duplicado')") }}
+          <span class="mono ml-2">
+            ← Hover para ver estados
+          </span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN 2 — COMPONENTES
+    ══════════════════════════════════════════ -->
+    <p class="heading-2 my-4">Componentes</p>
+
+    <div class="grid grid-cols-12 grid-rows-[auto_auto]">
+
+      <div class="col-span-12 grid grid-cols-12 gap-3  mb-4">
+        <!-- COL 1 -->
+        <div class="col-span-12 md:col-span-6">
+
+          <!-- Textbox -->
+          {% if not permisos or permisos.c_textbox.ver %}
+            <div class="card mb-4 componente-card" >
+              <p class="mono uppercase mb-3">Textbox {{ badges.badge('Texto', 'info') }}</p>
+              {{ inputs.input(permiso='c_textbox', label_log='Textbox', label='Escribe aquí', name="c-textbox", id='c-textbox', type='text') }}
+              <p class="mono mt-2">
+                Input de texto libre · máx. 255 caracteres
+              </p>
+            </div>
+          {% endif %}
+
+          <!-- Password -->
+          {% if not permisos or permisos.c_password.ver %}
+            <div class="card mb-4 componente-card" {% if permisos and not permisos.c_password.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Password Textbox {{ badges.badge('Password', 'info') }}</p>
+              {{ inputs.input_password(permiso='c_password', label_log='Password textbox', label='Escribe aquí', name="c-password", id='c-password') }}
+            </div>
+          {% endif %}
+
+          <!-- Combobox -->
+          {% if not permisos or permisos.c_combobox.ver %}
+            <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_combobox.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Combobox / Select {{ badges.badge('Select', 'info') }}</p>
+              {{ inputs.input_combobox(permiso='c_combobox', label_log='Combobox categoria', label='Seleccione categoria', name="c-combobox", id='c-combobox', url='/agrosol/api/opciones/') }}
+            </div>
+          {% endif %}
+
+          <!-- Datepicker -->
+          {% if not permisos or permisos.c_datepicker.ver %}
+            <div class="card mb-4 componente-card"  {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Date / Hour picker {{ badges.badge('Fecha y Hora', 'info') }}</p>
+              {{ inputs.input_icon(permiso='c_date_hourpicker', label_log='Fecha y hora', label='Fecha y Hora', name="c-date-hourpicker", id='c-date-hourpicker', icon_name='icon-date-fill') }}
+            </div>
+          {% endif %}
+
+          <!-- Datepicker -->
+          {% if not permisos or permisos.c_datepicker.ver %}
+            <div class="card mb-4 componente-card" data-permiso="c_datepicker" data-tipo="componente" data-label="Datepicker" {% if permisos and not permisos.c_datepicker.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Datepicker {{ badges.badge('Fecha', 'info') }}</p>
+              {{ inputs.input_icon(permiso='c_datepicker', label_log='Datepicker', label='Fecha', name="c-datepicker", id='c-date-hourpicker', icon_name='icon-date-fill') }}
+            </div>
+          {% endif %}
+
+          <!-- Rangebox / Slider -->
+          {% if not permisos or permisos.c_range.ver %}
+            <div class="card mb-4 componente-card" {% if permisos and not permisos.c_range.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Rangebox / Slider {{ badges.badge('Rango', 'info') }}</p>
+              {{ inputs.input_range(permiso='c_range', label_log='Range control', min='0', max='100', def_value='50', x_params="", x_input_params="") }}
+            </div>
+          {% endif %}
+
+        </div>
+
+        <!-- COL 2 -->
+        <div class="col-span-12 md:col-span-6">
+
+          <!-- Searcher -->
+          {% if not permisos or permisos.c_searcher.ver %}
+            <div class="card mb-4 componente-card z-50" {% if permisos and not permisos.c_searcher.usar %} aria-disabled='true'{% endif %}>
+              <p class="mono uppercase mb-3">Searcher {{ badges.badge('Búsqueda', 'info') }}</p>
+              {{ inputs.input_search(permiso='input_c_searcher', label_log='Buscar producto', name="c-searcher", id='c-searcher', placeholder="Buscar producto...", action='filtrarSugerencias') }}
+              <p class="mono mt-2">
+                Búsqueda con sugerencias dinámicas
+              </p>
+            </div>
+          {% endif %}
+
+          <!-- Checkboxes -->
+          {% if not permisos or permisos.c_checkbox.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_checkbox.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Checkboxes {{ badges.badge('Múltiple', 'info') }}</p>
+              {% call inputs.input_wrapper(permiso='c_checkbox', label_log='Wrapper Disponibilidad', label='Disponibilidad') %}
+                {{ inputs.input_checkbox(label='Opción A — Disponible', name='c-check1', id='c-check1', checked=true) }}
+                {{ inputs.input_checkbox(label='Opción B — En revisión', name='c-check2',  id='c-check2') }}
+                {{ inputs.input_checkbox(label='Opción C — Pendiente', name='c-check3',  id='c-check3') }}
+              {% endcall %}
+            </div>
+          {% endif %}
+
+          <!-- Radiobuttons -->
+          {% if not permisos or permisos.c_radio.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_radio.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Radiobutton {{ badges.badge('Único', 'info') }}</p>
+                {% call inputs.input_wrapper(permiso='c_radiobutton', label_log='Wrapper Prioridad', label='Prioridad') %}
+                  {{ inputs.input_radiobutton(label='Alta', name='c-radio', id='c-radio', checked=true, value='Alto') }}
+                  {{ inputs.input_radiobutton(label='Media', name='c-radio', id='c-radio', value='Medio') }}
+                  {{ inputs.input_radiobutton(label='Baja', name='c-radio', id='c-radio', value='Bajo') }}
+                {% endcall %}
+            </div>
+          {% endif %}
+
+          <!-- Toggle / Switch -->
+          {% if not permisos or permisos.c_toggle.ver %}
+          <div class="card componente-card">
+            {% call inputs.input_wrapper(permiso='c_toggle', label_log='Toggle / Switch', label='Preferencias') %}
+              {{ inputs.input_toggle(label='Notificaciones', description='Recibir alertas del sistema', name='c-toggle1', id='c-toggle1',  checked=true) }}
+              {{ inputs.input_toggle(label='Modo público', description='Visible para otros usuarios', name='c-toggle2', id='c-toggle2') }}
+            {% endcall %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Color picker + File upload en row -->
+      <div class="grid grid-cols-12 col-span-12 gap-3">
+        <div class="col-span-12 md:col-span-6">
+          {% if not permisos or permisos.c_color.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_color.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">Color Picker {{ badges.badge('Color', 'info') }}</p>
+              {{ inputs.input_color(permiso='c_color', label_log='Selector de color', name='c-color', id='c-color') }}
+            </div>
+          {% endif %}
+        </div>
+        <div class="col-span-12 md:col-span-6">
+          {% if not permisos or permisos.c_file.ver %}
+            <div class="flex flex-col items-start justify-center gap-3 mb-4 card componente-card" {% if permisos and not permisos.c_file.usar %} aria-disabled='true' {% endif %}>
+              <p class="mono uppercase mb-3">File / Image Upload {{ badges.badge('Archivo', 'info') }}</p>
+              {{ inputs.input_file(permiso='c_file', label_log='Subir archivo', name='c-file', id='c-file', accept='image/*' ) }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <footer class="flex w-full justify-center h-auto text-fg-muted text-sm p-0 m-0">Agrosol · Prueba Técnica de Componentes · {{ request.user.username }}</footer>
+    {% endif %}
+  </div>
+
+{% endblock %}

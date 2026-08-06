@@ -1,0 +1,5 @@
+{% macro json_data(id, data) -%}
+  <script id="{{ id }}" type="application/json">
+    {{ data|tojson }}
+  </script>
+{%- endmacro %}

@@ -1,0 +1,44 @@
+{% from 'components/buttons.html' import icon_button %}
+{% from 'components/inputs.html' import input_search %}
+{% import 'components/avatars.html' as avatars %}
+{% from 'components/popovers.html' import user_menu %}
+
+{% macro topbar(search_form, request) %}
+<header class="card topbar h-full p-1 px-3">
+  <!-- Logo -->
+  <a href="/agrosol/dashboard" class="topbar-logo" aria-label="Ir al inicio">
+    <img src="{{ static('images/logo letras blancas icono color@4x-8.png') }}" alt="Agrosol" id="main-logo" class="h-7 w-auto">
+  </a>
+
+  <div class="nav-section flex align-center gap-2  h-8">
+    {{ icon_button(permiso='btn_volver', label_log='Botón volver', x_params='hidden md:block', action='handleBack', func_type='button', type='btn-icon-ghost-neutral', size='4', icon_name='icon-arrow-left-fill') }}
+    <!-- Búsqueda -->
+    {{ input_search(permiso='input_busqueda_general', label_log='Buscar general', field=search_form.query, x_params='max-w-80 h-full bg-surface-2 hover:bg-surface-3 border-none hidden md:flex', name='general_search') }}
+  </div>
+
+  <!-- Acciones -->
+  <nav class="topbar-actions" aria-label="Acciones de usuario">
+
+    <!-- Notificaciones -->
+    {{ icon_button(permiso='btn_buscar_mobile', label_log='Abrir búsqueda móvil', x_params='md:hidden', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-magnifyng-glass-fill', action='openSearchMode') }}
+    {{ icon_button(permiso='btn_notificaciones', label_log='Abrir notificaciones', func_type='button', type='btn-icon-ghost-neutral', size='5', icon_name='icon-bell-regular', action='toggleNotifications') }}
+
+    <!-- Avatar con dropdown -->
+    <div class="relative rounded-full p-1" data-action="popoverContainer" style="z-index: 999;">
+      <button type="button relative"
+        class="topbar-avatar-btn"
+        data-action="togglePopover"
+        data-target="user-menu"
+        aria-haspopup="true"
+        aria-expanded="false">
+        {{ avatars.avatar(size='8', user=request.user) }}
+        <svg class="w-3 h-3 text-fg-muted" aria-hidden="true">
+          <use href="{{ static('sprite.svg') }}#icon-chevron-down-fill"/>
+        </svg>
+      </button>
+      {{ user_menu(popover_id='user-menu', user=request.user, request=request) }}
+    </div>
+  </nav>
+
+</header>
+{% endmacro %}

@@ -1,0 +1,23 @@
+  <!-- MODAL ELEMENTOS (ver lista completa de elementos de un módulo) -->
+  <div class="modal fade modal-custom" id="modal-elementos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="mb-0" style="font-weight:800;font-size:1.05rem;">
+            <i class="bi bi-list-check me-2" style="color:var(--verde);"></i>
+            Elementos de <span id="modal-elem-nombre" style="color:var(--verde);"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1rem;">
+            Elementos detectados por escaneo automático del template
+          </p>
+          <div id="lista-elementos-modal"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn-outline" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>

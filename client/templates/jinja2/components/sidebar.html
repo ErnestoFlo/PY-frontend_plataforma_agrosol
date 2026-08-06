@@ -1,0 +1,26 @@
+{% from 'components/buttons.html' import icon_button %}
+{% import 'components/sidebar_item.html' as sidebar_item %}
+
+{% macro sidebar(name, sidebar_items) %}
+  <div class="card w-auto h-full flex flex-col justify-center items-between gap-8 p-0 py-3">
+    <div class="w-auto flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
+      {{ icon_button(permiso='btn_collapse_sidebar', label_log='Colapsar barra lateral', func_type="button", type='btn-icon-ghost-neutral', size='5', icon_name='icon-bars-fill', action='collapseSidebar', target=name) }}
+    </div>
+    <div class="w-auto flex-1 flex flex-nowrap flex-col items-start justify-start gap-2 overflow-hidden px-2">
+      {% for item in sidebar_items %}
+        {% if item.group %}
+          {{ sidebar_item.sidebar_accordion_item(item) }}
+        {% else %}
+          {{ sidebar_item.sidebar_item(item) }}
+        {% endif %}
+      {% else %}
+        <p class="text-fg-muted text-xs px-3">Sin menú</p>
+      {% endfor %}
+    </div>
+    <div class="w-full flex overflow-hidden flex-nowrap items-center gap-3 rounded-full px-2 py-1 mx-1">
+      {{ icon_button(permiso='btn_faq', label_log='Abrir FAQ', type='btn-icon-ghost-neutral', size='5', icon_name='icon-faq-circle-fill') }}
+    </div>
+
+  </div>
+
+{% endmacro %}

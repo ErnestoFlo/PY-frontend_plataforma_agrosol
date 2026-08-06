@@ -1,0 +1,31 @@
+
+{% import "components/popovers.html" as popovers %}
+{% import "components/buttons.html" as buttons %}
+
+{% for row in rows %}
+  <tr class="table-tr" id="row-{{ row.id }}">
+    <td class="table-td-num border-none">{{ row.id }}</td>
+    {% if row.avatar %}
+      <td class="table-td">
+        <div class="w-8 h-8 rounded-full bg-surface-3 flex items-center justify-center text-xs font-semibold text-fg shrink-0">
+          {{ row.initials }}
+        </div>
+      </td>
+    {% endif %}
+    {% for cell in row.cells.values() %}
+      <td class="table-td w-auto max-w-10" title="{{ cell }}">{{ cell }}</td>
+    {% endfor %}
+    {% if with_actions %}
+      <td class="table-td overflow-visible w-auto flex justify-center gap-2 relative" data-action="popoverContainer">
+        {{ buttons.icon_button(permiso='btn_row_actions', label_log='Abrir acciones fila', func_type='button', x_params='p-1 relative', type='icon-ghost-neutral', icon_name='icon-elipsis-horizontal-fill', size='4', action='togglePopover', target=row.actions_id, attrs="aria-haspopup='true' aria-expanded='false'") }}
+        {{ popovers.row_actions(row) }}
+      </td>
+    {% endif %}
+  </tr>
+{% else %}
+  <tr>
+    <td colspan="99" class="table-td text-center text-fg-muted py-8">
+      Sin registros
+    </td>
+  </tr>
+{% endfor %}

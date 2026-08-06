@@ -1,0 +1,32 @@
+{% import 'components/buttons.html' as buttons %}
+
+{% macro sidebar_item(item, icon_params="") %} 
+  {% set link_class = "sidebar-item bg-primary-theme/15" if item.is_active else "sidebar-item"%}
+  {% set text_class = "text-fg" if item.is_active else "text-fg-body"%} 
+
+  <a href="{{ url(item.url) }}" class="flex items-center {{ link_class }}">    
+    {{ buttons.icon_button(permiso='btn_sidebar_item', label_log=item.label, x_params=icon_params, type='btn-icon-ghost-neutral', size='5', icon_name=item.icon) }}
+    <div class="{{ text_class }} align-start font-medium font-sans whitespace-nowrap">
+      {{ item.label }}
+    </div>
+  </a>
+
+{% endmacro %}
+
+{% macro sidebar_accordion_item(item) %}
+  <details name="sidebar-group" class="sidebar-accordion w-full h-auto overflow-hidden gap-1 group">
+    <summary class="sidebar-item cursor-pointer list-none">
+      {{ buttons.icon_button(permiso='btn_sidebar_item', label_log=item.label, x_params='pointer-events-none group-hover:hidden', type='btn-icon-ghost-neutral', size='5', icon_name=item.icon) }}
+      {{ buttons.icon_button(permiso='btn_sidebar_item', label_log='Expandir sección', x_params='pointer-events-none accordion-arrow transition-transform hidden group-hover:inline group-open:rotate-90', type='btn-icon-ghost-neutral', size='5', icon_name='icon-caret-right-fill') }}
+      <div class="text-fg-body align-start font-medium font-sans whitespace-nowrap flex-1">
+        {{ item.label }}
+      </div>
+    </summary>
+
+    <div class="ml-7 mt-2 flex flex-col gap-1">
+      {% for group_item in item.group %}
+        {{ sidebar_item(group_item) }}
+      {% endfor %}
+    </div>
+  </details>
+{% endmacro %}

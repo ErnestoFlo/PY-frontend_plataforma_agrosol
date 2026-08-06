@@ -1,0 +1,33 @@
+{% extends 'layouts/navigation.html' %}
+
+{% import 'components/buttons.html' as buttons %}
+{% from 'partials/modals.html' import modal %}
+
+
+{% block view %}
+  <section class="w-full h-full flex flex-col gap-2 max-w-full overflow-y-auto">
+    
+    <section class="card tools w-full flex flex-row justify-end p-2 px-4 gap-2 h-12">
+      {{ buttons.icon_button(permiso='btn_exportar_word', label_log='Botón Exportar a Word', func_type='button', type='btn-icon-ghost-neutral', size="5", icon_name="icon-word-regular", x_params='rounded-md') }}
+      {{ buttons.icon_button(permiso='btn_exportar_excel', label_log='Botón Exportar a Excel', func_type='button', type='btn-icon-ghost-neutral', size="5", icon_name="icon-excel-regular", x_params='rounded-md') }}
+      {{ buttons.icon_button(permiso='btn_exportar_pdf', label_log='Botón Exportar a PDF', func_type='button', type='btn-icon-ghost-neutral', size="5", icon_name="icon-pdf-regular", x_params='rounded-md') }}
+      {{ buttons.icon_button(permiso='btn_creacion?proveedor', label_log='Botón Creacion de proveedor', func_type='button', type='btn-icon-primary', size="4", icon_name="icon-plus-fill", x_params='p-2 rounded-md aspect-square', action='openModal', target='modal-create', hx_get=create_url, hx_target="#modal-create-content", hx_swap="innerHTML") }}
+    </section>
+  
+    {# Vista responsive - una sola estructura activa en el DOM #}
+    <div
+      id="tabla-prov-container"
+      class="flex flex-col flex-1 overflow-y-auto"
+      data-responsive-table="proveedores"
+      data-source-url="{{ url('proveedores') }}"
+    >
+      {{ skeletons.skeleton_table() }}
+    </div>
+
+    {# Modales #}
+    {{ modal(modal_id='modal-create', title='Crear Proveedor', size='modal-lg', show_footer=False) }}
+    {{ modal(modal_id='modal-edit', title='Editar Proveedor', size='modal-lg', show_footer=False) }}
+    {{ modal(modal_id='modal-delete', title='Eliminar Proveedor', size='modal-md', show_footer=False) }}
+    {{ modal(modal_id='modal-detail', title='Detalle del Proveedor', size='modal-lg', show_footer=False) }}
+  </section>
+{% endblock %}
